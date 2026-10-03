@@ -235,7 +235,7 @@ const dayKey=d=>{d=new Date(d);return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d
 const fdt=d=>new Date(d).toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
 let D,S={page:'login',role:'kasiyer',uSel:null,user:null,carts:[],ci:0,sel:-1,qcat:'Tümü',rPer:'hafta',rTab:'urun',uTab:'urun',uq:'',uf:'Tümü',gPer:'bugun',gTyp:'Tümü',mq:'',mf:'Tümü',sf:'Tümü',drawer:false,lbl:{}};
 
-const IC={menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',satis:'<path d="M4 5v14M7 5v14M11 5v14M14 5v14M17 5v14M20 5v14"/>',siparis:'<path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6L5 3H2"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/>',rapor:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',urun:'<path d="M3 7l9-4 9 4-9 4z"/><path d="M3 7v10l9 4 9-4V7"/>',stok:'<rect x="3" y="4" width="18" height="6" rx="1"/><rect x="3" y="14" width="18" height="6" rx="1"/>',gecmis:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',musteri:'<circle cx="9" cy="8" r="4"/><path d="M2 21c1-4 4-6 7-6s6 2 7 6"/>',tedarik:'<rect x="2" y="7" width="13" height="10"/><path d="M15 10h4l3 3v4h-7"/>',gider:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/>',kasa:'<rect x="3" y="8" width="18" height="12" rx="2"/><path d="M7 8V4h10v4"/>',personel:'<path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/>',ayar:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>',trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',cam:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>'};
+const IC={terminal:'<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M9 6v7M12 6v7M15 6v7M10 18h4"/>',menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',satis:'<path d="M4 5v14M7 5v14M11 5v14M14 5v14M17 5v14M20 5v14"/>',siparis:'<path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6L5 3H2"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/>',rapor:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',urun:'<path d="M3 7l9-4 9 4-9 4z"/><path d="M3 7v10l9 4 9-4V7"/>',stok:'<rect x="3" y="4" width="18" height="6" rx="1"/><rect x="3" y="14" width="18" height="6" rx="1"/>',gecmis:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',musteri:'<circle cx="9" cy="8" r="4"/><path d="M2 21c1-4 4-6 7-6s6 2 7 6"/>',tedarik:'<rect x="2" y="7" width="13" height="10"/><path d="M15 10h4l3 3v4h-7"/>',gider:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/>',kasa:'<rect x="3" y="8" width="18" height="12" rx="2"/><path d="M7 8V4h10v4"/>',personel:'<path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/>',ayar:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>',trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',cam:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>'};
 const ic=(k,s=20)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[k]}</svg>`;
 
 /* ---------- veri ---------- */
@@ -273,13 +273,13 @@ function mkSale(d,items,disc,pay,cust,ret,uid,demo,parts){
  return {id:nid(),no:nextFis(d),date:new Date().toISOString(),user:u?u.name:'',items:items.map(l=>({...l})),sub,disc,total,pay,parts:parts||null,cust,ret,demo:!!demo};
 }
 /* ---------- bulut (Firebase) ---------- */
-const COLS=['products','customers','users','sales','expenses','purchases','orders'];
+const COLS=['products','customers','users','sales','expenses','purchases','orders','remote'];
 let CACHE={},MID=null,metaJ='',READY=false,GOT=new Set(),META,dirty=false,saveT=null;
 function nid(){return Date.now()*1000+Math.floor(Math.random()*1000)}
 function nextFis(d){return d.sales.reduce((m,s)=>Math.max(m,s.no||0),0)+1}
 const defSet=()=>({market:'[MARKET ADI]',theme:'auto',acc:'#1F5FD6',fs:16,cols:3,autoRc:true,sound:true,neg:true,cashDisc:false});
 const metaOf=()=>({cats:D.cats,brands:D.brands,tags:D.tags,set:D.set});
-function seedCloud(){const d=seed();d.sales=[];d.expenses=[];d.customers=[];d.orders=[];d.products.forEach(p=>p.demo=true);return d}
+function seedCloud(){const d=seed();d.sales=[];d.expenses=[];d.customers=[];d.orders=[];d.remote=[];d.products.forEach(p=>p.demo=true);return d}
 function save(){dirty=true;clearTimeout(saveT);saveT=setTimeout(flush,60)}
 function flush(){clearTimeout(saveT);dirty=false;if(!MID||!window.FB||!D)return;const ops=[];
  const mj=JSON.stringify(metaOf());if(mj!==metaJ){metaJ=mj;ops.push(['set','meta','main',JSON.parse(mj)])}
@@ -288,13 +288,14 @@ function flush(){clearTimeout(saveT);dirty=false;if(!MID||!window.FB||!D)return;
  if(ops.length)window.FB.write(MID,ops).catch(e=>{toast('Kaydedilemedi: '+(e.code||e.message));onErr(e)})}
 window.addEventListener('pagehide',()=>{if(dirty)flush()});
 window.cloudIn=u=>{MID=u.uid;S.email=u.email;READY=false;GOT=new Set();META=undefined;CACHE={};COLS.forEach(c=>CACHE[c]={});metaJ='';
- D={cats:[],brands:[],tags:[],set:defSet(),products:[],customers:[],users:[],sales:[],expenses:[],purchases:[],orders:[]};showLoading()};
+ D={cats:[],brands:[],tags:[],set:defSet(),products:[],customers:[],users:[],sales:[],expenses:[],purchases:[],orders:[],remote:[]};showLoading()};
 window.cloudOut=()=>{MID=null;READY=false;D=null;S.user=null;S.carts=[];renderAcct()};
 window.onCol=(c,arr,pend)=>{if(!MID)return;if(dirty&&READY){flush();return}
  if(c==='sales')arr.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
  const oldNew=c==='orders'?D.orders.filter(o=>o.st==='Yeni').length:0;
  D[c]=arr;CACHE[c]={};arr.forEach(x=>CACHE[c][String(x.id)]=JSON.stringify(x));GOT.add(c);
  if(!READY)return tryReady();
+ if(c==='remote'){processRemote();termUpd();return}
  if(!pend){if(c==='orders'&&D.orders.filter(o=>o.st==='Yeni').length>oldNew){beep(true);toast('Yeni sipariş geldi')}remoteRender(c)}};
 window.onMeta=(data,pend,fromCache)=>{if(!MID)return;
  if(!data){if(fromCache||READY)return;META=null;return tryReady()}
@@ -303,7 +304,7 @@ window.onMeta=(data,pend,fromCache)=>{if(!MID)return;
  if(!READY)return tryReady();if(!pend){applySet();remoteRender('meta')}};
 function tryReady(){if(META===undefined||!COLS.every(c=>GOT.has(c)))return;READY=true;
  if(META===null){Object.assign(D,seedCloud());flush()}
- S.user=null;S.page='login';if(!S.carts.length)newCart();render()}
+ S.user=null;S.page='login';if(!S.carts.length)newCart();render();processRemote()}
 function remoteRender(c){if(!S.user){if(S.page==='login')renderLogin();return}if($('#modal').innerHTML)return;
  const a=document.activeElement;
  if(S.page==='satis'){const sc=$('#scan');if(sc&&sc.value)return;if(a&&a.id==='rec')return;renderSatis();return}
@@ -443,7 +444,7 @@ function doLogin(){const u=D.users.find(x=>x.id===S.uSel);if(!u)return;if($('#pw
 function logout(){S.edit=false;S.capKey=null;S.user=null;S.drawer=false;S.page='login';renderLogin()}
 
 /* ---------- menü ---------- */
-const MENU=[['satis','Satış ekranı',0],['siparis','Gelen siparişler',0],['rapor','Raporlar',1,[['Genel bakış','rapor',{rTab:'urun'}],['Kasiyer performansı','rapor',{rTab:'kasiyer'}],['Gün sonu (Z raporu)','zrap']]],['urun','Ürünler',1,[['Ürün listesi','urun',{uTab:'urun'}],['Kategoriler','urun',{uTab:'cats'}],['Markalar','urun',{uTab:'brands'}],['Etiketler','urun',{uTab:'tags'}],['Barkod etiketi yazdır','etiket']]],['stok','Stok',1,[['Stok durumu','stok',{sf:'Tümü'}],['Kritik stok','stok',{sf:'Kritik'}],['Mal alışları','alis']]],['gecmis','Satış geçmişi',0,[['Fişler','gecmis',{gTyp:'Tümü'}],['İadeler','gecmis',{gTyp:'İade'}]]],['musteri','Müşteriler',0,[['Müşteri listesi','musteri',{mf:'Tümü'}],['Veresiye hesapları','musteri',{mf:'Borçlu'}]]],['tedarik','Tedarikçiler',1],['gider','Giderler',1],['kasa','Kasa işlemleri',1],['personel','Personel ve yetkiler',1],['ayar','Ayarlar',1]];
+const MENU=[['satis','Satış ekranı',0],['terminal','El terminali',0],['siparis','Gelen siparişler',0],['rapor','Raporlar',1,[['Genel bakış','rapor',{rTab:'urun'}],['Kasiyer performansı','rapor',{rTab:'kasiyer'}],['Gün sonu (Z raporu)','zrap']]],['urun','Ürünler',1,[['Ürün listesi','urun',{uTab:'urun'}],['Kategoriler','urun',{uTab:'cats'}],['Markalar','urun',{uTab:'brands'}],['Etiketler','urun',{uTab:'tags'}],['Barkod etiketi yazdır','etiket']]],['stok','Stok',1,[['Stok durumu','stok',{sf:'Tümü'}],['Kritik stok','stok',{sf:'Kritik'}],['Mal alışları','alis']]],['gecmis','Satış geçmişi',0,[['Fişler','gecmis',{gTyp:'Tümü'}],['İadeler','gecmis',{gTyp:'İade'}]]],['musteri','Müşteriler',0,[['Müşteri listesi','musteri',{mf:'Tümü'}],['Veresiye hesapları','musteri',{mf:'Borçlu'}]]],['tedarik','Tedarikçiler',1],['gider','Giderler',1],['kasa','Kasa işlemleri',1],['personel','Personel ve yetkiler',1],['ayar','Ayarlar',1]];
 const GRP={zrap:'rapor',etiket:'urun',alis:'stok'};
 function sideHTML(){
  const yeni=D.orders.filter(o=>o.st==='Yeni').length;const g=GRP[S.page]||S.page;const u=UI();
@@ -461,10 +462,10 @@ function render(){
  if(!MID)return renderAcct();if(!READY)return showLoading();
  applySet();
  if(!S.user)return renderLogin();
- const allowK=['satis','siparis','gecmis','musteri'];if(!isY()&&!allowK.includes(S.page))S.page='satis';
+ const allowK=['satis','terminal','siparis','gecmis','musteri'];if(!isY()&&!allowK.includes(S.page))S.page='satis';
  if(S.page==='satis')return renderSatis();
  $('#app').innerHTML=`<div class="shell"><div class="scrim" onclick="closeSide()"></div><nav class="side" aria-label="Menü">${sideHTML()}</nav><div style="display:flex;flex-direction:column;min-width:0;min-height:0"><div class="top mtop"><button class="tb" onclick="openSide()" aria-label="Menüyü aç">${ic('menu')}${T('top_menu','Menü')}</button><div class="brand">${esc(D.set.market)}</div><button class="tb sp" onclick="nav('satis')">${ic('satis',18)}Satış</button></div><main class="main" id="main"></main></div></div>`;
- ({siparis:pgSiparis,rapor:pgRapor,zrap:pgZ,urun:pgUrun,etiket:pgEtiket,stok:pgStok,alis:pgAlis,gecmis:pgGecmis,musteri:pgMusteri,gider:pgGider,personel:pgPersonel,ayar:pgAyar,tedarik:pgSoon,kasa:pgSoon})[S.page]();
+ ({terminal:pgTerminal,siparis:pgSiparis,rapor:pgRapor,zrap:pgZ,urun:pgUrun,etiket:pgEtiket,stok:pgStok,alis:pgAlis,gecmis:pgGecmis,musteri:pgMusteri,gider:pgGider,personel:pgPersonel,ayar:pgAyar,tedarik:pgSoon,kasa:pgSoon})[S.page]();
 }
 const head=(t,a='')=>`<div class="row" style="gap:12px"><h1>${T('ttl_'+S.page,t)}</h1><div class="row sp">${a}</div></div>`;
 
@@ -557,11 +558,11 @@ async function pickCam(){
    st.getTracks().forEach(x=>x.stop())}catch(e){sc-=500}
   if(sc>bs){bs=sc;best=d}}
  if(best){lsSet('camId',best.deviceId);return best.deviceId}return ''}
-async function camScan(cb){
- window._camCb=cb||onScanCode;stopCam();
+async function camScan(cb,opt){
+ window._camCb=cb||onScanCode;stopCam();window._camCont=!!(opt&&opt.cont);
  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){modal(mHead('Kamerayla okutma')+`<p style="margin:0;line-height:1.6">Bu tarayıcı kameraya erişemiyor. Uygulamayı Chrome'da (Android) ya da Safari'de (iPhone/iPad) aç.</p><button class="btn pri" onclick="closeM()">Tamam</button>`);return}
- modal(mHead('Barkodu okut')+`<div style="position:relative;border-radius:12px;overflow:hidden;background:#000"><video id="cv" playsinline muted style="width:100%;display:block"></video><div style="position:absolute;left:10%;right:10%;top:32%;height:36%;border:3px solid #FFD43B;border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.35);pointer-events:none"></div></div>
- <p class="muted" id="cst" style="margin:0;line-height:1.5">Barkodu sarı çerçeveye getir.</p>
+ modal(mHead(window._camCont?'El terminali':'Barkodu okut')+`<div style="position:relative;border-radius:12px;overflow:hidden;background:#000"><video id="cv" playsinline muted style="width:100%;display:block"></video><div style="position:absolute;left:10%;right:10%;top:32%;height:36%;border:3px solid #FFD43B;border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.35);pointer-events:none"></div></div>
+ <p class="muted" id="cst" style="margin:0;line-height:1.5">Barkodu sarı çerçeveye getir.</p>${window._camCont?'<div id="ctl"></div>':''}
  <button class="btn" onclick="stopCam();closeM()">Kapat</button>`);
  const id=await pickCam();if(!$('#cv'))return;let st;
  const vc={width:{ideal:1280},height:{ideal:720}};
@@ -575,7 +576,26 @@ async function camScan(cb){
  barLoop(v);ocrStart();
 }
 function camNext(){const l=window._cams||[];if(l.length<2)return;const cur=window._ctr&&window._ctr.getSettings?window._ctr.getSettings().deviceId:'';const i=l.findIndex(d=>d.deviceId===cur);const n=l[(i+1)%l.length];lsSet('camId',n.deviceId);lsSet('camZoom','');camScan(window._camCb)}
-function camDone(code,src){if(!window._camOn)return;window._camOn=false;stopCam();beep(true);closeM();const cb=window._camCb;cb&&cb(code)}
+const rcv=()=>{const v=lsGet('rcv');return v===null?!touch():v==='1'};
+function processRemote(){if(!READY||!D||!D.remote||!D.remote.length)return;if(!rcv()||!S.user)return;
+ const items=D.remote.slice().sort((a,b)=>String(a.at).localeCompare(String(b.at)));D.remote=[];save();
+ const now=Date.now();let n=0;
+ for(const it of items){if(now-new Date(it.at).getTime()>120000)continue;const p=findCode(it.code);
+  if(!p){toast('Telefondan okutulan barkod kayıtlı değil: '+it.code);beep(false);continue}
+  if(S.page!=='satis'){S.page='satis';render()}addP(p.id,p.unit==='kg'?undefined:(it.qty||1));n++}
+ if(n>1)toast(n+' ürün telefondan eklendi')}
+function termSend(code){code=String(code||'').trim();if(!code)return;const p=findCode(code);const it={id:nid(),code,qty:1,at:new Date().toISOString(),from:S.user?S.user.name:''};
+ D.remote.push(it);save();S.sent=[{id:it.id,code,name:p?p.name+' · '+tl(p.price):'Kayıtlı değil'},...(S.sent||[])].slice(0,30);if(navigator.vibrate)navigator.vibrate(60);termUpd()}
+function termUpd(){const row=x=>{const done=!D.remote.some(r=>r.id===x.id);return `<div class="row" style="flex-wrap:nowrap;padding:8px 0;border-bottom:1px solid var(--line)"><span style="flex:1;min-width:0"><b>${esc(x.name)}</b><br><span class="muted mono">${esc(x.code)}</span></span><span class="tag ${done?'t-Nakit':'t-Veresiye'}">${done?'Kasada ✓':'Gönderiliyor…'}</span></div>`};
+ const l=S.sent||[];const a=$('#tlist');if(a)a.innerHTML=l.map(row).join('')||'<p class="muted" style="margin:0">Henüz okutma yok.</p>';const b=$('#ctl');if(b)b.innerHTML=l.slice(0,3).map(row).join('')}
+function pgTerminal(){$('#main').innerHTML=head('El terminali')+`<div class="card" style="max-width:640px"><p style="margin:0;line-height:1.6">Bu telefonla okuttuğun barkodlar, kasada açık olan satış ekranının sepetine düşer. Kamera açık kalır, ürünleri art arda okutabilirsin.</p>
+ ${rcv()?'<p class="err" style="margin:0">Bu cihaz alıcı olarak ayarlı. El terminali olarak kullanacaksan Ayarlar › Satış ekranı bölümünden "Bu cihaz telefondan okutulanları alsın" ayarını kapat.</p>':''}
+ <button class="btn pri" style="min-height:64px;font-size:1.15rem" onclick="camScan(termSend,{cont:true})">📷 Okutmaya başla</button>
+ <div class="row" style="flex-wrap:nowrap"><input class="in mono" id="tin" inputmode="numeric" placeholder="Barkodu elle yaz" onkeydown="if(event.key==='Enter'){termSend(this.value);this.value=''}"><button class="btn" onclick="const i=$('#tin');termSend(i.value);i.value=''">Gönder</button></div>
+ <h2>Son okutulanlar</h2><div id="tlist"></div></div>`;termUpd()}
+function camDone(code,src){if(!window._camOn)return;
+ if(window._camCont){const now=Date.now();if(now<(window._camPause||0))return;if(code===window._camLast&&now-window._camLastT<2500)return;window._camLast=code;window._camLastT=now;window._camPause=now+800;window._barSeen={};window._ocrSeen={};beep(true);const cb=window._camCb;cb&&cb(code);return}
+ window._camOn=false;stopCam();beep(true);closeM();const cb=window._camCb;cb&&cb(code)}
 function camUse(){const c=($('#cfix').value||'').trim();closeM();const cb=window._camCb;if(c&&cb)cb(c)}
 async function getDet(){if(window._det!==undefined)return window._det;window._det=null;
  try{if('BarcodeDetector' in window){const f=await BarcodeDetector.getSupportedFormats();if(f.includes('ean_13'))return window._det=new BarcodeDetector({formats:f.filter(x=>['ean_13','ean_8','upc_a'].includes(x))})}}catch(e){}
@@ -586,7 +606,7 @@ async function barLoop(v){const det=await getDet();if(!det)return;
  const cv=document.createElement('canvas');let last='';
  while(window._camOn){try{if(v.readyState>=2&&v.videoWidth){const r=await det.detect(crop(v,cv,900));let got='';
    for(const x of (r||[])){const c=String(x.rawValue||'').trim();if(validEan(c)){got=c;break}}
-   if(got){if(got===last||findCode(got)&&window._barSeen[got]){camDone(got,'cizgi');return}window._barSeen[got]=1;last=got}}}catch(e){}
+   if(got){if(got===last||findCode(got)&&window._barSeen[got]){camDone(got,'cizgi');if(!window._camCont)return;last='';continue}window._barSeen[got]=1;last=got}}}catch(e){}
   await new Promise(r=>setTimeout(r,60))}}
 function loadTess(){if(window.Tesseract)return Promise.resolve();if(window._tessP)return window._tessP;window._tessP=new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';sc.onload=ok;sc.onerror=()=>{window._tessP=null;no()};document.head.appendChild(sc)});return window._tessP}
 async function getOcr(){if(window._ocr)return window._ocr;if(window._ocrP)return window._ocrP;
@@ -600,11 +620,11 @@ async function ocrStart(){if(window._ocrOn)return;window._ocrOn=true;const v=$('
  let w;try{w=await getOcr()}catch(e){window._ocrOn=false;return}
  const cv=document.createElement('canvas');const t0=Date.now();
  while(window._camOn){try{if(v&&v.readyState>=2&&v.videoWidth){crop(v,cv,1000);const cx=cv.getContext('2d',{willReadFrequently:true});const im=cx.getImageData(0,0,cv.width,cv.height),d=im.data;let sum=0;for(let i=0;i<d.length;i+=4){const g=d[i]*.3+d[i+1]*.59+d[i+2]*.11;d[i]=g;sum+=g}const avg=sum/(d.length/4);for(let i=0;i<d.length;i+=4){const g=d[i]>avg*.85?255:0;d[i]=d[i+1]=d[i+2]=g}cx.putImageData(im,0,0);
-   const r=await w.recognize(cv);const c=ocrPick(r.data.text||'');if(c){window._ocrOn=false;camDone(c,'rakam');return}}}catch(e){}await new Promise(r=>setTimeout(r,150))}
+   const r=await w.recognize(cv);const c=ocrPick(r.data.text||'');if(c){camDone(c,'rakam');if(!window._camCont){window._ocrOn=false;return}}}}catch(e){}await new Promise(r=>setTimeout(r,150))}
  window._ocrOn=false}
 async function camTorch(){const t=window._ctr;if(!t)return;window._torch=!window._torch;try{await t.applyConstraints({advanced:[{torch:window._torch}]})}catch(e){toast('Fener açılamadı')}}
 async function camZoom(){const t=window._ctr,z=window._zc;if(!t||!z)return;let n=(window._zv||1)+1;if(n>Math.min(z.max,4))n=z.min||1;window._zv=n;lsSet('camZoom',n);try{await t.applyConstraints({advanced:[{zoom:n}]});$('#czoom').textContent='Yakınlaştır ('+n+'x)'}catch(e){}}
-function stopCam(){window._camOn=false;window._ocrOn=false;window._torch=false;if(window._cs){window._cs.getTracks().forEach(t=>t.stop());window._cs=null}}
+function stopCam(){window._camOn=false;window._camCont=false;window._ocrOn=false;window._torch=false;if(window._cs){window._cs.getTracks().forEach(t=>t.stop());window._cs=null}}
 function hold(){newCart();drawCart();toast('Yeni satış sekmesi açıldı');focusScan()}
 function closeCart(){const go=()=>{S.carts.splice(S.ci,1);if(!S.carts.length)newCart();S.ci=Math.max(0,Math.min(S.ci,S.carts.length-1));drawCart()};if(C().items.length)ask('Bu sekmedeki ürünler silinsin mi?',go);else go()}
 function clearCart(){const c=C();if(!c.items.length)return;c.items=[];c.disc=0;c.rec='';c.cust=null;S.sel=-1;drawCart();toast('Sepet temizlendi')}
@@ -803,7 +823,7 @@ function pgAyar(){const s=D.set;const tg=(k,l,d)=>`<div class="tgl" onclick="D.s
  <div class="f" style="font-size:.82rem;font-weight:600;color:var(--tx2)">Ana renk<div class="row">${['#1F5FD6','#157347','#B8440A','#5B3FC4','#B42B5A','#0E7490'].map(c=>`<button class="swatch ${s.acc===c?'on':''}" style="background:${c}" aria-label="Renk ${c}" onclick="D.set.acc='${c}';save();render()"></button>`).join('')}<label class="chip" style="gap:8px">Özel <input type="color" value="${s.acc}" onchange="D.set.acc=this.value;save();render()" style="width:28px;height:24px;border:0;background:none;padding:0"></label></div></div>
  <div class="f" style="font-size:.82rem;font-weight:600;color:var(--tx2)">Yazı boyutu${seg([['14','Küçük'],['16','Normal'],['18','Büyük'],['20','Çok büyük']],String(s.fs),'setFs')}</div></div>
  <div class="card"><h2>Satış ekranı</h2><div class="f" style="font-size:.82rem;font-weight:600;color:var(--tx2)">Hızlı ürün sütun sayısı${seg([['2','2'],['3','3'],['4','4'],['5','5']],String(s.cols),'setCols')}</div>
- ${tg('autoRc','Satıştan sonra fişi göster','Kapalıysa sadece kısa bildirim çıkar')}${tg('sound','Sesli uyarılar','Barkod okununca ve hata olunca ses')}${tg('neg','Stokta olmayan ürünü satmaya izin ver')}${tg('cashDisc','Kasiyer indirim yapabilsin','Kapalıysa yönetici şifresi istenir')}</div>
+ ${tg('autoRc','Satıştan sonra fişi göster','Kapalıysa sadece kısa bildirim çıkar')}${tg('sound','Sesli uyarılar','Barkod okununca ve hata olunca ses')}${tg('neg','Stokta olmayan ürünü satmaya izin ver')}${tg('cashDisc','Kasiyer indirim yapabilsin','Kapalıysa yönetici şifresi istenir')}<div class="tgl" onclick="lsSet('rcv',rcv()?'0':'1');render()"><div>Bu cihaz telefondan okutulanları alsın<small>Kasadaki bilgisayar/tablette açık, el terminali olarak kullanılan telefonda kapalı olmalı. Sadece bu cihaz için geçerli.</small></div><span class="sw ${rcv()?'on':''}"><i></i></span></div></div>
  ${edCard()}
  <div class="card"><h2>Yedekleme ve veri</h2><p class="muted" style="margin:0">Veriler bulutta, tüm cihazlarda ortak. İnternet kesilirse satış devam eder, bağlantı gelince eşitlenir.</p><p style="margin:0;font-size:.9rem">Market hesabı: <b>${esc(S.email||"")}</b></p><div class="row"><button class="btn" onclick="clrDemo()">Örnek ürünleri sil</button><button class="btn" onclick="acctOut()">Bu cihazı hesaptan çıkar</button><button class="btn danger" onclick="resetAll()">Her şeyi sıfırla</button></div></div>
  <div class="card"><h2>Sonraki aşamada</h2><p class="muted" style="margin:0;line-height:1.6">Fiş ve yazıcı ayarları, etiket şablonu, KDV oranları, terazi bağlantısı, online sipariş ve bildirim ayarları.</p></div></div>`}
@@ -821,7 +841,7 @@ import {initializeFirestore,persistentLocalCache,persistentMultipleTabManager,co
 const app=initializeApp({apiKey:"AIzaSyACrApSGsB84Y5bLjsjFc39vjLq0WYDq-U",authDomain:"barkod-sistemi-v1.firebaseapp.com",projectId:"barkod-sistemi-v1",storageBucket:"barkod-sistemi-v1.firebasestorage.app",messagingSenderId:"628617167908",appId:"1:628617167908:web:9a1a53a471a958d79b84b1"});
 const auth=getAuth(app);
 let db;try{db=initializeFirestore(app,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()}),ignoreUndefinedProperties:true})}catch(e){db=initializeFirestore(app,{ignoreUndefinedProperties:true})}
-const COLS=['products','customers','users','sales','expenses','purchases','orders'];let uns=[];
+const COLS=['products','customers','users','sales','expenses','purchases','orders','remote'];let uns=[];
 window.FB={login:(e,p)=>signInWithEmailAndPassword(auth,e,p),signup:(e,p)=>createUserWithEmailAndPassword(auth,e,p),logout:()=>signOut(auth),reset:e=>sendPasswordResetEmail(auth,e),
  async write(mid,ops){for(let i=0;i<ops.length;i+=400){const b=writeBatch(db);for(const [t,c,id,data] of ops.slice(i,i+400)){const r=doc(db,'markets',mid,c,id);if(t==='set')b.set(r,data);else b.delete(r)}await b.commit()}}};
 onAuthStateChanged(auth,u=>{uns.forEach(f=>f());uns=[];if(!u){window.cloudOut();return}window.cloudIn(u);
