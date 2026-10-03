@@ -523,7 +523,7 @@ function askKg(id,idx){const p=P(id);modal(mHead(esc(p.name))+`<p class="muted" 
 function okKg(id,idx){const q=num2($('#kg').value);if(q<=0){toast('Geçerli bir miktar gir');return}closeM();if(idx>-1){C().items[idx].qty=q;drawCart()}else addP(id,q)}
 function chq(i,d){const l=C().items[i];l.qty+=d;if(l.qty<=0)C().items.splice(i,1);S.sel=Math.min(i,C().items.length-1);drawCart()}
 function delLine(i){const c=C();if(i==null)i=S.sel>-1?S.sel:c.items.length-1;if(i<0||!c.items[i])return;c.items.splice(i,1);S.sel=Math.min(i,c.items.length-1);drawCart();focusScan()}
-function findCode(v){return D.products.find(p=>p.barcode===v)}
+function findCode(v){v=String(v||'').trim();return D.products.find(p=>p.barcode===v)||(v.length===12?D.products.find(p=>p.barcode==='0'+v):null)||(v.length===13&&v[0]==='0'?D.products.find(p=>p.barcode===v.slice(1)):null)}
 function matches(v){v=v.toLocaleLowerCase('tr');return D.products.filter(p=>p.name.toLocaleLowerCase('tr').includes(v)||p.barcode.includes(v)).slice(0,7)}
 function parseScan(raw){const m=raw.match(/^(\d+(?:[.,]\d+)?)\*(.*)$/);return m?{q:num2(m[1]),v:m[2].trim()}:{q:null,v:raw.trim()}}
 function sugg(){const {v}=parseScan($('#scan').value);const g=$('#sg');if(v.length<2||/^\d{8,}$/.test(v)){g.innerHTML='';return}const r=matches(v);g.innerHTML=r.map(p=>`<button onclick="pickSug(${p.id})"><span><b>${esc(p.name)}</b> <span class="muted mono">${p.barcode}</span></span><b>${tl(p.price)}</b></button>`).join('')}
@@ -536,15 +536,57 @@ function scanKey(e){
  if(isY())modal(mHead('Ürün bulunamadı')+`<p style="margin:0"><b class="mono">${esc(v)}</b> kayıtlı değil.</p><div class="row"><button class="btn" onclick="closeM()">Vazgeç</button><button class="btn pri sp" onclick="prodForm(null,'${esc(v)}')">Yeni ürün olarak ekle</button></div>`);
  else toast('Ürün bulunamadı: '+v);
 }
-function camScan(){
- if(!('BarcodeDetector' in window)){modal(mHead('Kamerayla okutma')+`<p style="margin:0;line-height:1.6">Bu tarayıcı kamerayla barkod okumayı desteklemiyor. Android'de Chrome ile açarsan çalışır; iPhone/iPad desteği yazılım aşamasında eklenecek. Şimdilik barkodu elle yazabilir ya da adıyla arayabilirsin.</p><button class="btn pri" onclick="closeM()">Tamam</button>`);return}
- modal(mHead('Barkodu kameraya göster')+`<video id="cv" playsinline muted style="width:100%;border-radius:12px;background:#000"></video><button class="btn" onclick="stopCam();closeM()">Kapat</button>`);
- const det=new BarcodeDetector({formats:['ean_13','ean_8','code_128','upc_a','upc_e']});
- navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}).then(st=>{window._cs=st;const v=$('#cv');v.srcObject=st;v.play();
-  const loop=async()=>{if(!$('#cv'))return stopCam();try{const r=await det.detect(v);if(r.length){stopCam();closeM();const code=r[0].rawValue;const p=findCode(code);if(p)addP(p.id);else{$('#scan').value=code;scanKey({key:'Enter',preventDefault(){}})}return}}catch(e){}requestAnimationFrame(loop)};loop();
- }).catch(()=>{closeM();toast('Kameraya izin verilmedi')});
+/* ---------- kamera: çizgi + rakam okuma ---------- */
+function validEan(c){if(!/^\d+$/.test(c)||![8,12,13].includes(c.length))return false;const d=[...c].map(Number);const ch=d.pop();let t=0;d.reverse().forEach((x,i)=>t+=x*(i%2?1:3));return (10-t%10)%10===ch}
+function onScanCode(code){const p=findCode(code);if(p)addP(p.id);else{const s=$('#scan');if(s){s.value=code;scanKey({key:'Enter',preventDefault(){}})}}}
+function camSt(t){const e=$('#cst');if(e)e.textContent=t}
+async function camScan(cb){
+ window._camCb=cb||onScanCode;
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){modal(mHead('Kamerayla okutma')+`<p style="margin:0;line-height:1.6">Bu tarayıcı kameraya erişemiyor. Uygulamayı Chrome'da (Android) ya da Safari'de (iPhone/iPad) aç.</p><button class="btn pri" onclick="closeM()">Tamam</button>`);return}
+ modal(mHead('Barkodu kameraya göster')+`<div style="position:relative;border-radius:12px;overflow:hidden;background:#000"><video id="cv" playsinline muted style="width:100%;display:block"></video><div style="position:absolute;left:8%;right:8%;top:30%;height:40%;border:3px solid #FFD43B;border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.35);pointer-events:none"></div></div>
+ <p class="muted" id="cst" style="margin:0;line-height:1.5">Barkodu, çizgiler ve altındaki rakamlar sarı çerçevenin içinde kalacak şekilde tut. Çizgiler okunamazsa rakamlar okunur.</p>
+ <div class="row"><button class="btn" id="ctorch" hidden onclick="camTorch()">Fener</button><button class="btn" id="czoom" hidden onclick="camZoom()">Yakınlaştır</button><button class="btn sp" onclick="stopCam();closeM()">Kapat</button></div>`);
+ let st;try{st=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}}})}catch(e){closeM();toast('Kameraya izin verilmedi');return}
+ const v=$('#cv');if(!v){st.getTracks().forEach(t=>t.stop());return}
+ window._cs=st;window._camOn=true;window._ocrSeen={};v.srcObject=st;try{await v.play()}catch(e){}
+ const tr=st.getVideoTracks()[0];window._ctr=tr;let caps={};try{caps=tr.getCapabilities?tr.getCapabilities():{}}catch(e){}
+ try{if(caps.focusMode&&caps.focusMode.includes('continuous'))await tr.applyConstraints({advanced:[{focusMode:'continuous'}]})}catch(e){}
+ if(caps.torch&&$('#ctorch'))$('#ctorch').hidden=false;
+ if(caps.zoom&&caps.zoom.max>1&&$('#czoom')){$('#czoom').hidden=false;window._zc=caps.zoom;window._zv=caps.zoom.min||1}
+ barLoop(v);ocrLoop(v);
 }
-function stopCam(){if(window._cs){window._cs.getTracks().forEach(t=>t.stop());window._cs=null}}
+function camDone(code){if(!window._camOn)return;window._camOn=false;stopCam();closeM();beep(true);const cb=window._camCb;cb&&cb(code)}
+async function getDet(){if(window._det!==undefined)return window._det;window._det=null;
+ try{if('BarcodeDetector' in window){const f=await BarcodeDetector.getSupportedFormats();if(f.includes('ean_13'))return window._det=new BarcodeDetector({formats:f.filter(x=>['ean_13','ean_8','upc_a','upc_e','code_128','code_39'].includes(x))})}}catch(e){}
+ try{const m=await import('https://cdn.jsdelivr.net/npm/barcode-detector@2/dist/es/pure.min.js');window._det=new m.BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e','code_128','code_39']})}catch(e){window._det=null}
+ return window._det}
+async function barLoop(v){const det=await getDet();if(!det)return;
+ while(window._camOn){try{if(v.readyState>=2){const r=await det.detect(v);if(r&&r.length&&r[0].rawValue){camDone(r[0].rawValue.trim());return}}}catch(e){}await new Promise(r=>setTimeout(r,120))}}
+function loadTess(){if(window.Tesseract)return Promise.resolve();if(window._tessP)return window._tessP;window._tessP=new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';sc.onload=ok;sc.onerror=()=>{window._tessP=null;no()};document.head.appendChild(sc)});return window._tessP}
+async function getOcr(){if(window._ocr)return window._ocr;if(window._ocrP)return window._ocrP;
+ window._ocrP=(async()=>{await loadTess();const w=await Tesseract.createWorker('eng');await w.setParameters({tessedit_char_whitelist:'0123456789',tessedit_pageseg_mode:'6'});window._ocr=w;return w})();
+ try{return await window._ocrP}catch(e){window._ocrP=null;throw e}}
+function ocrPick(text){const seen=window._ocrSeen;const lines=text.split('\n').map(l=>l.replace(/\D/g,'')).filter(l=>l.length>=8);
+ for(const l of lines){
+  for(const n of [13,12,8]){for(let i=0;i+n<=l.length;i++){const c=l.slice(i,i+n);if(!validEan(c))continue;
+   if(findCode(c))return c;
+   if(l.length===n){seen[c]=(seen[c]||0)+1;if(seen[c]>=2)return c}}}}
+ return null}
+async function ocrLoop(v){
+ if(!window._ocr)camSt('Rakam okuyucu hazırlanıyor… (ilk seferde biraz sürebilir) Bu sırada çizgiler okunmaya devam ediyor.');
+ let w;try{w=await getOcr()}catch(e){camSt('Rakam okuyucu yüklenemedi, sadece çizgiler okunuyor.');return}
+ if(!window._camOn)return;camSt('Çizgileri ya da altındaki rakamları sarı çerçeveye getir.');
+ const cv=document.createElement('canvas'),cx=cv.getContext('2d',{willReadFrequently:true});
+ while(window._camOn){
+  try{if(v.readyState>=2&&v.videoWidth){const sx=v.videoWidth*.08,sy=v.videoHeight*.30,sw=v.videoWidth*.84,sh=v.videoHeight*.40,sc=Math.min(2,1400/sw);
+   cv.width=Math.round(sw*sc);cv.height=Math.round(sh*sc);cx.drawImage(v,sx,sy,sw,sh,0,0,cv.width,cv.height);
+   const im=cx.getImageData(0,0,cv.width,cv.height),d=im.data;let sum=0;for(let i=0;i<d.length;i+=4){const g=d[i]*.3+d[i+1]*.59+d[i+2]*.11;d[i]=g;sum+=g}const avg=sum/(d.length/4);
+   for(let i=0;i<d.length;i+=4){const g=d[i]>avg*.85?255:0;d[i]=d[i+1]=d[i+2]=g}cx.putImageData(im,0,0);
+   const r=await w.recognize(cv);const c=ocrPick(r.data.text||'');if(c){camDone(c);return}}}catch(e){}
+  await new Promise(r=>setTimeout(r,250))}}
+async function camTorch(){const t=window._ctr;if(!t)return;window._torch=!window._torch;try{await t.applyConstraints({advanced:[{torch:window._torch}]})}catch(e){toast('Fener açılamadı')}}
+async function camZoom(){const t=window._ctr,z=window._zc;if(!t||!z)return;let n=(window._zv||1)+1;if(n>Math.min(z.max,4))n=z.min||1;window._zv=n;try{await t.applyConstraints({advanced:[{zoom:n}]});$('#czoom').textContent='Yakınlaştır ('+n+'x)'}catch(e){}}
+function stopCam(){window._camOn=false;window._torch=false;if(window._cs){window._cs.getTracks().forEach(t=>t.stop());window._cs=null}}
 function hold(){newCart();drawCart();toast('Yeni satış sekmesi açıldı');focusScan()}
 function closeCart(){const go=()=>{S.carts.splice(S.ci,1);if(!S.carts.length)newCart();S.ci=Math.max(0,Math.min(S.ci,S.carts.length-1));drawCart()};if(C().items.length)ask('Bu sekmedeki ürünler silinsin mi?',go);else go()}
 function clearCart(){const c=C();if(!c.items.length)return;c.items=[];c.disc=0;c.rec='';c.cust=null;S.sel=-1;drawCart();toast('Sepet temizlendi')}
@@ -660,7 +702,7 @@ function prodForm(id,bc){
  window._ft=[...p.tags];
  const opt=(arr,v)=>arr.map(x=>`<option ${x===v?'selected':''}>${esc(x)}</option>`).join('');
  modal(mHead(id?'Ürünü düzenle':'Yeni ürün')+`
- <div class="row" style="flex-wrap:nowrap;align-items:flex-end"><label class="f" style="flex:1">Barkod<input class="in mono" id="pb" value="${esc(p.barcode)}" placeholder="Okut veya yaz" ${!id&&!bc?'autofocus':''}></label><button class="btn" onclick="$('#pb').value=window.genBc()">Üret</button></div>
+ <div class="row" style="flex-wrap:nowrap;align-items:flex-end"><label class="f" style="flex:1">Barkod<input class="in mono" id="pb" value="${esc(p.barcode)}" placeholder="Okut veya yaz" ${!id&&!bc?'autofocus':''}></label><button class="btn" onclick="pfCam(${id||0})">Kamera</button><button class="btn" onclick="$('#pb').value=window.genBc()">Üret</button></div>
  <label class="f">Ürün adı<input class="in" id="pn" value="${esc(p.name)}" placeholder="örn. Süt 1 L" ${bc?'autofocus':''}></label>
  <div class="g2"><label class="f">Kategori<select class="in" id="pk">${opt(D.cats,p.cat)}</select></label><label class="f">Marka<select class="in" id="pm"><option value="">—</option>${opt(D.brands,p.brand)}</select></label></div>
  <div class="f" style="font-size:.82rem;font-weight:600;color:var(--tx2)">Etiketler<div class="row" style="gap:6px" id="ptg">${tagChips()}</div></div>
@@ -669,6 +711,7 @@ function prodForm(id,bc){
  <div class="tgl" onclick="this.querySelector('.sw').classList.toggle('on')"><div>Hızlı ürünlere ekle<small>Satış ekranında dokunmatik kutu olarak görünür</small></div><span class="sw ${p.quick?'on':''}" id="pq"><i></i></span></div>
  <div class="row">${id?`<button class="btn danger" onclick="delProd(${id})">Sil</button>`:''}<button class="btn sp" onclick="closeM()">Vazgeç</button><button class="btn pri" onclick="saveProd(${id||0})">Kaydet</button></div>`,true);pProfit();
 }
+function pfCam(id){const keep={n:$('#pn').value,c1:$('#pc1').value,c2:$('#pc2').value};camScan(code=>{prodForm(id||null,code);if(keep.n)$('#pn').value=keep.n;if(keep.c1)$('#pc1').value=keep.c1;if(keep.c2)$('#pc2').value=keep.c2;if(id){$('#pb').value=code}pProfit()})}
 function tagChips(){return D.tags.map(t=>`<button class="chip ${window._ft.includes(t)?'on':''}" onclick="togTag('${esc(t)}')">${esc(t)}</button>`).join('')}
 function togTag(t){const i=window._ft.indexOf(t);i>-1?window._ft.splice(i,1):window._ft.push(t);$('#ptg').innerHTML=tagChips()}
 function pProfit(){const a=num2($('#pc1').value),b=num2($('#pc2').value);$('#ppr').textContent=(a?'%'+Math.round((b-a)/a*100)+' · ':'')+tl(b-a)}
