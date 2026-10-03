@@ -559,7 +559,7 @@ async function pickCam(){
  if(best){lsSet('camId',best.deviceId);return best.deviceId}return ''}
 async function camScan(cb){
  window._camCb=cb||onScanCode;stopCam();
- if(touch()&&lsGet('camMode')!=='canli')return photoScan(window._camCb);
+ if(lsGet('camMode')==='foto'&&touch())return photoScan(window._camCb);
  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){modal(mHead('Kamerayla okutma')+`<p style="margin:0;line-height:1.6">Bu tarayıcı kameraya erişemiyor. Uygulamayı Chrome'da (Android) ya da Safari'de (iPhone/iPad) aç.</p><button class="btn pri" onclick="closeM()">Tamam</button>`);return}
  modal(mHead('Barkodu okut')+`<div style="position:relative;border-radius:12px;overflow:hidden;background:#000"><video id="cv" playsinline muted style="width:100%;display:block"></video><div style="position:absolute;left:10%;right:10%;top:32%;height:36%;border:3px solid #FFD43B;border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.35);pointer-events:none"></div></div>
  <p class="muted" id="cst" style="margin:0;line-height:1.5">Barkodu sarı çerçeveye getir. Görüntü bulanıksa telefonu biraz uzaklaştırıp Yakınlaştır'a bas.</p>
