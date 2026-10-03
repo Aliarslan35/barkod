@@ -546,7 +546,7 @@ async function camScan(cb){
  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){modal(mHead('Kamerayla okutma')+`<p style="margin:0;line-height:1.6">Bu tarayıcı kameraya erişemiyor. Uygulamayı Chrome'da (Android) ya da Safari'de (iPhone/iPad) aç.</p><button class="btn pri" onclick="closeM()">Tamam</button>`);return}
  modal(mHead('Barkodu okut')+`<div style="position:relative;border-radius:12px;overflow:hidden;background:#000"><video id="cv" playsinline muted style="width:100%;display:block"></video><div style="position:absolute;left:10%;right:10%;top:32%;height:36%;border:3px solid #FFD43B;border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.35);pointer-events:none"></div></div>
  <p class="muted" id="cst" style="margin:0;line-height:1.5">Barkodu sarı çerçeveye getir. Görüntü bulanıksa telefonu biraz uzaklaştırıp Yakınlaştır'a bas.</p>
- <label class="f" id="camsel" hidden>Kamera<select class="in" id="camlist" onchange="lsSet('camId',this.value);camScan(window._camCb)"></select></label>
+ <div class="row" id="camsel" hidden><span id="camname" class="muted" style="flex:1;font-size:.85rem"></span><button class="btn" onclick="camNext()">Kamerayı değiştir</button></div>
  <div class="row"><button class="btn" id="czoom" hidden onclick="camZoom()">Yakınlaştır</button><button class="btn" id="ctorch" hidden onclick="camTorch()">Fener</button><button class="btn" onclick="ocrStart()">Rakamları oku</button><label class="row" style="gap:6px;font-size:.85rem;font-weight:600;cursor:pointer"><input type="checkbox" ${D.set.camConfirm!==false?'checked':''} onchange="D.set.camConfirm=this.checked;save()" style="width:20px;height:20px">Onay sor</label><button class="btn sp" onclick="stopCam();closeM()">Kapat</button></div>`);
  const id=lsGet('camId');let st;
  const vc={width:{ideal:1280},height:{ideal:720}};
@@ -558,9 +558,13 @@ async function camScan(cb){
  try{if(caps.focusMode&&caps.focusMode.includes('continuous'))await tr.applyConstraints({advanced:[{focusMode:'continuous'}]})}catch(e){}
  if(caps.torch)$('#ctorch').hidden=false;
  if(caps.zoom&&caps.zoom.max>1){$('#czoom').hidden=false;window._zc=caps.zoom;window._zv=caps.zoom.min||1;const zs=+lsGet('camZoom');if(zs>1){window._zv=zs-1;camZoom()}}
- try{const ds=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput');if(ds.length>1&&$('#camlist')){const cur=tr.getSettings?tr.getSettings().deviceId:'';$('#camlist').innerHTML=ds.map((d,i)=>`<option value="${esc(d.deviceId)}" ${d.deviceId===cur?'selected':''}>${esc(d.label||('Kamera '+(i+1)))}</option>`).join('');$('#camsel').hidden=false}}catch(e){}
+ try{const all=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput');const back=all.filter(d=>!/front|ön|user/i.test(d.label));window._cams=back.length?back:all;
+  const cur=tr.getSettings?tr.getSettings().deviceId:'';
+  if(!id){const main=window._cams.find(d=>/camera2 0|camera 0/i.test(d.label));if(main&&main.deviceId&&main.deviceId!==cur){lsSet('camId',main.deviceId);return camScan(window._camCb)}}
+  if(window._cams.length>1&&$('#camsel')){const i=window._cams.findIndex(d=>d.deviceId===cur);$('#camname').textContent='Kamera '+(i+1)+' / '+window._cams.length+(window._cams[i]&&window._cams[i].label?' · '+window._cams[i].label:'');$('#camsel').hidden=false}}catch(e){}
  barLoop(v);
 }
+function camNext(){const l=window._cams||[];if(l.length<2)return;const cur=window._ctr&&window._ctr.getSettings?window._ctr.getSettings().deviceId:'';const i=l.findIndex(d=>d.deviceId===cur);const n=l[(i+1)%l.length];lsSet('camId',n.deviceId);lsSet('camZoom','');camScan(window._camCb)}
 function camDone(code,src){if(!window._camOn)return;window._camOn=false;stopCam();beep(true);const cb=window._camCb;
  if(D.set.camConfirm===false){closeM();cb&&cb(code);return}
  const p=findCode(code);
