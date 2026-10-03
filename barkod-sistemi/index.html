@@ -550,7 +550,7 @@ async function pickCam(){
  if(!devs.length||!devs[0].label){try{const t=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}});t.getTracks().forEach(x=>x.stop());devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput')}catch(e){return ''}}
  let cands=devs.filter(d=>!/front|ön|user/i.test(d.label));if(!cands.length)cands=devs;
  if(cands.length===1){lsSet('camId',cands[0].deviceId);return cands[0].deviceId}
- camSt('En net kamera aranıyor… (sadece ilk seferde)');let best=null,bs=-1e9;
+ camSt('Kamera hazırlanıyor… (sadece ilk seferde birkaç saniye)');let best=null,bs=-1e9;
  for(const d of cands){let sc=0;if(camBad(d.label))sc-=100;if(camGood(d.label))sc+=50;
   try{const st=await navigator.mediaDevices.getUserMedia({audio:false,video:{deviceId:{exact:d.deviceId}}});const tr=st.getVideoTracks()[0];const c=tr.getCapabilities?tr.getCapabilities():{};
    if(c.focusMode&&c.focusMode.includes('continuous'))sc+=100;if(c.focusDistance&&c.focusDistance.max>0)sc+=20;if(c.width&&c.width.max)sc+=Math.min(40,c.width.max/100);
@@ -559,13 +559,10 @@ async function pickCam(){
  if(best){lsSet('camId',best.deviceId);return best.deviceId}return ''}
 async function camScan(cb){
  window._camCb=cb||onScanCode;stopCam();
- if(lsGet('camMode')==='foto'&&touch())return photoScan(window._camCb);
  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){modal(mHead('Kamerayla okutma')+`<p style="margin:0;line-height:1.6">Bu tarayıcı kameraya erişemiyor. Uygulamayı Chrome'da (Android) ya da Safari'de (iPhone/iPad) aç.</p><button class="btn pri" onclick="closeM()">Tamam</button>`);return}
  modal(mHead('Barkodu okut')+`<div style="position:relative;border-radius:12px;overflow:hidden;background:#000"><video id="cv" playsinline muted style="width:100%;display:block"></video><div style="position:absolute;left:10%;right:10%;top:32%;height:36%;border:3px solid #FFD43B;border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.35);pointer-events:none"></div></div>
- <p class="muted" id="cst" style="margin:0;line-height:1.5">Barkodu sarı çerçeveye getir. Görüntü bulanıksa telefonu biraz uzaklaştırıp Yakınlaştır'a bas.</p>
- <button class="btn pri" style="min-height:52px" onclick="lsSet('camMode','');photoScan(window._camCb)">📷 Fotoğraf çekerek okut (daha net)</button>
- <div class="row" id="camsel" hidden><span id="camname" class="muted" style="flex:1;font-size:.85rem"></span><button class="btn" onclick="camNext()">Kamerayı değiştir</button></div>
- <div class="row"><button class="btn" id="czoom" hidden onclick="camZoom()">Yakınlaştır</button><button class="btn" id="ctorch" hidden onclick="camTorch()">Fener</button><button class="btn" onclick="ocrStart()">Rakamları oku</button><label class="row" style="gap:6px;font-size:.85rem;font-weight:600;cursor:pointer"><input type="checkbox" ${D.set.camConfirm!==false?'checked':''} onchange="D.set.camConfirm=this.checked;save()" style="width:20px;height:20px">Onay sor</label><button class="btn sp" onclick="stopCam();closeM()">Kapat</button></div>`);
+ <p class="muted" id="cst" style="margin:0;line-height:1.5">Barkodu sarı çerçeveye getir.</p>
+ <button class="btn" onclick="stopCam();closeM()">Kapat</button>`);
  const id=await pickCam();if(!$('#cv'))return;let st;
  const vc={width:{ideal:1280},height:{ideal:720}};
  try{st=await navigator.mediaDevices.getUserMedia({audio:false,video:id?{...vc,deviceId:{exact:id}}:{...vc,facingMode:{ideal:'environment'}}})}
@@ -574,49 +571,18 @@ async function camScan(cb){
  window._cs=st;window._camOn=true;window._barSeen={};window._ocrSeen={};window._camT0=Date.now();v.srcObject=st;try{await v.play()}catch(e){}
  const tr=st.getVideoTracks()[0];window._ctr=tr;let caps={};try{caps=tr.getCapabilities?tr.getCapabilities():{}}catch(e){}
  try{if(caps.focusMode&&caps.focusMode.includes('continuous'))await tr.applyConstraints({advanced:[{focusMode:'continuous'}]});else if(caps.focusMode&&caps.focusMode.includes('single-shot'))await tr.applyConstraints({advanced:[{focusMode:'single-shot'}]})}catch(e){}
- camSt('Barkodu sarı çerçeveye getir. Görüntü bulanıksa telefonu biraz uzaklaştırıp Yakınlaştır düğmesine bas.');
- if(caps.torch)$('#ctorch').hidden=false;
- if(caps.zoom&&caps.zoom.max>1){$('#czoom').hidden=false;window._zc=caps.zoom;window._zv=caps.zoom.min||1;const zs=+lsGet('camZoom');if(zs>1){window._zv=zs-1;camZoom()}}
- try{const all=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput');const back=all.filter(d=>!/front|ön|user/i.test(d.label));back.sort((a,b)=>(camBad(a.label)-camBad(b.label))||(camGood(b.label)-camGood(a.label)));window._cams=back.length?back:all;
-  const cur=tr.getSettings?tr.getSettings().deviceId:'';
-  if(window._cams.length>1&&$('#camsel')){const i=window._cams.findIndex(d=>d.deviceId===cur);$('#camname').textContent='Kamera '+(i+1)+' / '+window._cams.length+(window._cams[i]&&window._cams[i].label?' · '+window._cams[i].label:'');$('#camsel').hidden=false}}catch(e){}
- barLoop(v);
+ camSt('Barkodu sarı çerçeveye getir.');
+ barLoop(v);ocrStart();
 }
 function camNext(){const l=window._cams||[];if(l.length<2)return;const cur=window._ctr&&window._ctr.getSettings?window._ctr.getSettings().deviceId:'';const i=l.findIndex(d=>d.deviceId===cur);const n=l[(i+1)%l.length];lsSet('camId',n.deviceId);lsSet('camZoom','');camScan(window._camCb)}
-function camDone(code,src){if(!window._camOn)return;window._camOn=false;stopCam();beep(true);const cb=window._camCb;
- if(D.set.camConfirm===false){closeM();cb&&cb(code);return}
- const p=findCode(code);
- modal(mHead('Okunan barkod')+`<div style="text-align:center;padding:10px 0"><div class="mono" style="font-size:2rem;font-weight:700;letter-spacing:2px">${esc(code)}</div><div class="muted" style="margin-top:4px">${{rakam:'Rakamlardan okundu',foto:'Fotoğraftan okundu',cizgi:'Çizgilerden okundu'}[src]||''}</div><div style="margin-top:12px;font-size:1.1rem;font-weight:800">${p?esc(p.name)+' · '+tl(p.price):'<span style="color:var(--warnTx)">Bu barkod kayıtlı değil</span>'}</div></div>
- <p class="muted" style="margin:0">Paketteki numarayla aynı mı? Değilse tekrar okut ya da numarayı düzelt.</p><input class="in mono" id="cfix" value="${esc(code)}" inputmode="numeric" onkeydown="if(event.key==='Enter')camUse()">
- <div class="row"><button class="btn" onclick="closeM();camScan(window._camCb)">Tekrar okut</button>${src==='foto'?`<button class="btn" onclick="lsSet('camMode','canli');closeM();camScan(window._camCb)">Canlı kamera</button>`:''}<button class="btn pri sp" autofocus onclick="camUse()">Kullan</button></div>`)}
-function photoScan(cb){window._camCb=cb||window._camCb||onScanCode;stopCam();
- const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.setAttribute('capture','environment');inp.style.display='none';document.body.appendChild(inp);
- inp.onchange=async()=>{const f=inp.files&&inp.files[0];inp.remove();if(!f)return;
-  modal(mHead('Fotoğraf okunuyor')+`<p class="muted" id="cst" style="margin:0">Barkod aranıyor…</p><div class="row"><button class="btn" onclick="lsSet('camMode','canli');closeM();camScan(window._camCb)">Canlı kameraya dön</button><button class="btn sp" onclick="closeM()">Kapat</button></div>`);
-  let code=null,src='foto';
-  try{const bmp=await createImageBitmap(f);const det=await getDet();
-   const tryDet=async img=>{if(!det)return null;try{const r=await det.detect(img);for(const x of r||[]){const c=String(x.rawValue||'').trim();if(validEan(c))return c}}catch(e){}return null};
-   const cv=document.createElement('canvas'),cx=cv.getContext('2d',{willReadFrequently:true});
-   const draw=(w,rot)=>{const sc=Math.min(1,w/Math.max(bmp.width,bmp.height));const W=Math.round(bmp.width*sc),H=Math.round(bmp.height*sc);if(rot){cv.width=H;cv.height=W;cx.save();cx.translate(H,0);cx.rotate(Math.PI/2);cx.drawImage(bmp,0,0,W,H);cx.restore()}else{cv.width=W;cv.height=H;cx.drawImage(bmp,0,0,W,H)}return cv};
-   code=await tryDet(bmp)||await tryDet(draw(1600))||await tryDet(draw(1000))||await tryDet(draw(1600,true));
-   if(!code){camSt('Çizgiler okunamadı, rakamlar okunuyor… (ilk seferde biraz sürebilir)');src='rakam';
-    try{const w=await getOcr();await w.setParameters({tessedit_pageseg_mode:'11'});
-     for(const rot of [false,true]){draw(1800,rot);const r=await w.recognize(cv);const t=(r.data.text||'');
-      const ls=t.split('\n').map(l=>l.replace(/\D/g,'')).filter(l=>l.length>=8);
-      for(const l of ls){for(const n of [13,12,8]){for(let i=0;i+n<=l.length;i++){const c=l.slice(i,i+n);if(validEan(c)&&(findCode(c)||l.length===n)){code=c;break}}if(code)break}if(code)break}
-      if(code)break}
-     await w.setParameters({tessedit_pageseg_mode:'6'})}catch(e){}}
-  }catch(e){}
-  if(code){window._camOn=true;camDone(code,src)}
-  else camSt('Barkod bulunamadı. Barkoda daha yakın ve düz çek, ışığın yansımamasına dikkat et, sonra tekrar dene.'),$('#modal .row').insertAdjacentHTML('afterbegin',`<button class="btn pri" onclick="photoScan(window._camCb)">Tekrar çek</button>`)};
- inp.click()}
+function camDone(code,src){if(!window._camOn)return;window._camOn=false;stopCam();beep(true);closeM();const cb=window._camCb;cb&&cb(code)}
 function camUse(){const c=($('#cfix').value||'').trim();closeM();const cb=window._camCb;if(c&&cb)cb(c)}
 async function getDet(){if(window._det!==undefined)return window._det;window._det=null;
  try{if('BarcodeDetector' in window){const f=await BarcodeDetector.getSupportedFormats();if(f.includes('ean_13'))return window._det=new BarcodeDetector({formats:f.filter(x=>['ean_13','ean_8','upc_a'].includes(x))})}}catch(e){}
  try{const m=await import('https://cdn.jsdelivr.net/npm/barcode-detector@2/dist/es/pure.min.js');window._det=new m.BarcodeDetector({formats:['ean_13','ean_8','upc_a']})}catch(e){window._det=null}
  return window._det}
 function crop(v,cv,maxW){const sx=v.videoWidth*.10,sy=v.videoHeight*.32,sw=v.videoWidth*.80,sh=v.videoHeight*.36,sc=Math.min(1.5,maxW/sw);cv.width=Math.round(sw*sc);cv.height=Math.round(sh*sc);cv.getContext('2d',{willReadFrequently:true}).drawImage(v,sx,sy,sw,sh,0,0,cv.width,cv.height);return cv}
-async function barLoop(v){const det=await getDet();if(!det){camSt('Bu cihazda çizgi okuma yüklenemedi. "Rakamları oku" butonunu dene.');return}
+async function barLoop(v){const det=await getDet();if(!det)return;
  const cv=document.createElement('canvas');let last='';
  while(window._camOn){try{if(v.readyState>=2&&v.videoWidth){const r=await det.detect(crop(v,cv,900));let got='';
    for(const x of (r||[])){const c=String(x.rawValue||'').trim();if(validEan(c)){got=c;break}}
@@ -630,12 +596,12 @@ function ocrPick(text){const seen=window._ocrSeen;const lines=text.split('\n').m
  for(const l of lines)for(const n of [13,12,8])for(let i=0;i+n<=l.length;i++){const c=l.slice(i,i+n);if(!validEan(c))continue;
   if(window._barSeen[c]||findCode(c))return c;if(l.length===n){seen[c]=(seen[c]||0)+1;if(seen[c]>=2)return c}}
  return null}
-async function ocrStart(){if(window._ocrOn)return;window._ocrOn=true;const v=$('#cv');camSt(window._ocr?'Rakamlar okunuyor… barkodun altındaki numarayı çerçeveye getir.':'Rakam okuyucu hazırlanıyor (ilk seferde 10-20 saniye sürebilir)…');
- let w;try{w=await getOcr()}catch(e){camSt('Rakam okuyucu yüklenemedi; internet bağlantısını kontrol et.');window._ocrOn=false;return}
- camSt('Rakamlar okunuyor… barkodun altındaki numarayı çerçeveye getir.');const cv=document.createElement('canvas');const t0=Date.now();
- while(window._camOn&&Date.now()-t0<15000){try{if(v&&v.readyState>=2&&v.videoWidth){crop(v,cv,1200);const cx=cv.getContext('2d',{willReadFrequently:true});const im=cx.getImageData(0,0,cv.width,cv.height),d=im.data;let sum=0;for(let i=0;i<d.length;i+=4){const g=d[i]*.3+d[i+1]*.59+d[i+2]*.11;d[i]=g;sum+=g}const avg=sum/(d.length/4);for(let i=0;i<d.length;i+=4){const g=d[i]>avg*.85?255:0;d[i]=d[i+1]=d[i+2]=g}cx.putImageData(im,0,0);
+async function ocrStart(){if(window._ocrOn)return;window._ocrOn=true;const v=$('#cv');
+ let w;try{w=await getOcr()}catch(e){window._ocrOn=false;return}
+ const cv=document.createElement('canvas');const t0=Date.now();
+ while(window._camOn){try{if(v&&v.readyState>=2&&v.videoWidth){crop(v,cv,1000);const cx=cv.getContext('2d',{willReadFrequently:true});const im=cx.getImageData(0,0,cv.width,cv.height),d=im.data;let sum=0;for(let i=0;i<d.length;i+=4){const g=d[i]*.3+d[i+1]*.59+d[i+2]*.11;d[i]=g;sum+=g}const avg=sum/(d.length/4);for(let i=0;i<d.length;i+=4){const g=d[i]>avg*.85?255:0;d[i]=d[i+1]=d[i+2]=g}cx.putImageData(im,0,0);
    const r=await w.recognize(cv);const c=ocrPick(r.data.text||'');if(c){window._ocrOn=false;camDone(c,'rakam');return}}}catch(e){}await new Promise(r=>setTimeout(r,150))}
- window._ocrOn=false;if(window._camOn)camSt('Rakamlar okunamadı. Işığı artır, barkodu düz tut ve tekrar dene.')}
+ window._ocrOn=false}
 async function camTorch(){const t=window._ctr;if(!t)return;window._torch=!window._torch;try{await t.applyConstraints({advanced:[{torch:window._torch}]})}catch(e){toast('Fener açılamadı')}}
 async function camZoom(){const t=window._ctr,z=window._zc;if(!t||!z)return;let n=(window._zv||1)+1;if(n>Math.min(z.max,4))n=z.min||1;window._zv=n;lsSet('camZoom',n);try{await t.applyConstraints({advanced:[{zoom:n}]});$('#czoom').textContent='Yakınlaştır ('+n+'x)'}catch(e){}}
 function stopCam(){window._camOn=false;window._ocrOn=false;window._torch=false;if(window._cs){window._cs.getTracks().forEach(t=>t.stop());window._cs=null}}
