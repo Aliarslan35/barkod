@@ -740,22 +740,43 @@ function prodForm(id,bc){
  window._ft=[...p.tags];
  const opt=(arr,v)=>arr.map(x=>`<option ${x===v?'selected':''}>${esc(x)}</option>`).join('');
  modal(mHead(id?'Ürünü düzenle':'Yeni ürün')+`
- <div class="row" style="flex-wrap:nowrap;align-items:flex-end"><label class="f" style="flex:1">Barkod<input class="in mono" id="pb" value="${esc(p.barcode)}" placeholder="Okut veya yaz" ${!id&&!bc?'autofocus':''}></label><button class="btn" onclick="pfCam(${id||0})">Kamera</button><button class="btn" onclick="$('#pb').value=window.genBc()">Üret</button></div>
- <label class="f">Ürün adı<input class="in" id="pn" value="${esc(p.name)}" placeholder="örn. Süt 1 L" ${bc?'autofocus':''}></label>
+ <div class="row" style="flex-wrap:nowrap;align-items:flex-end"><label class="f" style="flex:1">Barkod<input class="in mono" id="pb" value="${esc(p.barcode)}" placeholder="Okut veya yaz" ${!id&&!bc?'autofocus':''} onchange="pfLookup()" onkeydown="if(event.key==='Enter'){event.preventDefault();pfLookup()}"></label><button class="btn" onclick="pfCam(${id||0})">Kamera</button><button class="btn" onclick="$('#pb').value=window.genBc()">Üret</button></div>
+ <div id="pfs" class="muted" style="margin:-4px 0 0;font-size:.82rem;min-height:1em"></div>
+ <label class="f">Ürün adı<input class="in" id="pn" value="${esc(p.name)}" placeholder="örn. Süt 1 L" ${bc?'autofocus':''} oninput="window._pfAuto=false"></label>
  <div class="g2"><label class="f">Kategori<select class="in" id="pk">${opt(D.cats,p.cat)}</select></label><label class="f">Marka<select class="in" id="pm"><option value="">—</option>${opt(D.brands,p.brand)}</select></label></div>
  <div class="f" style="font-size:.82rem;font-weight:600;color:var(--tx2)">Etiketler<div class="row" style="gap:6px" id="ptg">${tagChips()}</div></div>
  <div class="g3"><label class="f">Alış fiyatı<input class="in" id="pc1" inputmode="decimal" value="${p.cost!==''?String(p.cost).replace('.',','):''}" oninput="pProfit()"></label><label class="f">Satış fiyatı<input class="in" id="pc2" inputmode="decimal" value="${p.price!==''?String(p.price).replace('.',','):''}" oninput="pProfit()"></label><div class="f" style="font-size:.82rem;font-weight:600;color:var(--tx2)">Kâr<div id="ppr" style="min-height:46px;display:flex;align-items:center;padding:0 12px;border-radius:10px;background:var(--okSoft);color:var(--okTx);font-weight:800"></div></div></div>
  <div class="g3" style="grid-template-columns:repeat(4,1fr)"><label class="f">KDV %<select class="in" id="pv">${[0,1,10,20].map(v=>`<option ${v==p.vat?'selected':''}>${v}</option>`).join('')}</select></label><label class="f">Birim<select class="in" id="pu"><option value="adet" ${p.unit==='adet'?'selected':''}>Adet</option><option value="kg" ${p.unit==='kg'?'selected':''}>Kg</option></select></label><label class="f">Stok<input class="in" id="ps" inputmode="decimal" value="${p.stock}"></label><label class="f">Kritik<input class="in" id="pcr" inputmode="decimal" value="${p.crit}"></label></div>
  <div class="tgl" onclick="this.querySelector('.sw').classList.toggle('on')"><div>Hızlı ürünlere ekle<small>Satış ekranında dokunmatik kutu olarak görünür</small></div><span class="sw ${p.quick?'on':''}" id="pq"><i></i></span></div>
- <div class="row">${id?`<button class="btn danger" onclick="delProd(${id})">Sil</button>`:''}<button class="btn sp" onclick="closeM()">Vazgeç</button><button class="btn pri" onclick="saveProd(${id||0})">Kaydet</button></div>`,true);pProfit();
+ <div class="row">${id?`<button class="btn danger" onclick="delProd(${id})">Sil</button>`:''}<button class="btn sp" onclick="closeM()">Vazgeç</button><button class="btn pri" onclick="saveProd(${id||0})">Kaydet</button></div>`,true);pProfit();window._pfAuto=false;if(!id&&p.barcode&&!p.name)pfLookup();
 }
 function pfCam(id){const keep={n:$('#pn').value,c1:$('#pc1').value,c2:$('#pc2').value};camScan(code=>{prodForm(id||null,code);if(keep.n)$('#pn').value=keep.n;if(keep.c1)$('#pc1').value=keep.c1;if(keep.c2)$('#pc2').value=keep.c2;if(id){$('#pb').value=code}pProfit()})}
+const OFF_HOSTS=['world.openfoodfacts.org','world.openbeautyfacts.org','world.openproductsfacts.org'];
+async function offLookup(code){
+ for(const h of OFF_HOSTS){try{const ac=new AbortController();const t=setTimeout(()=>ac.abort(),6000);
+  const r=await fetch(`https://${h}/api/v2/product/${encodeURIComponent(code)}.json?fields=product_name_tr,product_name,generic_name_tr,brands,quantity`,{signal:ac.signal});clearTimeout(t);
+  if(!r.ok)continue;const j=await r.json();if(j.status!==1||!j.product)continue;const p=j.product;
+  let name=(p.product_name_tr||p.product_name||p.generic_name_tr||'').trim();if(!name)continue;
+  const q=(p.quantity||'').trim();if(q&&!name.toLowerCase().includes(q.toLowerCase().replace(/\s/g,'').slice(0,3)))name+=' '+q;
+  const brand=(p.brands||'').split(',')[0].trim();return {name,brand}}catch(e){}}
+ return null}
+async function pfLookup(){const pb=$('#pb'),pn=$('#pn'),st=$('#pfs');if(!pb||!pn)return;const code=pb.value.trim();
+ if(!/^\d{8,14}$/.test(code)){if(st)st.textContent='';return}
+ if(pn.value.trim()&&!window._pfAuto)return;
+ if(st)st.textContent='Ürün adı internetten aranıyor…';window._pfCode=code;
+ const r=await offLookup(code);if(!$('#pn')||window._pfCode!==code)return;
+ if(!r){$('#pfs').textContent='Bu barkod için isim bulunamadı, adını kendin yaz.';return}
+ if($('#pn').value.trim()&&!window._pfAuto)return;
+ $('#pn').value=r.name;window._pfAuto=true;
+ if(r.brand){const sel=$('#pm');if(![...sel.options].some(o=>o.value===r.brand)){const o=document.createElement('option');o.value=o.textContent=r.brand;sel.appendChild(o)}sel.value=r.brand}
+ $('#pfs').textContent='✓ İsim bulundu, kontrol edip gerekirse düzelt.'}
 function tagChips(){return D.tags.map(t=>`<button class="chip ${window._ft.includes(t)?'on':''}" onclick="togTag('${esc(t)}')">${esc(t)}</button>`).join('')}
 function togTag(t){const i=window._ft.indexOf(t);i>-1?window._ft.splice(i,1):window._ft.push(t);$('#ptg').innerHTML=tagChips()}
 function pProfit(){const a=num2($('#pc1').value),b=num2($('#pc2').value);$('#ppr').textContent=(a?'%'+Math.round((b-a)/a*100)+' · ':'')+tl(b-a)}
 window.genBc=()=>{let s='2';for(let i=0;i<11;i++)s+=Math.floor(Math.random()*10);return ck(s)};
 function saveProd(id){const name=$('#pn').value.trim();const price=num2($('#pc2').value);if(!name){toast('Ürün adı gerekli');return}if(!price){toast('Satış fiyatı gerekli');return}
  const bc=$('#pb').value.trim()||window.genBc();if(D.products.some(p=>p.barcode===bc&&p.id!==id)){toast('Bu barkod başka üründe kayıtlı');return}
+ {const br=$('#pm').value;if(br&&!D.brands.includes(br))D.brands.push(br)}
  const o={name,barcode:bc,cat:$('#pk').value,brand:$('#pm').value,tags:[...window._ft],cost:num2($('#pc1').value),price,vat:+$('#pv').value,unit:$('#pu').value,stock:num2($('#ps').value),crit:num2($('#pcr').value),quick:$('#pq').classList.contains('on')};
  if(id)Object.assign(P(id),o);else D.products.push({id:nid(),...o});save();closeM();toast(id?'Ürün güncellendi':'Ürün eklendi');if(S.page==='satis'){renderSatis();if(!id)addP(D.products[D.products.length-1].id)}else render()}
 function delProd(id){ask('Ürün silinsin mi?',()=>{D.products=D.products.filter(p=>p.id!==id);save();render()})}
