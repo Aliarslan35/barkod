@@ -559,11 +559,11 @@ async function pickCam(){
  if(best){lsSet('camId',best.deviceId);return best.deviceId}return ''}
 async function camScan(cb){
  window._camCb=cb||onScanCode;stopCam();
- if(lsGet('camMode')==='foto'&&touch())return photoScan(window._camCb);
+ if(touch()&&lsGet('camMode')!=='canli')return photoScan(window._camCb);
  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){modal(mHead('Kamerayla okutma')+`<p style="margin:0;line-height:1.6">Bu tarayıcı kameraya erişemiyor. Uygulamayı Chrome'da (Android) ya da Safari'de (iPhone/iPad) aç.</p><button class="btn pri" onclick="closeM()">Tamam</button>`);return}
  modal(mHead('Barkodu okut')+`<div style="position:relative;border-radius:12px;overflow:hidden;background:#000"><video id="cv" playsinline muted style="width:100%;display:block"></video><div style="position:absolute;left:10%;right:10%;top:32%;height:36%;border:3px solid #FFD43B;border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.35);pointer-events:none"></div></div>
  <p class="muted" id="cst" style="margin:0;line-height:1.5">Barkodu sarı çerçeveye getir. Görüntü bulanıksa telefonu biraz uzaklaştırıp Yakınlaştır'a bas.</p>
- <button class="btn pri" style="min-height:52px" onclick="lsSet('camMode','foto');photoScan(window._camCb)">📷 Fotoğraf çekerek okut (daha net)</button>
+ <button class="btn pri" style="min-height:52px" onclick="lsSet('camMode','');photoScan(window._camCb)">📷 Fotoğraf çekerek okut (daha net)</button>
  <div class="row" id="camsel" hidden><span id="camname" class="muted" style="flex:1;font-size:.85rem"></span><button class="btn" onclick="camNext()">Kamerayı değiştir</button></div>
  <div class="row"><button class="btn" id="czoom" hidden onclick="camZoom()">Yakınlaştır</button><button class="btn" id="ctorch" hidden onclick="camTorch()">Fener</button><button class="btn" onclick="ocrStart()">Rakamları oku</button><label class="row" style="gap:6px;font-size:.85rem;font-weight:600;cursor:pointer"><input type="checkbox" ${D.set.camConfirm!==false?'checked':''} onchange="D.set.camConfirm=this.checked;save()" style="width:20px;height:20px">Onay sor</label><button class="btn sp" onclick="stopCam();closeM()">Kapat</button></div>`);
  const id=await pickCam();if(!$('#cv'))return;let st;
@@ -588,11 +588,11 @@ function camDone(code,src){if(!window._camOn)return;window._camOn=false;stopCam(
  const p=findCode(code);
  modal(mHead('Okunan barkod')+`<div style="text-align:center;padding:10px 0"><div class="mono" style="font-size:2rem;font-weight:700;letter-spacing:2px">${esc(code)}</div><div class="muted" style="margin-top:4px">${{rakam:'Rakamlardan okundu',foto:'Fotoğraftan okundu',cizgi:'Çizgilerden okundu'}[src]||''}</div><div style="margin-top:12px;font-size:1.1rem;font-weight:800">${p?esc(p.name)+' · '+tl(p.price):'<span style="color:var(--warnTx)">Bu barkod kayıtlı değil</span>'}</div></div>
  <p class="muted" style="margin:0">Paketteki numarayla aynı mı? Değilse tekrar okut ya da numarayı düzelt.</p><input class="in mono" id="cfix" value="${esc(code)}" inputmode="numeric" onkeydown="if(event.key==='Enter')camUse()">
- <div class="row"><button class="btn" onclick="closeM();camScan(window._camCb)">Tekrar okut</button>${src==='foto'?`<button class="btn" onclick="lsSet('camMode','');closeM();camScan(window._camCb)">Canlı kamera</button>`:''}<button class="btn pri sp" autofocus onclick="camUse()">Kullan</button></div>`)}
+ <div class="row"><button class="btn" onclick="closeM();camScan(window._camCb)">Tekrar okut</button>${src==='foto'?`<button class="btn" onclick="lsSet('camMode','canli');closeM();camScan(window._camCb)">Canlı kamera</button>`:''}<button class="btn pri sp" autofocus onclick="camUse()">Kullan</button></div>`)}
 function photoScan(cb){window._camCb=cb||window._camCb||onScanCode;stopCam();
  const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.setAttribute('capture','environment');inp.style.display='none';document.body.appendChild(inp);
  inp.onchange=async()=>{const f=inp.files&&inp.files[0];inp.remove();if(!f)return;
-  modal(mHead('Fotoğraf okunuyor')+`<p class="muted" id="cst" style="margin:0">Barkod aranıyor…</p><div class="row"><button class="btn" onclick="lsSet('camMode','');closeM();camScan(window._camCb)">Canlı kameraya dön</button><button class="btn sp" onclick="closeM()">Kapat</button></div>`);
+  modal(mHead('Fotoğraf okunuyor')+`<p class="muted" id="cst" style="margin:0">Barkod aranıyor…</p><div class="row"><button class="btn" onclick="lsSet('camMode','canli');closeM();camScan(window._camCb)">Canlı kameraya dön</button><button class="btn sp" onclick="closeM()">Kapat</button></div>`);
   let code=null,src='foto';
   try{const bmp=await createImageBitmap(f);const det=await getDet();
    const tryDet=async img=>{if(!det)return null;try{const r=await det.detect(img);for(const x of r||[]){const c=String(x.rawValue||'').trim();if(validEan(c))return c}}catch(e){}return null};
