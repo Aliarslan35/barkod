@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Online sipariş</title>
+<meta name="theme-color" content="#1F5FD6">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+:root{--acc:#1F5FD6;--accD:#174BAA;--bg:#F3F5F9;--surf:#fff;--surf2:#F1F3F7;--line:#E3E7EE;--tx:#121722;--tx2:#5B6578;--ok:#157347;--okSoft:#E3F4EA;--bad:#C92A2A;--badSoft:#FDE8E8;--warn:#B45309;--warnSoft:#FEF3E2}
+@media (prefers-color-scheme:dark){:root{--bg:#0F1115;--surf:#171A21;--surf2:#1F232C;--line:#2A2F3A;--tx:#E9ECF2;--tx2:#9AA3B5;--okSoft:#12301F;--badSoft:#3A1717;--warnSoft:#3A2A12}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--tx);font-family:'Plus Jakarta Sans','Segoe UI',system-ui,sans-serif;font-size:16px}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.top{position:sticky;top:0;z-index:20;background:var(--acc);color:#fff;padding:12px 16px 14px;box-shadow:0 2px 12px rgba(0,0,0,.12)}
+.brand{display:flex;align-items:center;gap:10px;max-width:1100px;margin:0 auto}
+.brand i{width:36px;height:36px;display:block;flex:none;background:#fff;border-radius:10px;padding:3px}
+.brand b{font-size:1.1rem;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand a{color:#fff;font-size:.8rem;font-weight:700;text-decoration:none;background:rgba(255,255,255,.18);padding:7px 10px;border-radius:10px;white-space:nowrap}
+.srch{max-width:1100px;margin:10px auto 0;position:relative}
+.srch input{width:100%;min-height:46px;border-radius:12px;border:0;padding:0 14px 0 42px;background:#fff;color:#121722;font-size:1rem;outline:none}
+.srch svg{position:absolute;left:13px;top:13px;color:#7A8499}
+.wrap{max-width:1100px;margin:0 auto;padding:12px 16px 120px}
+.note{background:var(--warnSoft);color:var(--warn);border-radius:12px;padding:10px 14px;font-weight:600;font-size:.9rem;margin-bottom:10px}
+.cats{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none;position:sticky;top:var(--th,118px);z-index:10;background:var(--bg)}
+.cats::-webkit-scrollbar{display:none}
+.cats button{flex:none;min-height:38px;padding:0 14px;border-radius:19px;border:1px solid var(--line);background:var(--surf);font-weight:600;font-size:.88rem;color:var(--tx2)}
+.cats button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+@media (max-width:420px){.grid{grid-template-columns:1fr 1fr}}
+.pc{background:var(--surf);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.pim{aspect-ratio:4/3;background:var(--surf2);display:grid;place-items:center;position:relative;overflow:hidden}
+.pim img{width:100%;height:100%;object-fit:cover}
+.pim .lt{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:1.5rem}
+.pb{padding:10px 10px 12px;display:flex;flex-direction:column;gap:6px;flex:1}
+.pn{font-weight:700;font-size:.92rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.5em}
+.pp{font-weight:800;font-size:1.05rem}.pp small{font-weight:600;color:var(--tx2);font-size:.75rem}
+.add{width:100%;min-height:40px;border-radius:11px;border:0;background:var(--acc);color:#fff;font-weight:700;margin-top:auto}
+.stp{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:auto;background:var(--surf2);border-radius:11px;padding:3px}
+.stp button{width:36px;height:34px;border-radius:9px;border:0;background:var(--surf);font-size:1.2rem;font-weight:700;color:var(--acc)}
+.stp b{font-size:.88rem;white-space:nowrap}
+.empty{text-align:center;color:var(--tx2);padding:40px 10px}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:30;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 30%)}
+.bar button{display:flex;align-items:center;gap:12px;width:100%;max-width:640px;margin:0 auto;min-height:58px;border-radius:16px;border:0;background:var(--ok);color:#fff;padding:0 18px;font-weight:800;font-size:1.05rem;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.bar .cnt{background:rgba(255,255,255,.22);border-radius:10px;padding:4px 10px;font-size:.9rem}
+.bar .sp{margin-left:auto}
+.sheet{position:fixed;inset:0;z-index:50;background:rgba(10,14,22,.5);display:flex;align-items:flex-end;justify-content:center}
+.sh{background:var(--surf);width:100%;max-width:640px;max-height:92vh;overflow-y:auto;border-radius:20px 20px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom))}
+@media (min-width:700px){.sheet{align-items:center}.sh{border-radius:20px}}
+.shh{display:flex;align-items:center;gap:10px;margin-bottom:8px}.shh h2{margin:0;font-size:1.2rem;flex:1}
+.x{width:38px;height:38px;border-radius:10px;border:0;background:var(--surf2);font-size:1.2rem}
+.ln{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.ln .nm{flex:1;min-width:0}.ln .nm b{display:block;font-size:.92rem}.ln .nm small{color:var(--tx2)}
+.ln .stp{margin:0;width:140px;flex:none}
+.tot{display:flex;justify-content:space-between;padding:6px 0;font-size:.95rem}.tot.big{font-size:1.15rem;font-weight:800;border-top:1px solid var(--line);margin-top:4px;padding-top:10px}
+.lbl{display:block;font-size:.82rem;font-weight:700;color:var(--tx2);margin:12px 0 5px}
+.in{width:100%;min-height:48px;border-radius:12px;border:1.5px solid var(--line);background:var(--surf);padding:10px 12px;font-size:1rem;outline:none}
+.in:focus{border-color:var(--acc)}
+textarea.in{min-height:70px;resize:vertical}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}.opts.c3{grid-template-columns:1fr 1fr 1fr}
+.opts button{min-height:50px;border-radius:12px;border:1.5px solid var(--line);background:var(--surf);font-weight:700;font-size:.88rem;padding:6px}
+.opts button.on{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 10%,var(--surf));color:var(--acc)}
+.go{width:100%;min-height:56px;border-radius:14px;border:0;background:var(--ok);color:#fff;font-weight:800;font-size:1.05rem;margin-top:16px}
+.go:disabled{opacity:.5}
+.err{color:var(--bad);font-weight:700;font-size:.88rem;min-height:20px;margin-top:8px}
+.muted{color:var(--tx2)}
+.ok{max-width:520px;margin:30px auto;background:var(--surf);border-radius:20px;padding:24px 20px;text-align:center;border:1px solid var(--line)}
+.ok .ic{width:72px;height:72px;border-radius:50%;background:var(--okSoft);color:var(--ok);display:grid;place-items:center;margin:0 auto 10px;font-size:2rem}
+.steps{display:flex;justify-content:space-between;margin:18px 0 6px;position:relative}
+.steps:before{content:'';position:absolute;left:12%;right:12%;top:13px;height:3px;background:var(--line)}
+.steps div{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.76rem;font-weight:700;color:var(--tx2)}
+.steps i{width:28px;height:28px;border-radius:50%;background:var(--surf2);border:3px solid var(--line);display:grid;place-items:center;font-style:normal;font-size:.8rem}
+.steps .on i{background:var(--ok);border-color:var(--ok);color:#fff}.steps .on{color:var(--tx)}
+.btn2{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 16px;border-radius:12px;border:1.5px solid var(--line);background:var(--surf);font-weight:700;text-decoration:none;color:var(--tx);margin:6px 4px 0}
+.btn2.wa{background:#1DAA54;border-color:#1DAA54;color:#fff}
+.closed{background:var(--badSoft);color:var(--bad);border-radius:12px;padding:12px 14px;font-weight:700;margin-bottom:10px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#121722;color:#fff;padding:10px 16px;border-radius:12px;font-weight:600;font-size:.9rem;z-index:99;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.skel{height:220px;border-radius:16px;background:linear-gradient(90deg,var(--surf) 25%,var(--surf2) 50%,var(--surf) 75%);background-size:200% 100%;animation:sk 1.2s infinite}
+@keyframes sk{to{background-position:-200% 0}}
+.lastord{display:flex;align-items:center;gap:10px;background:var(--surf);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-bottom:10px;font-size:.9rem}
+.lastord button{margin-left:auto;border:0;background:var(--acc);color:#fff;border-radius:10px;min-height:36px;padding:0 12px;font-weight:700}
+</style>
+</head>
+<body>
+<div id="app"><div class="top"><div class="brand"><i><svg width="100%" height="100%" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="lgG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2E6BEA"/><stop offset="1" stop-color="#1A4FC0"/></linearGradient></defs><rect width="64" height="64" rx="15" fill="url(#lgG)"/><path d="M24.5 23v-3.2a7.5 7.5 0 0 1 15 0V23" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/><path d="M15.5 23h33l-2.6 27.2a3.5 3.5 0 0 1-3.5 3.2H21.6a3.5 3.5 0 0 1-3.5-3.2z" fill="#fff"/><g fill="#1A4FC0"><rect x="22" y="30" width="2.4" height="16" rx=".6"/><rect x="26" y="30" width="1.2" height="16" rx=".5"/><rect x="28.8" y="30" width="3" height="16" rx=".6"/><rect x="33.4" y="30" width="1.2" height="16" rx=".5"/><rect x="36.2" y="30" width="2.4" height="16" rx=".6"/><rect x="40.2" y="30" width="1.6" height="16" rx=".5"/></g><rect x="11" y="36.6" width="42" height="2.8" rx="1.4" fill="#FF7A1A"/></svg>
+</i><b>Yükleniyor…</b></div></div><div class="wrap"><div class="grid"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div></div></div>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const tl=n=>'₺'+(Number(n)||0).toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const r2=n=>Math.round((+n||0)*100)/100;
+const LOGO=`<svg width="100%" height="100%" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="lgG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2E6BEA"/><stop offset="1" stop-color="#1A4FC0"/></linearGradient></defs><rect width="64" height="64" rx="15" fill="url(#lgG)"/><path d="M24.5 23v-3.2a7.5 7.5 0 0 1 15 0V23" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/><path d="M15.5 23h33l-2.6 27.2a3.5 3.5 0 0 1-3.5 3.2H21.6a3.5 3.5 0 0 1-3.5-3.2z" fill="#fff"/><g fill="#1A4FC0"><rect x="22" y="30" width="2.4" height="16" rx=".6"/><rect x="26" y="30" width="1.2" height="16" rx=".5"/><rect x="28.8" y="30" width="3" height="16" rx=".6"/><rect x="33.4" y="30" width="1.2" height="16" rx=".5"/><rect x="36.2" y="30" width="2.4" height="16" rx=".6"/><rect x="40.2" y="30" width="1.6" height="16" rx=".5"/></g><rect x="11" y="36.6" width="42" height="2.8" rx="1.4" fill="#FF7A1A"/></svg>
+`;
+const QCOL=['#2563EB','#16A34A','#D97706','#DB2777','#7C3AED','#0891B2','#DC2626','#4B5563'];
+const qcol=c=>{let h=0;for(const ch of String(c||''))h=(h*31+ch.charCodeAt(0))>>>0;return QCOL[h%QCOL.length]};
+const MID=new URLSearchParams(location.search).get('m')||'';
+const ls={get(k){try{return JSON.parse(localStorage.getItem('sp_'+MID+'_'+k))}catch(e){return null}},set(k,v){try{localStorage.setItem('sp_'+MID+'_'+k,JSON.stringify(v))}catch(e){}}};
+let SHOP=null,ITEMS=[],CART=ls.get('cart')||{},Q='',CAT='Tümü',ORD=null,unsub=null;
+const byId=id=>ITEMS.find(x=>x.i===id);
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2200)}
+const stepOf=it=>it.u==='kg'?0.5:1;
+const qtx=(it,q)=>it.u==='kg'?String(q).replace('.',',')+' kg':q+' adet';
+function cartLines(){return Object.entries(CART).map(([id,q])=>({it:byId(+id),q})).filter(x=>x.it&&x.q>0)}
+function sums(){const ls=cartLines();const sub=r2(ls.reduce((a,x)=>a+x.it.p*x.q,0));const del=ls.length?(S.del||defDel()):null;let fee=0;if(del==='ev'&&SHOP.fee>0&&!(SHOP.free>0&&sub>=SHOP.free))fee=SHOP.fee;return {ls,sub,fee,tot:r2(sub+fee),n:ls.length}}
+const S={del:ls.get('del')||null,pay:'nakit'};
+const defDel=()=>SHOP.ev?'ev':'gel';
+function setQ(id,d){const it=byId(id);if(!it)return;const st=stepOf(it);let q=r2((CART[id]||0)+d*st);if(q<=0)delete CART[id];else CART[id]=Math.min(q,it.u==='kg'?50:99);ls.set('cart',CART);draw(true)}
+function stepper(it){const q=CART[it.i];return q?`<div class="stp"><button aria-label="Azalt" onclick="setQ(${it.i},-1)">−</button><b>${qtx(it,q)}</b><button aria-label="Arttır" onclick="setQ(${it.i},1)">+</button></div>`:`<button class="add" onclick="setQ(${it.i},1)">Sepete ekle</button>`}
+function card(it){return `<div class="pc"><div class="pim">${it.g?`<img src="${esc(it.g)}" alt="" loading="lazy" onerror="this.parentNode.innerHTML='<span class=lt style=background:${qcol(it.c)}>${esc((it.n.trim()[0]||'?').toLocaleUpperCase('tr'))}</span>'">`:`<span class="lt" style="background:${qcol(it.c)}">${esc((it.n.trim()[0]||'?').toLocaleUpperCase('tr'))}</span>`}</div><div class="pb"><div class="pn">${esc(it.n)}</div><div class="pp">${tl(it.p)}${it.u==='kg'?'<small> /kg</small>':''}</div><div id="st${it.i}">${stepper(it)}</div></div></div>`}
+const nrm=s=>String(s||'').toLocaleLowerCase('tr');
+function list(){const q=nrm(Q).trim();let l=ITEMS;if(CAT!=='Tümü')l=l.filter(x=>x.c===CAT);if(q)l=l.filter(x=>nrm(x.n).includes(q)||nrm(x.b).includes(q));return l}
+function draw(partial){if(!SHOP)return;
+ if(partial){document.querySelectorAll('[id^=st]').forEach(e=>{const it=byId(+e.id.slice(2));if(it)e.innerHTML=stepper(it)});drawBar();if($('.sheet'))cartSheet();return}
+ const l=list();const lo=ls.get('last');
+ $('#app').innerHTML=`<div class="top" id="top"><div class="brand"><i>${LOGO}</i><b>${esc(SHOP.name||'Market')}</b>${SHOP.wa?`<a href="https://wa.me/${waNum(SHOP.wa)}" target="_blank" rel="noopener">WhatsApp</a>`:''}</div><div class="srch"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" placeholder="Ürün ara" value="${esc(Q)}" oninput="Q=this.value;drawList()" autocomplete="off" enterkeyhint="search"></div></div>
+ <div class="wrap">${!SHOP.on?'<div class="closed">Şu an online sipariş alınmıyor. Ürünlere bakabilirsin; sipariş için marketi arayabilirsin.</div>':''}${SHOP.note?`<div class="note">${esc(SHOP.note)}</div>`:''}
+ ${lo&&lo.id?`<div class="lastord">📦 Son siparişin <b>#${String(lo.id).slice(-5)}</b><button onclick="showOrder('${esc(lo.id)}')">Durumu gör</button></div>`:''}
+ <div class="cats" id="cats">${['Tümü',...(SHOP.cats||[])].map(c=>`<button class="${c===CAT?'on':''}" onclick="CAT=${esc(JSON.stringify(c))};draw()">${esc(c)}</button>`).join('')}</div>
+ <div id="list"></div></div><div class="bar" id="bar"></div>`;
+ const t=$('#top');if(t)document.documentElement.style.setProperty('--th',t.offsetHeight+'px');drawList();drawBar()}
+function drawList(){const e=$('#list');if(!e)return;const l=list();e.innerHTML=l.length?`<div class="grid">${l.slice(0,400).map(card).join('')}</div>${l.length>400?'<p class="muted" style="text-align:center">Daha fazlası için aramayı kullan.</p>':''}`:`<div class="empty">${ITEMS.length?'Aradığın ürün bulunamadı.':'Şu an listelenen ürün yok.'}</div>`}
+function drawBar(){const b=$('#bar');if(!b)return;const s=sums();b.innerHTML=s.n?`<button onclick="cartSheet()"><span class="cnt">${s.n}</span>Sepete git<span class="sp">${tl(s.sub)}</span></button>`:''}
+function waNum(t){let d=String(t||'').replace(/\D/g,'');if(d.startsWith('00'))d=d.slice(2);if(d.startsWith('0'))d='90'+d.slice(1);else if(d.length===10&&d[0]==='5')d='90'+d;return d}
+function cartSheet(){const s=sums();const me=ls.get('me')||{};let sh=$('.sheet');if(!sh){sh=document.createElement('div');sh.className='sheet';sh.onclick=e=>{if(e.target===sh)sh.remove()};document.body.appendChild(sh)}
+ if(!s.n){sh.remove();return}
+ const del=S.del||defDel();const minOk=!(SHOP.min>0&&s.sub<SHOP.min);
+ sh.innerHTML=`<div class="sh"><div class="shh"><h2>Sepetim</h2><button class="x" aria-label="Kapat" onclick="$('.sheet').remove()">✕</button></div>
+ ${s.ls.map(x=>`<div class="ln"><div class="nm"><b>${esc(x.it.n)}</b><small>${tl(x.it.p)}${x.it.u==='kg'?' /kg':''} · ${tl(x.it.p*x.q)}</small></div><div class="stp"><button aria-label="Azalt" onclick="setQ(${x.it.i},-1)">−</button><b>${qtx(x.it,x.q)}</b><button aria-label="Arttır" onclick="setQ(${x.it.i},1)">+</button></div></div>`).join('')}
+ <div style="margin-top:8px"><div class="tot"><span>Ürünler</span><b>${tl(s.sub)}</b></div>${del==='ev'&&SHOP.fee>0?`<div class="tot"><span>Teslimat${SHOP.free>0?` <small class="muted">(${tl(SHOP.free)} üstü ücretsiz)</small>`:''}</span><b>${s.fee?tl(s.fee):'Ücretsiz'}</b></div>`:''}<div class="tot big"><span>Toplam</span><span>${tl(s.tot)}</span></div>
+ ${s.ls.some(x=>x.it.u==='kg')?'<p class="muted" style="font-size:.8rem;margin:4px 0 0">Kilo ile satılan ürünlerde tutar tartıya göre biraz değişebilir.</p>':''}</div>
+ ${SHOP.on?`${SHOP.ev&&SHOP.gel?`<span class="lbl">Teslimat</span><div class="opts"><button class="${del==='ev'?'on':''}" onclick="S.del='ev';ls.set('del','ev');cartSheet()">🛵 Eve teslim</button><button class="${del==='gel'?'on':''}" onclick="S.del='gel';ls.set('del','gel');cartSheet()">🏪 Gelip alacağım</button></div>`:`<p class="muted" style="margin:12px 0 0">${SHOP.ev?'🛵 Eve teslim':'🏪 Marketten teslim alınır'}</p>`}
+ <label class="lbl" for="fn">Ad soyad</label><input class="in" id="fn" autocomplete="name" value="${esc(me.name||'')}">
+ <label class="lbl" for="fp">Telefon</label><input class="in" id="fp" type="tel" inputmode="tel" autocomplete="tel" placeholder="05xx xxx xx xx" value="${esc(me.phone||'')}">
+ ${del==='ev'?`<label class="lbl" for="fa">Adres</label><textarea class="in" id="fa" autocomplete="street-address" placeholder="Mahalle, sokak, bina, daire, tarif">${esc(me.addr||'')}</textarea>`:''}
+ <span class="lbl">Ödeme</span><div class="opts ${SHOP.ver?'c3':''}">${[['nakit','💵 Nakit'],['kart','💳 Kart'],...(SHOP.ver?[['veresiye','📒 Veresiye']]:[])].map(([k,l])=>`<button class="${S.pay===k?'on':''}" onclick="S.pay='${k}';cartSheet()">${l}</button>`).join('')}</div>
+ <p class="muted" style="font-size:.8rem;margin:6px 0 0">${S.pay==='veresiye'?'Veresiye sadece kayıtlı müşterilerimiz içindir; market onaylar.':'Ödeme '+(del==='ev'?'teslimatta':'marketten alırken')+' yapılır.'}</p>
+ <label class="lbl" for="fo">Not <span style="font-weight:500">(isteğe bağlı)</span></label><input class="in" id="fo" placeholder="Örn. ekmek taze olsun, zile basmayın">
+ <div class="err" id="ferr">${minOk?'':'En az sipariş tutarı '+tl(SHOP.min)}</div>
+ <button class="go" id="gob" ${minOk?'':'disabled'} onclick="send()">Siparişi gönder · ${tl(s.tot)}</button>`:'<div class="closed" style="margin-top:12px">Şu an online sipariş alınmıyor.</div>'}</div>`}
+async function send(){const s=sums();const del=S.del||defDel();const name=$('#fn').value.trim(),phone=$('#fp').value.trim(),addr=del==='ev'?($('#fa').value||'').trim():'',note=$('#fo').value.trim();const er=$('#ferr');
+ if(name.length<2){er.textContent='Adını yaz';$('#fn').focus();return}
+ if(phone.replace(/\D/g,'').length<10){er.textContent='Telefon numaranı yaz';$('#fp').focus();return}
+ if(del==='ev'&&addr.length<5){er.textContent='Adresini yaz';$('#fa').focus();return}
+ ls.set('me',{name,phone,addr:addr||(ls.get('me')||{}).addr||''});
+ const id=String(Date.now()*1000+Math.floor(Math.random()*1000));const b=$('#gob');b.disabled=true;b.textContent='Gönderiliyor…';
+ const o={name:name.slice(0,60),phone:phone.slice(0,20),addr:addr.slice(0,300),note:note.slice(0,300),del,pay:S.pay,items:s.ls.slice(0,80).map(x=>({i:x.it.i,n:x.it.n,q:x.q,p:x.it.p,u:x.it.u})),total:s.tot,fee:s.fee,ts:new Date().toISOString(),st:'Yeni'};
+ try{await window.SP.order(MID,id,o);CART={};ls.set('cart',CART);ls.set('last',{id,ts:o.ts});const sh=$('.sheet');if(sh)sh.remove();showOrder(id,o)}
+ catch(e){b.disabled=false;b.textContent='Siparişi gönder · '+tl(s.tot);er.textContent='Sipariş gönderilemedi. İnternetini kontrol edip tekrar dene'+(SHOP.wa?' ya da WhatsApp\'tan yaz.':'.')}}
+const STEPS=['Alındı','Hazırlanıyor','Yolda','Teslim edildi'];
+function showOrder(id,first){if(unsub){unsub();unsub=null}ORD={id,o:first||null};drawOrder();unsub=window.SP.watch(MID,id,o=>{ORD.o=o;drawOrder()})}
+function drawOrder(){const o=ORD.o;const st=o?o.st:'Yeni';const idx=st==='Yeni'?0:STEPS.indexOf(st);const gel=o&&o.del==='gel';const lab=s=>gel&&s==='Yolda'?'Hazır':s;
+ $('#app').innerHTML=`<div class="top"><div class="brand"><i>${LOGO}</i><b>${esc(SHOP?SHOP.name:'Market')}</b></div></div><div class="wrap"><div class="ok">
+ ${st==='İptal'?`<div class="ic" style="background:var(--badSoft);color:var(--bad)">✕</div><h2 style="margin:0">Sipariş iptal edildi</h2><p class="muted">Bir sorun olduysa marketle iletişime geçebilirsin.</p>`:
+ `<div class="ic">${st==='Teslim edildi'?'✓':'🛒'}</div><h2 style="margin:0 0 4px">${st==='Teslim edildi'?'Teslim edildi, afiyet olsun!':gel&&st==='Yolda'?'Siparişin hazır, gelip alabilirsin':st==='Yolda'?'Siparişin yolda':st==='Hazırlanıyor'?'Siparişin hazırlanıyor':'Siparişin alındı'}</h2><p class="muted" style="margin:0">Sipariş no <b>#${esc(String(ORD.id).slice(-5))}</b>${o?` · ${tl(o.total)}`:''}</p>
+ <div class="steps">${STEPS.map((s,i)=>`<div class="${i<=idx?'on':''}"><i>${i<idx||st==='Teslim edildi'?'✓':i+1}</i>${lab(s)}</div>`).join('')}</div><p class="muted" style="font-size:.82rem">Bu sayfa kendiliğinden güncellenir.</p>`}
+ ${o?`<div style="text-align:left;margin-top:10px;border-top:1px solid var(--line);padding-top:10px">${(o.items||[]).map(x=>`<div class="tot"><span>${esc(x.u==='kg'?String(x.q).replace('.',',')+' kg':x.q+' ×')} ${esc(x.n)}</span><span>${tl(x.p*x.q)}</span></div>`).join('')}${o.fee?`<div class="tot"><span>Teslimat</span><span>${tl(o.fee)}</span></div>`:''}<div class="tot big"><span>Toplam</span><span>${tl(o.total)}</span></div></div>`:''}
+ <div style="margin-top:12px">${SHOP&&SHOP.wa?`<a class="btn2 wa" href="https://wa.me/${waNum(SHOP.wa)}?text=${encodeURIComponent('Merhaba, #'+String(ORD.id).slice(-5)+' numaralı siparişim hakkında yazıyorum.')}" target="_blank" rel="noopener">WhatsApp'tan yaz</a>`:''}<button class="btn2" onclick="back()">Alışverişe dön</button></div></div></div>`}
+function back(){if(unsub){unsub();unsub=null}ORD=null;draw()}
+window.addEventListener('keydown',e=>{if(e.key==='Escape'){const sh=$('.sheet');if(sh)sh.remove()}});
+window.SHOPLOAD=(meta,items)=>{SHOP=meta;ITEMS=items;document.title=(meta.name||'Market')+' · Online sipariş';Object.keys(CART).forEach(id=>{if(!byId(+id))delete CART[id]});if(!ORD)draw()};
+window.SHOPERR=m=>{$('#app').innerHTML=`<div class="wrap"><div class="ok"><div class="ic" style="background:var(--badSoft);color:var(--bad)">!</div><h2 style="margin:0">${esc(m)}</h2><p class="muted">Linki marketten tekrar isteyebilirsin.</p><button class="btn2" onclick="location.reload()">Yenile</button></div></div>`};
+if(!MID)window.SHOPERR('Geçersiz sipariş linki');
+setTimeout(()=>{if(!SHOP&&MID)window.SHOPERR('Bağlantı kurulamadı')},15000);
+</script>
+<script type="module">
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import {getFirestore,doc,getDoc,setDoc,onSnapshot} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+const app=initializeApp({apiKey:"AIzaSyACrApSGsB84Y5bLjsjFc39vjLq0WYDq-U",authDomain:"barkod-sistemi-v1.firebaseapp.com",projectId:"barkod-sistemi-v1",storageBucket:"barkod-sistemi-v1.firebasestorage.app",messagingSenderId:"628617167908",appId:"1:628617167908:web:9a1a53a471a958d79b84b1"});
+const db=getFirestore(app);
+const mid=new URLSearchParams(location.search).get('m');
+window.SP={order:(m,id,o)=>setDoc(doc(db,'shops',m,'orders',id),o),watch:(m,id,cb)=>onSnapshot(doc(db,'shops',m,'orders',id),s=>{if(s.exists())cb(s.data())},()=>{})};
+async function load(){try{const s=await getDoc(doc(db,'shops',mid));if(!s.exists()){window.SHOPERR('Bu market henüz online sipariş sayfası açmamış');return}const meta=s.data();
+ const parts=await Promise.all(Array.from({length:meta.parts||0},(_,i)=>getDoc(doc(db,'shops',mid,'cat',String(i)))));const items=parts.flatMap(p=>p.exists()?(p.data().items||[]):[]);window.SHOPLOAD(meta,items)}
+ catch(e){window.SHOPERR('Sayfa yüklenemedi')}}
+if(mid)load();
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&mid&&window.SHOP_T&&Date.now()-window.SHOP_T>300000)load()});window.SHOP_T=Date.now();
+</script>
+</body>
+</html>
