@@ -652,7 +652,7 @@ body.demo::after{content:'DENEME MODU · kaydedilmez';position:fixed;left:50%;bo
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.15 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.16 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -924,7 +924,7 @@ function render(){
  applySet();
  if(!S.user)return renderLogin();
  const allowK=['ana','satis','terminal','siparis','gecmis','musteri'];if(!isY()&&!allowK.includes(S.page))S.page='satis';
- if(S.page==='satis')return renderSatis();
+ if(S.page==='satis'){renderSatis();setTimeout(processRemote,80);return}
  $('#app').innerHTML=`<div class="shell"><div class="scrim" onclick="closeSide()"></div><nav class="side" aria-label="Menü">${sideHTML()}</nav><div style="display:flex;flex-direction:column;min-width:0;min-height:0"><div class="top mtop"><button class="tb" onclick="togSide()" aria-label="Menüyü aç">${ic('menu')}${T('top_menu','Menü')}</button><div class="brand bl"><i class="blg">${LOGO.replace(/lgG/g,'lgG3')}</i><span>${esc(D.set.market)}</span></div><button class="tb sp" onclick="nav('satis')">${ic('satis',18)}Satış</button></div><main class="main" id="main"></main></div></div>`;
  (({terminal:pgTerminal,siparis:pgSiparis,rapor:pgRapor,zrap:pgZ,urun:pgUrun,etiket:pgEtiket2,etiket2:pgEtiket2,stok:pgStok,alis:pgAlis,gecmis:pgGecmis,musteri:pgMusteri,gider:pgGider,personel:pgPersonel,ayar:pgAyar,tedarik:pgTed,tedarikci:pgTed,kasa:pgKasa,alisF:pgAlisF,ana:pgAna,sayim:pgSayim,karlilik:pgKar,skt:pgSkt,fire:pgFire,hizli:pgHizli,kampanya:pgKamp,kar:pgKZ,kkart:pgKkart,odeme:pgOdeme})[S.page]||pgAna)();subNav();
 }
@@ -1075,17 +1075,18 @@ async function camScan(cb,opt){
  camSt('Barkodu sarı çerçeveye getir.');
  barLoop(v);ocrStart();
 }
-const rcv=()=>{const v=lsGet('rcv');return v===null?!touch():v==='1'};
-function processRemote(){if(!READY||!D||!D.remote||!D.remote.length)return;if(!rcv()||!S.user)return;
- const items=D.remote.slice().sort((a,b)=>String(a.at).localeCompare(String(b.at)));D.remote=[];save();
+const rcv=()=>{const v=lsGet('rcv');return v===null?(!touch()||S.page==='satis'):v==='1'};
+const devId=()=>{let v=lsGet('devId');if(!v){v='d'+nid();lsSet('devId',v)}return v};
+function processRemote(){if(!READY||!D||!D.remote||!D.remote.length)return;if(!rcv()||!S.user)return;const me=devId();
+ const items=D.remote.filter(it=>it.dev!==me).sort((a,b)=>String(a.at).localeCompare(String(b.at)));if(!items.length)return;D.remote=D.remote.filter(it=>it.dev===me);save();
  const now=Date.now();let n=0;
- S.remQ=S.remQ||[];for(const it of items){if(now-new Date(it.at).getTime()>120000)continue;S.remQ.push({code:it.code,qty:it.qty||1});n++}
+ S.remQ=S.remQ||[];for(const it of items){if(Math.abs(now-new Date(it.at).getTime())>600000)continue;S.remQ.push({code:it.code,qty:it.qty||1});n++}
  if(n){if(S.page!=='satis'){S.page='satis';render()}remPump()}if(n>1)toast(n+' ürün telefondan geldi')}
-function termSend(code){code=String(code||'').trim();if(!code)return;const p=findCode(code);const it={id:nid(),code,qty:1,at:new Date().toISOString(),from:S.user?S.user.name:''};
+function termSend(code){code=String(code||'').trim();if(!code)return;const p=findCode(code);const it={id:nid(),code,qty:1,at:new Date().toISOString(),from:S.user?S.user.name:'',dev:devId()};
  D.remote.push(it);save();S.sent=[{id:it.id,code,name:p?p.name+' · '+tl(p.price):'Kayıtlı değil · kasada fiyatı sorulacak'},...(S.sent||[])].slice(0,30);if(navigator.vibrate)navigator.vibrate(60);termUpd()}
 function termUpd(){const row=x=>{const done=!D.remote.some(r=>r.id===x.id);return `<div class="row" style="flex-wrap:nowrap;padding:8px 0;border-bottom:1px solid var(--line)"><span style="flex:1;min-width:0"><b>${esc(x.name)}</b><br><span class="muted mono">${esc(x.code)}</span></span><span class="tag ${done?'t-Nakit':'t-Veresiye'}">${done?'Kasada ✓':'Gönderiliyor…'}</span></div>`};
  const l=S.sent||[];const a=$('#tlist');if(a)a.innerHTML=l.map(row).join('')||'<p class="muted" style="margin:0">Henüz okutma yok.</p>';const b=$('#ctl');if(b)b.innerHTML=l.slice(0,3).map(row).join('')}
-function pgTerminal(){$('#main').innerHTML=head('El terminali')+`<div class="card" style="max-width:640px"><p style="margin:0;line-height:1.6">Bu telefonla okuttuğun barkodlar, kasada açık olan satış ekranının sepetine düşer. Kamera açık kalır, ürünleri art arda okutabilirsin.</p>
+function pgTerminal(){$('#main').innerHTML=head('El terminali')+`<div class="card" style="max-width:640px"><p style="margin:0;line-height:1.6">Bu telefonla okuttuğun barkodlar, kasada (bilgisayar ya da tablet) açık olan <b>Satış ekranının</b> sepetine düşer. Kasadaki cihazda satış ekranı açık olsun, ikisi de aynı market hesabıyla girmiş olsun. Kamera açık kalır, ürünleri art arda okutabilirsin.</p>
  ${rcv()?'<p class="err" style="margin:0">Bu cihaz alıcı olarak ayarlı. El terminali olarak kullanacaksan Ayarlar › Satış ekranı bölümünden "Bu cihaz telefondan okutulanları alsın" ayarını kapat.</p>':''}
  <button class="btn pri" style="min-height:64px;font-size:1.15rem" onclick="camScan(termSend,{cont:true})">📷 Okutmaya başla</button>
  <div class="row" style="flex-wrap:nowrap"><input class="in mono" id="tin" inputmode="numeric" placeholder="Barkodu elle yaz" onkeydown="if(event.key==='Enter'){termSend(this.value);this.value=''}"><button class="btn" onclick="const i=$('#tin');termSend(i.value);i.value=''">Gönder</button></div>
@@ -2289,7 +2290,7 @@ function pgAyar(){const s=D.set;const tg=(k,l,d)=>`<div class="tgl" onclick="D.s
  <div class="f" style="font-size:.82rem;font-weight:600;color:var(--tx2)">Yazı boyutu${seg([['14','Küçük'],['16','Normal'],['18','Büyük'],['20','Çok büyük']],String(s.fs),'setFs')}</div></div>
  <div class="card"><h2>Kâr ve stok</h2><div class="g3"><label class="f">Hedef kâr oranı (%)<input class="in" inputmode="decimal" value="${KT().hedef}" onchange="setKT('karHedef',this.value)"></label><label class="f">En düşük kâr uyarısı (%)<input class="in" inputmode="decimal" value="${KT().min}" onchange="setKT('karMin',this.value)"></label><label class="f">SKT uyarısı (gün önce)<input class="in" inputmode="numeric" value="${KT().skt}" onchange="setKT('sktGun',this.value)"></label></div><p class="muted" style="margin:0;font-size:.82rem">Kâr oranı alış fiyatına göre hesaplanır: 10 TL'ye alınıp 12 TL'ye satılan ürün %20.</p></div>
  <div class="card"><h2>Satış ekranı</h2><div class="f" style="font-size:.82rem;font-weight:600;color:var(--tx2)">Hızlı ürün sütun sayısı${seg([['2','2'],['3','3'],['4','4'],['5','5']],String(s.cols),'setCols')}</div>
- ${tg('autoRc','Satıştan sonra fişi göster','Kapalıysa sadece kısa bildirim çıkar')}${tg('waVer','Veresiye satışında WhatsApp fişi öner','Satıştan sonra fişi ve toplam borcu müşteriye gönderme penceresi çıkar')}${tg('sound','Sesli uyarılar','Barkod okununca ve hata olunca ses')}${tg('neg','Stokta olmayan ürünü satmaya izin ver')}${tg('cashDisc','Kasiyer indirim yapabilsin','Kapalıysa yönetici şifresi istenir')}<div class="tgl" onclick="lsSet('rcv',rcv()?'0':'1');render()"><div>Bu cihaz telefondan okutulanları alsın<small>Kasadaki bilgisayar/tablette açık, el terminali olarak kullanılan telefonda kapalı olmalı. Sadece bu cihaz için geçerli.</small></div><span class="sw ${rcv()?'on':''}"><i></i></span></div></div>
+ ${tg('autoRc','Satıştan sonra fişi göster','Kapalıysa sadece kısa bildirim çıkar')}${tg('waVer','Veresiye satışında WhatsApp fişi öner','Satıştan sonra fişi ve toplam borcu müşteriye gönderme penceresi çıkar')}${tg('sound','Sesli uyarılar','Barkod okununca ve hata olunca ses')}${tg('neg','Stokta olmayan ürünü satmaya izin ver')}${tg('cashDisc','Kasiyer indirim yapabilsin','Kapalıysa yönetici şifresi istenir')}<div class="tgl" onclick="lsSet('rcv',rcv()?'0':'1');render()"><div>Bu cihaz telefondan okutulanları alsın<small>Bilgisayarda hep açık. Tablet ve telefonda satış ekranı açıkken kendiliğinden alır; burayı açarsan her ekranda alır. El terminali olarak kullanılan telefonda kapalı kalsın. Sadece bu cihaz için geçerli.</small></div><span class="sw ${rcv()?'on':''}"><i></i></span></div></div>
  <div class="card"><h2>Fiş yazıcı</h2><div class="f" style="font-size:.82rem;font-weight:600;color:var(--tx2)">Kâğıt genişliği${seg([['58','58 mm'],['80','80 mm'],['a4','Normal yazıcı (A4)']],RC().w,'rcW')}</div>
  <label class="f">Fişin üstüne yazılacaklar <span class="muted" style="font-weight:500">(adres, telefon, vergi no)</span><textarea class="in" rows="3" style="min-height:80px;padding-top:10px;font:inherit" onchange="rcSet('head',this.value.trim())" placeholder="Örnek Mah. 1. Sok. No:5\nTel: 0232 000 00 00">${esc(RC().head)}</textarea></label>
  <label class="f">Fişin altına yazılacak<input class="in" value="${esc(RC().foot)}" onchange="rcSet('foot',this.value.trim())" placeholder="Teşekkür ederiz"></label>
@@ -2307,7 +2308,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.15';
+const APPV='3.16';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
