@@ -702,6 +702,13 @@ body.tmon{overflow:hidden}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 @media (max-width:600px){html{font-size:calc(var(--fs,16px) * .88)}body{font-size:14px}.hhead>.row.sp{margin-left:0;width:100%}}
 @media (max-width:370px){html{font-size:calc(var(--fs,16px) * .82)}body{font-size:13px}}
+
+/* hızlı ürünler başlığı tek satır v3.28 */
+.qrow{display:flex;flex-wrap:wrap;align-items:center;gap:5px}
+.qrow .qh{margin:0 4px 0 0;font-size:.95rem;white-space:nowrap}
+.qrow .chip{padding:0 10px}
+.qrow .qact{margin-right:4px;display:inline-flex;align-items:center;gap:4px}
+.qrow .qed{width:32px;height:32px;color:var(--acc)}
 </style>
 </head>
 <body>
@@ -711,7 +718,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.27 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.28 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1004,8 +1011,7 @@ function renderSatis(){
  <div class="who">${esc(S.user.isim||S.user.name)}<br><small id="clk"></small></div></header>
  <div class="pos ${isHid('quick')?'noquick':''} ${qoff?'qoff':''}" id="pos">
  <section class="card quick"${HA('quick')}><button class="qopen" onclick="qTog(false)" aria-label="Hızlı ürünleri aç">${ic('grid',20)}<span>${esc(Tp('quick_title','Hızlı ürünler'))}</span></button>
- <div class="row" style="flex-wrap:nowrap"><h2>${T('quick_title','Hızlı ürünler')}</h2><div class="row sp" style="gap:8px;flex-wrap:nowrap">${isY()?`<a href="#" style="font-size:.82rem;font-weight:700;color:var(--acc)" onclick="event.preventDefault();nav('urun',{uTab:'urun',uf:'Hızlı'})">Düzenle</a>`:''}<button class="qtog" onclick="qTog(true)" aria-label="Hızlı ürünleri kapat">${ic('chl',16)}</button></div></div>
- <div class="row" style="gap:6px">${cats.map(c=>`<button class="chip ${S.qcat===c?'on':''}" onclick="S.qcat='${esc(c)}';renderSatis()">${esc(c)}</button>`).join('')}</div>
+ <div class="qrow"><h2 class="qh">${T('quick_title','Hızlı ürünler')}</h2><span class="qact">${isY()?`<button class="ib ghost qed" title="Hızlı ürünleri düzenle" aria-label="Hızlı ürünleri düzenle" onclick="nav('urun',{uTab:'urun',uf:'Hızlı'})">${ic('edit',17)}</button>`:''}<button class="qtog" onclick="qTog(true)" aria-label="Hızlı ürünleri kapat">${ic('chl',16)}</button></span>${cats.map(c=>`<button class="chip ${S.qcat===c?'on':''}" onclick="S.qcat='${esc(c)}';renderSatis()">${esc(c)}</button>`).join('')}</div>
  <div class="qgrid">${D.products.filter(p=>p.quick&&(S.qcat==='Tümü'||p.cat===S.qcat)).sort(qSort).map(p=>`<button class="qp2 ${p.img?'im':''} ${p.stock<=0?'out':''}" style="--qc:${qcol(p.cat)}" onclick="addP(${p.id})" title="${esc(p.name)}">${p.img?`<img src="${esc(p.img)}" alt="" loading="lazy" onerror="this.parentNode.classList.remove('im');this.remove()">`:`<span class="qi">${esc((p.name.trim()[0]||'?').toLocaleUpperCase('tr'))}</span>`}<span class="qpr">${tl(p.price)}${p.unit==='kg'?'<small>/kg</small>':''}</span>${p.stock<=0?'<span class="qx">Stok yok</span>':''}<b class="qn">${esc(p.name)}</b></button>`).join('')||'<div class="muted">Bu kategoride hızlı ürün yok.</div>'}</div></section>
  <section class="card cart" id="cartBox"></section>
  <section class="pay" id="payBox"></section></div>
@@ -2380,7 +2386,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.27';
+const APPV='3.28';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
