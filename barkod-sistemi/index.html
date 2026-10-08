@@ -728,7 +728,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.30 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.31 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1220,12 +1220,12 @@ function pay(type,parts,force){
  for(const l of c.items){const p=P(l.pid);if(p)p.stock=Math.round((p.stock+(c.ret?1:-1)*l.qty*(l.mul||1))*1000)/1000}
  if(type==='Veresiye'){const cu=D.customers.find(x=>x.id===c.cust);cu.moves.push({date:s.date,t:c.ret?'Veresiye iade':'Veresiye satış',a:s.total})}
  if(parts&&parts.Veresiye>0&&c.cust){const cu=D.customers.find(x=>x.id===c.cust);if(cu)cu.moves.push({date:s.date,t:c.ret?'Veresiye iade (parçalı)':'Veresiye satış (parçalı)',a:(c.ret?-1:1)*parts.Veresiye,sid:s.id})}
- const rec=num(c.rec);save();
+ const rec=num(c.rec);if(type==='Nakit'&&!c.ret&&rec>0){s.rec=r2(rec);s.chg=rec>t.total?r2(rec-t.total):0}save();
  S.carts.splice(S.ci,1);if(!S.carts.length)newCart();else S.ci=Math.min(S.ci,S.carts.length-1);S.sel=-1;
  drawCart();tick();beep(true);
  if(type==='Veresiye'&&!c.ret&&D.set.waVer!==false&&s.cust)waAfter(s.id);else{if(D.set.autoRc)showRc(s,type==='Nakit'&&rec>t.total?rec-t.total:0);else toast((c.ret?'İade tamamlandı: ':'Satış tamamlandı: ')+tl(Math.abs(s.total)));if(RC().auto){if(D.set.autoRc)setTimeout(rcPrint,300);else printSale(s.id)}}
 }
-function rcHTML(s,chg){const cu=s.cust?D.customers.find(x=>x.id===s.cust):null;const rc=RC();return `<div class="receipt printme"><div style="text-align:center;font-weight:700">${esc(D.set.market)}</div>${rc.head?`<div style="text-align:center;white-space:pre-line;font-size:.92em">${esc(rc.head)}</div>`:''}<div style="text-align:center">${s.ret?'İADE FİŞİ':'SATIŞ FİŞİ'} #${s.no}</div><div style="text-align:center">${fdt(s.date)} · ${esc(s.user)}</div><hr>${s.items.map(l=>`<div>${esc(l.name)}</div><div class="rl"><span>${qf(l.qty,l.unit)} x ${tl(l.price)}${l.disc?' %'+Math.round(l.disc)+' ind.':''}</span><span>${tl(lineT(l))}</span></div>`).join('')}<hr>${(s.camp||[]).map(r=>`<div class="rl"><span>Kampanya: ${esc(r.n)}</span><span>-${tl(r.amt)}</span></div>`).join('')}${(()=>{const od=r2((s.disc||0)-(s.camp||[]).reduce((a,r)=>a+r.amt,0));return od>0?`<div class="rl"><span>İndirim</span><span>-${tl(od)}</span></div>`:''})()}<div class="rl" style="font-weight:700;font-size:1.1em"><span>TOPLAM</span><span>${tl(s.total)}</span></div><div class="rl"><span>Ödeme</span><span>${s.pay}${s.parts?` (${partsTxt(s.parts)})`:''}</span></div>${chg?`<div class="rl"><span>Para üstü</span><span>${tl(chg)}</span></div>`:''}${cu?`<div class="rl"><span>Müşteri</span><span>${esc(cu.name)}</span></div>`:''}${rc.foot?`<hr><div style="text-align:center;white-space:pre-line">${esc(rc.foot)}</div>`:''}</div>`}
+function rcHTML(s,chg){chg=chg||s.chg||0;const cu=s.cust?D.customers.find(x=>x.id===s.cust):null;const rc=RC();return `<div class="receipt printme"><div style="text-align:center;font-weight:700">${esc(D.set.market)}</div>${rc.head?`<div style="text-align:center;white-space:pre-line;font-size:.92em">${esc(rc.head)}</div>`:''}<div style="text-align:center">${s.ret?'İADE FİŞİ':'SATIŞ FİŞİ'} #${s.no}</div><div style="text-align:center">${fdt(s.date)} · ${esc(s.user)}</div><hr>${s.items.map(l=>`<div>${esc(l.name)}</div><div class="rl"><span>${qf(l.qty,l.unit)} x ${tl(l.price)}${l.disc?' %'+Math.round(l.disc)+' ind.':''}</span><span>${tl(lineT(l))}</span></div>`).join('')}<hr>${(s.camp||[]).map(r=>`<div class="rl"><span>Kampanya: ${esc(r.n)}</span><span>-${tl(r.amt)}</span></div>`).join('')}${(()=>{const od=r2((s.disc||0)-(s.camp||[]).reduce((a,r)=>a+r.amt,0));return od>0?`<div class="rl"><span>İndirim</span><span>-${tl(od)}</span></div>`:''})()}<div class="rl" style="font-weight:700;font-size:1.1em"><span>TOPLAM</span><span>${tl(s.total)}</span></div><div class="rl"><span>Ödeme</span><span>${s.pay}${s.parts?` (${partsTxt(s.parts)})`:''}</span></div>${s.rec?`<div class="rl"><span>Alınan</span><span>${tl(s.rec)}</span></div>`:''}${chg?`<div class="rl"><span>Para üstü</span><span>${tl(chg)}</span></div>`:''}${cu?`<div class="rl"><span>Müşteri</span><span>${esc(cu.name)}</span></div>`:''}${rc.foot?`<hr><div style="text-align:center;white-space:pre-line">${esc(rc.foot)}</div>`:''}</div>`}
 function showRc(s,chg){modal(mHead(s.ret?'İade tamamlandı':'Satış tamamlandı')+(chg?`<div style="background:var(--okSoft);color:var(--okTx);border-radius:12px;padding:14px;font-weight:800;font-size:1.4rem;display:flex;justify-content:space-between"><span>Para üstü</span><span>${tl(chg)}</span></div>`:'')+rcHTML(s,chg)+`<div class="row"><button class="btn" onclick="rcPrint()">Fişi yazdır</button>${S.undo&&S.undo.sid===s.id?'<button class="btn" onclick="undoLast()">Geri al</button>':''}<button class="btn pri sp" autofocus onclick="closeM()">Yeni satış</button></div>`)}
 function help(){modal(mHead('Klavye kısayolları')+`<table class="tbl" style="min-width:0">${Object.keys(KEYDEF).filter(a=>!(ACTHIDE[a]&&UI().hide[ACTHIDE[a]])).map(a=>`<tr><td><b class="mono">${kn(KL(a))}</b></td><td>${esc(keyLbl(a))}</td></tr>`).join('')}<tr><td><b class="mono">3*barkod</b></td><td>3 adet ekle</td></tr></table><p class="muted" style="margin:0">Tuşları yönetici Menü › Ayarlar › Kişiselleştirme bölümünden değiştirebilir. Tarayıcıda F11 ve F12 tam ekran ve geliştirici araçlarına gidebilir; kurulan uygulamada bu sorun olmaz.</p>`)}
 function priceCheck(){modal(mHead('Fiyat gör')+`<input class="in" id="pc" autofocus placeholder="Barkod okut veya ad yaz" oninput="pcShow()" onkeydown="if(event.key==='Enter')pcShow()"><div id="pcr"></div>`)}
@@ -2396,7 +2396,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.30';
+const APPV='3.31';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
