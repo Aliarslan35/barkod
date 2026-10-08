@@ -103,7 +103,7 @@ h2{margin:0;font-size:1rem;font-weight:800}
 .ln .bc2{font-size:.72rem;color:var(--tx3)}
 .qty{display:flex;align-items:center;justify-content:center;gap:4px}
 .qty button{width:36px;height:36px;border:1px solid var(--line2);border-radius:8px;background:var(--surf);font-size:1.1rem;padding:0}
-.qty span{min-width:34px;text-align:center;font-weight:800}
+.qty span{min-width:34px;text-align:center;font-weight:800}.qty .lqc{cursor:pointer;width:auto!important;min-width:44px;padding:0 8px;font-size:1rem;font-weight:800;text-decoration:underline dotted;text-underline-offset:3px}.qty .lqc:hover{background:var(--bg2,rgba(0,0,0,.06))}
 .r{text-align:right}
 .empty{padding:40px 20px;text-align:center;color:var(--tx3)}
 .cfoot{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--line);background:var(--surf2);flex-wrap:wrap;flex:none}
@@ -663,7 +663,7 @@ body.demo::after{content:'DENEME MODU · kaydedilmez';position:fixed;left:50%;bo
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.20 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.23 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -987,7 +987,7 @@ function drawCart(){
  ${la&&!isHid('last_band')?`<div class="last" id="lastb"${HA('last_band')}><div class="lic">${pimg(P(la.pid),40)||esc(ini(la.name))}</div><div class="lt"><small>${T('last_lbl','SON OKUTULAN')}</small><b>${esc(la.name)} ${la.unit==='kg'?'· '+qf(la.qty,'kg'):'× '+la.qty}</b></div><div class="lpr">${tl(la.price)}${la.unit==='kg'?'/kg':''}</div></div>`:''}
  <div class="lh"><span>${T('h_urun','ÜRÜN')}</span><span style="text-align:center">${T('h_adet','ADET')}</span><span class="r">${T('h_birim','BİRİM')}</span><span class="r">${T('h_tutar','TUTAR')}</span><span></span></div>
  <div class="lines">${c.items.length?c.items.map((l,i)=>`<div class="ln ${i===S.sel?'sel':''}" onclick="S.sel=${i};drawCart()"><div class="c1"><div class="nm">${esc(l.name)}${l.disc?` <span class="tag t-Nakit">%${l.disc} ind.</span>`:''}${!l.mul&&t.campBy&&t.campBy[l.pid]?` <span class="tag t-Havale">${esc(kampLbl(t.campBy[l.pid]))}</span>`:''}</div><div class="bc2 mono">${esc(l.bc||'')}</div></div>
- <div class="qty c2" onclick="event.stopPropagation()">${l.unit==='kg'?`<button aria-label="Miktarı değiştir" style="width:auto;padding:0 10px;font-size:.9rem;font-weight:800" onclick="askKg(${l.pid},${i})">${qf(l.qty,'kg')}</button>`:`<button aria-label="Azalt" onclick="chq(${i},-1)">${ic('minus',16)}</button><span>${l.qty}</span><button aria-label="Artır" onclick="chq(${i},1)">${ic('plus',16)}</button>`}</div>
+ <div class="qty c2" onclick="event.stopPropagation()">${l.unit==='kg'?`<button aria-label="Miktarı değiştir" style="width:auto;padding:0 10px;font-size:.9rem;font-weight:800" onclick="askKg(${l.pid},${i})">${qf(l.qty,'kg')}</button>`:`<button aria-label="Azalt" onclick="chq(${i},-1)">${ic('minus',16)}</button><button class="lqc" aria-label="Adedi yaz" title="Adedi yazmak için dokun" onclick="lineQty(${i})">${l.qty}</button><button aria-label="Artır" onclick="chq(${i},1)">${ic('plus',16)}</button>`}</div>
  <span class="r c3 lpc" title="Fiyatı değiştirmek için dokun" onclick="event.stopPropagation();linePrice(${i})">${tl(l.price)}</span><b class="r c4">${tl(lineT(l))}</b><button class="ib ghost c5" aria-label="Satırı sil" onclick="event.stopPropagation();delLine(${i})">${ic('trash',18)}</button></div>`).join(''):`<div class="empty">Sepet boş. Barkod okut, ürün ara ya da hızlı ürünlerden seç.</div>`}</div>
  <div class="cfoot"${HA('cust_row')}>${ic('user',18)}<span style="font-size:.88rem">${T('cust_lbl','Müşteri')}: <b>${cu?esc(cu.name):'Seçilmedi'}</b>${cu?` <span class="muted">· borç ${tl(bal(cu))}${cu.limit?' / limit '+tl(cu.limit):''}</span>`:''}</span>${cu?`<button class="btn sm okb sp" onclick="tahsPos(${cu.id})">Tahsilat al</button>`:''}<button class="btn sm ${cu?'':'sp'}" onclick="pickCust()">${cu?T('cust_change','Değiştir'):T('cust_pick','Müşteri seç')} <span class="kbd">${kn(KL('cust'))}</span></button><span class="muted">${c.items.length} kalem</span></div>`;
  const ch=num(c.rec)-t.total;const [pbig,psm]=payBtns();
@@ -2327,7 +2327,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.20';
+const APPV='3.23';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -2719,6 +2719,12 @@ function linePrice(i){const go=()=>{const l=C().items[i];if(!l)return;const p=P(
  ${p&&isY()&&!l.mul&&!l.unreg?`<label class="row" style="gap:10px;cursor:pointer;flex-wrap:nowrap"><input type="checkbox" class="tck" id="lpk"><span>Ürünün fiyatını da kalıcı olarak değiştir</span></label>`:''}
  <div class="row"><button class="btn sp" onclick="closeM()">Vazgeç</button><button class="btn pri" onclick="linePriceOk(${i})">Uygula</button></div>`)};
  if(!isY()&&!D.set.cashDisc)askPw('Fiyat değiştirmek için yönetici onayı gerekiyor.',go);else go()}
+function lineQty(i){const l=C().items[i];if(!l)return;
+ modal(mHead('Adet: '+esc(l.name))+`<label class="f">Kaç adet<input class="in" id="lqv" type="number" inputmode="numeric" min="0" step="1" autofocus value="${l.qty}" style="font-size:1.6rem;font-weight:800;text-align:center" onfocus="this.select()" onkeydown="if(event.key==='Enter')lineQtyOk(${i})"></label>
+ <div class="row" style="gap:6px">${[2,3,5,6,10,12,20,24].map(n=>`<button class="chip" onclick="$('#lqv').value=${n};lineQtyOk(${i})">${n}</button>`).join('')}</div>
+ <div class="row"><button class="btn sp" onclick="closeM()">Vazgeç</button><button class="btn pri" onclick="lineQtyOk(${i})">Uygula</button></div>`);setTimeout(()=>{const e=$('#lqv');if(e){e.focus();e.select()}},50)}
+function lineQtyOk(i){const l=C().items[i];if(!l)return closeM();const v=Math.round(num2($('#lqv').value));if(!(v>=0)||isNaN(v)){toast('Adedi yaz');return}
+ closeM();if(v===0){C().items.splice(i,1);S.sel=Math.min(i,C().items.length-1)}else{l.qty=v;S.sel=i}drawCart();if(typeof focusScan==='function')focusScan()}
 function linePriceOk(i){const l=C().items[i];const v=num2($('#lpv').value);if(!(v>0)){toast('Fiyatı yaz');return}l.price=r2(v);const k=$('#lpk');if(k&&k.checked){const p=P(l.pid);if(p){p.price=r2(v);save();toast('Ürünün fiyatı kalıcı olarak değişti')}}else toast('Bu satış için fiyat değişti');closeM();drawCart()}
 /* parçalı ödeme */
 const SPK=[['Nakit','💵 Nakit'],['Kart','💳 Kart'],['Havale','🏦 Havale'],['Veresiye','📒 Veresiye']];
@@ -2764,7 +2770,7 @@ function upFix(){if(!D||!D.products)return false;let ch=false;const set=(o,k)=>{
  return ch}
 
 showLoading();setTimeout(netFail,8000);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>{try{r.update()}catch(e){}}).catch(()=>{});{let _rl=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(_rl)return;_rl=true;try{if(S.carts&&S.carts.some(c=>c.items&&c.items.length))return}catch(e){}location.reload()})}
 </script>
 <script type="module">
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
