@@ -697,6 +697,11 @@ body.tmon{overflow:hidden}
 .karrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 12px;background:var(--okSoft,#E7F5EC);border-top:1px solid var(--line);font-size:.85rem}
 .karrow b{color:var(--okTx,#146C2E);font-size:1rem}.karrow b.kn{color:#C42B2B}.karrow .btn{margin-left:auto;min-height:30px}
 .big[onclick]{cursor:pointer;user-select:none}
+
+/* telefon: ekrana sığdır v3.25 */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+@media (max-width:600px){html{font-size:calc(var(--fs,16px) * .88)}body{font-size:14px}.hhead>.row.sp{margin-left:0;width:100%}}
+@media (max-width:370px){html{font-size:calc(var(--fs,16px) * .82)}body{font-size:13px}}
 </style>
 </head>
 <body>
@@ -706,7 +711,7 @@ body.tmon{overflow:hidden}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.24 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.25 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -2373,7 +2378,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.24';
+const APPV='3.25';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -2766,7 +2771,7 @@ function linePrice(i){const go=()=>{const l=C().items[i];if(!l)return;const p=P(
  <div class="row"><button class="btn sp" onclick="closeM()">Vazgeç</button><button class="btn pri" onclick="linePriceOk(${i})">Uygula</button></div>`)};
  if(!isY()&&!D.set.cashDisc)askPw('Fiyat değiştirmek için yönetici onayı gerekiyor.',go);else go()}
 /* ---------- el terminali modu (v3.24) ---------- */
-function termCard(){return `<div class="tmcard" onclick="termStart()" role="button" aria-label="El terminali modunu başlat"><div class="tmic">${ic('scan',26)}</div><div style="flex:1;min-width:0"><b>El terminali modu</b><small>Telefonu barkod okuyucu yap · okuttukların kasaya düşer</small></div><span class="tmgo">BAŞLAT</span></div>`}
+function termCard(){return `<div class="tmcard" onclick="termStart()" role="button" aria-label="El terminali modunu başlat"><div class="tmic">${ic('satis',26)}</div><div style="flex:1;min-width:0"><b>El terminali modu</b><small>Telefonu barkod okuyucu yap · okuttukların kasaya düşer</small></div><span class="tmgo">BAŞLAT</span></div>`}
 function termStart(){lsSet('termMode','1');termOpen()}
 function termKill(){const o=$('#tmode');if(o){stopCam();o.remove()}document.body.classList.remove('tmon');window._tmOpen=false;try{window._wl&&window._wl.release()}catch(e){}window._wl=null}
 function termAuto(){if(lsGet('termMode')==='1'&&!$('#tmode'))termOpen();else if($('#tmode'))termDraw()}
