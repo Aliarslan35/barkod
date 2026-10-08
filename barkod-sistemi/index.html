@@ -728,6 +728,21 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
  .cart .empty{padding:16px 12px}
  .cfoot{padding:5px 12px;gap:8px}.cfoot .btn{min-height:32px;padding:0 10px;font-size:.82rem}
 }
+
+/* müşteri seçimi sekme satırında v3.33 */
+.ctabs{align-items:center}
+.ccust{margin-left:auto;display:flex;align-items:center;gap:6px;flex:none;padding-left:8px}
+.ctabs .ccb{display:inline-flex;align-items:center;gap:6px;max-width:260px;background:var(--surf2);border-color:var(--line2);color:var(--tx);font-weight:600}
+.ctabs .ccb.ci{padding:0 9px;gap:2px;color:var(--acc)}.ctabs .ccb.ci b{font-size:1rem;line-height:1}
+.ccbor{font-size:.8rem;color:var(--tx2);white-space:nowrap}.ccbor b{color:var(--badTx)}
+.ctabs button svg{vertical-align:-2px}
+.ctabs .ccb.tah{background:var(--ok,#157347);border-color:var(--ok,#157347);color:#fff}
+@media (max-width:600px){.ccbor{display:none}}
+/* yatay tablet: hızlı ürünler tam 2 satır */
+@media (min-width:821px) and (max-width:1250px){
+ .pos:not(.qoff):not(.noquick){grid-template-rows:minmax(0,1fr) auto!important}
+ .pos:not(.qoff) .qgrid{max-height:200px!important}
+}
 </style>
 </head>
 <body>
@@ -737,7 +752,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.32 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.33 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1056,14 +1071,14 @@ function drawCart(){
  const c=C(),t=cartTot(c);$('#pos').classList.toggle('ret',c.ret);
  const cu=c.cust?D.customers.find(x=>x.id===c.cust):null;
  const la=S.lastAdd&&S.lastAdd.cid===c.id?S.lastAdd:null;
- $('#cartBox').innerHTML=`<div class="ctabs">${S.carts.map((x,i)=>`<button class="${i===S.ci?'on':''}" onclick="S.ci=${i};S.sel=-1;drawCart()">Müşteri ${i+1}${x.items.length&&i!==S.ci?' · bekliyor':''}</button>`).join('')}<button aria-label="Yeni müşteri sekmesi" onclick="hold()">${ic('plus',16)}</button>${S.carts.length>1?`<button aria-label="Bu sekmeyi kapat" onclick="closeCart()">${ic('x',16)}</button>`:''}</div>
+ $('#cartBox').innerHTML=`<div class="ctabs">${S.carts.map((x,i)=>`<button class="${i===S.ci?'on':''}" onclick="S.ci=${i};S.sel=-1;drawCart()">${(()=>{const k=x.cust&&D.customers.find(y=>y.id===x.cust);return k?`${ic('user',14)} `+esc(k.name):'Müşteri '+(i+1)})()}${x.items.length&&i!==S.ci?' · bekliyor':''}</button>`).join('')}<button aria-label="Yeni müşteri sekmesi" onclick="hold()">${ic('plus',16)}</button>${S.carts.length>1?`<button aria-label="Bu sekmeyi kapat" onclick="closeCart()">${ic('x',16)}</button>`:''}<div class="ccust"${HA('cust_row')}>${cu?`<button class="ccb tah" onclick="tahsPos(${cu.id})">Tahsilat</button>`:''}${cu?`<span class="ccbor">Borç <b>${tl(bal(cu))}</b></span>`:''}<button class="ccb ci" onclick="pickCust()" aria-label="${cu?'Müşteriyi değiştir':'Müşteri seç'}" title="${cu?'Müşteriyi değiştir':'Müşteri seç'} (${kn(KL('cust'))})">${ic(cu?'edit':'user',17)}${cu?'':'<b>+</b>'}</button></div></div>
  ${c.ret?`<div class="rethead">İADE MODU · okutulan ürünler iade alınır <button class="btn sm sp" style="min-height:32px;background:#fff;color:#A61E1E;border:0" onclick="toggleRet()">İadeyi kapat</button></div>`:''}
  ${la&&!isHid('last_band')?`<div class="last" id="lastb"${HA('last_band')}><div class="lic">${pimg(P(la.pid),40)||esc(ini(la.name))}</div><div class="lt"><small>${T('last_lbl','SON OKUTULAN')}</small><b>${esc(la.name)} ${la.unit==='kg'?'· '+qf(la.qty,'kg'):'× '+la.qty}</b></div><div class="lpr">${tl(la.price)}${la.unit==='kg'?'/kg':''}</div></div>`:''}
  <div class="lh"><span>${T('h_urun','ÜRÜN')}</span><span style="text-align:center">${T('h_adet','ADET')}</span><span class="r">${T('h_birim','BİRİM')}</span><span class="r">${T('h_tutar','TUTAR')}</span><span></span></div>
  <div class="lines">${c.items.length?c.items.map((l,i)=>`<div class="ln ${i===S.sel?'sel':''}" onclick="S.sel=${i};drawCart()"><div class="c1"><div class="nm">${esc(l.name)}${l.disc?` <span class="tag t-Nakit">%${l.disc} ind.</span>`:''}${!l.mul&&t.campBy&&t.campBy[l.pid]?` <span class="tag t-Havale">${esc(kampLbl(t.campBy[l.pid]))}</span>`:''}</div><div class="bc2 mono">${esc(l.bc||'')}${karOn()&&!c.ret?' '+karLine(l):''}</div></div>
  <div class="qty c2" onclick="event.stopPropagation()">${l.unit==='kg'?`<button aria-label="Miktarı değiştir" style="width:auto;padding:0 10px;font-size:.9rem;font-weight:800" onclick="askKg(${l.pid},${i})">${qf(l.qty,'kg')}</button>`:`<button aria-label="Azalt" onclick="chq(${i},-1)">${ic('minus',16)}</button><button class="lqc" aria-label="Adedi yaz" title="Adedi yazmak için dokun" onclick="lineQty(${i})">${l.qty}</button><button aria-label="Artır" onclick="chq(${i},1)">${ic('plus',16)}</button>`}</div>
  <span class="r c3 lpc" title="Fiyatı değiştirmek için dokun" onclick="event.stopPropagation();linePrice(${i})">${tl(l.price)}</span><b class="r c4">${tl(lineT(l))}</b><button class="ib ghost c5" aria-label="Satırı sil" onclick="event.stopPropagation();delLine(${i})">${ic('trash',18)}</button></div>`).join(''):`<div class="empty">Sepet boş. Barkod okut, ürün ara ya da hızlı ürünlerden seç.</div>`}</div>
- ${karRow(c,t)}<div class="cfoot"${HA('cust_row')}>${ic('user',18)}<span style="font-size:.88rem">${T('cust_lbl','Müşteri')}: <b>${cu?esc(cu.name):'Seçilmedi'}</b>${cu?` <span class="muted">· borç ${tl(bal(cu))}${cu.limit?' / limit '+tl(cu.limit):''}</span>`:''}</span>${cu?`<button class="btn sm okb sp" onclick="tahsPos(${cu.id})">Tahsilat al</button>`:''}<button class="btn sm ${cu?'':'sp'}" onclick="pickCust()">${cu?T('cust_change','Değiştir'):T('cust_pick','Müşteri seç')} <span class="kbd">${kn(KL('cust'))}</span></button><span class="muted">${c.items.length} kalem</span></div>`;
+ ${karRow(c,t)}`;
  const ch=num(c.rec)-t.total;const [pbig,psm]=payBtns();
  const ls=D.sales.length?D.sales[D.sales.length-1]:null;const canUndo=ls&&S.undo&&S.undo.sid===ls.id;
  $('#payBox').innerHTML=`<div class="payhd"><button class="ib" aria-label="Sepete dön" onclick="payClose()">${ic('chl')}</button><h2>Ödeme</h2><span class="muted">${c.items.length} kalem</span></div>
@@ -2405,7 +2420,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.32';
+const APPV='3.33';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
