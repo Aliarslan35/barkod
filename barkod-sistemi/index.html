@@ -654,6 +654,49 @@ body.demo::after{content:'DENEME MODU · kaydedilmez';position:fixed;left:50%;bo
 .setup{margin-bottom:16px;border:1.5px solid color-mix(in srgb,var(--acc) 35%,var(--line))}
 .webset{border:1.5px solid color-mix(in srgb,var(--acc) 30%,var(--line))}.ord.onew{border-color:var(--warn,#B45309);box-shadow:0 0 0 2px color-mix(in srgb,#F59E0B 35%,transparent)}a.btn{text-decoration:none}.wstat{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding:8px 8px 8px 12px;border-radius:10px;font-weight:700;font-size:.88rem;background:var(--surf2);color:var(--tx2)}.wstat.ok{background:var(--okSoft);color:var(--okTx)}.wstat.bad{background:var(--badSoft);color:var(--badTx)}.onote{font-size:.88rem;background:var(--surf2);border-radius:8px;padding:6px 10px}
 .qrp{text-align:center;padding:10px}.qrp svg{width:min(280px,70vw);height:auto;display:block;margin:10px auto}.qrt{font-size:1.4rem;font-weight:800}.qrs{color:var(--tx2);font-weight:600}
+
+/* el terminali modu v3.24 */
+.tmcard{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#1F5FD6,#0F3A8A);color:#fff;border-radius:18px;padding:16px;margin-bottom:12px;cursor:pointer;box-shadow:0 6px 18px rgba(31,95,214,.28)}
+.tmcard b{font-size:1.1rem;display:block}.tmcard small{display:block;opacity:.85;font-size:.8rem;margin-top:2px;line-height:1.35}
+.tmic{width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.18);display:grid;place-items:center;flex:none}
+.tmgo{background:#fff;color:#1F5FD6;font-weight:900;border-radius:10px;padding:9px 12px;font-size:.85rem;flex:none}
+body.tmon{overflow:hidden}
+#tmode{position:fixed;inset:0;z-index:95;background:#070B12;color:#E8ECF2;display:flex;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);overflow:auto}
+#tmode.fl{animation:tmfl .5s}#tmode.fe{animation:tmfe .6s}
+@keyframes tmfl{0%{box-shadow:inset 0 0 0 8px #3DDC84}100%{box-shadow:inset 0 0 0 0 transparent}}
+@keyframes tmfe{0%{box-shadow:inset 0 0 0 8px #FF5A5A}100%{box-shadow:inset 0 0 0 0 transparent}}
+.tmbar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 14px}
+.tmbar b{font-size:1rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tmpill{display:inline-flex;align-items:center;gap:7px;font-size:.78rem;background:rgba(255,255,255,.1);border-radius:999px;padding:6px 11px;white-space:nowrap}
+.tmpill i{width:8px;height:8px;border-radius:50%;background:#3DDC84;box-shadow:0 0 0 4px rgba(61,220,132,.2)}
+.tmpill.bad{background:#3D1212}.tmpill.bad i{background:#FF6B6B;box-shadow:0 0 0 4px rgba(255,107,107,.2)}
+.tmcam{position:relative;margin:0 12px;border-radius:20px;overflow:hidden;background:#10151D;aspect-ratio:4/3;max-height:42vh;flex:none}
+.tmcam video{width:100%;height:100%;object-fit:cover;display:block}
+.tmwin{position:absolute;inset:22% 12%;border-radius:14px;pointer-events:none}
+.tmwin:before,.tmwin:after{content:"";position:absolute;width:28px;height:28px;border:4px solid #3DDC84}
+.tmwin:before{left:-2px;top:-2px;border-right:0;border-bottom:0;border-radius:12px 0 0 0}
+.tmwin:after{right:-2px;bottom:-2px;border-left:0;border-top:0;border-radius:0 0 12px 0}
+.tmlaser{position:absolute;left:6px;right:6px;top:50%;height:2px;background:#FF4D4D;box-shadow:0 0 10px #FF4D4D;animation:tmls 1.6s ease-in-out infinite}
+@keyframes tmls{0%,100%{transform:translateY(-22px)}50%{transform:translateY(22px)}}
+.tmstart{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:0;border-radius:14px;padding:14px 18px;font-weight:800;font-size:1rem;background:#1F5FD6;color:#fff}
+.tmst{text-align:center;padding:12px 12px 6px}.tmst b{font-size:1.25rem;display:block}.tmst p{margin:3px 0 0;font-size:.8rem;opacity:.65}
+.tmok,.tmerr{margin:4px 12px 8px;border-radius:14px;padding:11px 13px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.tmok{background:#123D25;border:1px solid #2E9E5B}.tmok.fs{background:#14284D;border-color:#3B6FD8}
+.tmok b,.tmerr b{font-size:.98rem;display:block}.tmok small,.tmerr small{display:block;font-size:.76rem;opacity:.75;margin-top:2px}
+.tmok .p{font-size:1.3rem;font-weight:900;color:#6DD58C;white-space:nowrap}.tmok.fs .p{color:#9CC1FF}.tmok .p small{display:inline;font-size:.7rem}
+.tmerr{background:#3D1212;border:1px solid #D04545;display:block}
+.tmlist{margin:0 12px;font-size:.85rem}.tmlist div{display:flex;justify-content:space-between;gap:8px;padding:8px 2px;border-bottom:1px solid #1C2432;opacity:.85}
+.tmman{display:flex;gap:8px;margin:10px 12px 0}.tmman .in{background:#161D29;color:#E8ECF2;border-color:#263042}.tmman .btn{background:#1F5FD6;color:#fff;border:0}
+.tmbtm{margin-top:auto;display:flex;gap:8px;padding:12px}
+.tmbtm button{flex:1;border:0;border-radius:14px;padding:14px 6px;font-weight:800;font-size:.9rem;background:#161D29;color:#E8ECF2;min-height:52px}
+.tmbtm button.on{background:#1F5FD6;color:#fff}.tmbtm button.x{background:#A61E1E;color:#fff}
+
+/* gizli kâr v3.24 */
+.kch{display:inline-block;font-family:Roboto,system-ui,sans-serif;font-size:.74rem;font-weight:800;border-radius:999px;padding:1px 7px;margin-left:4px;vertical-align:1px}
+.kch.kp{background:var(--okSoft,#E7F5EC);color:var(--okTx,#146C2E)}.kch.kn{background:#FDECEC;color:#A61E1E}.kch.k0{background:var(--surf2,#EEF1F5);color:var(--tx3,#8A93A0);font-weight:600}
+.karrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 12px;background:var(--okSoft,#E7F5EC);border-top:1px solid var(--line);font-size:.85rem}
+.karrow b{color:var(--okTx,#146C2E);font-size:1rem}.karrow b.kn{color:#C42B2B}.karrow .btn{margin-left:auto;min-height:30px}
+.big[onclick]{cursor:pointer;user-select:none}
 </style>
 </head>
 <body>
@@ -663,7 +706,7 @@ body.demo::after{content:'DENEME MODU · kaydedilmez';position:fixed;left:50%;bo
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.23 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.24 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -930,7 +973,8 @@ function subNav(){const g=GRP[S.page]||S.page;if(g!=='kasa'&&g!=='ayar')return;c
 function render(){
  if(!MID)return renderAcct();if(!READY)return showLoading();
  applySet();
- if(!S.user)return renderLogin();
+ if(!S.user){termKill();return renderLogin()}
+ termAuto();
  const allowK=['ana','satis','terminal','siparis','gecmis','musteri'];if(!isY()&&!allowK.includes(S.page))S.page='satis';
  if(S.page==='satis'){renderSatis();setTimeout(processRemote,80);return}
  $('#app').innerHTML=`<div class="shell"><div class="scrim" onclick="closeSide()"></div><nav class="side" aria-label="Menü">${sideHTML()}</nav><div style="display:flex;flex-direction:column;min-width:0;min-height:0"><div class="top mtop"><button class="tb" onclick="togSide()" aria-label="Menüyü aç">${ic('menu')}${T('top_menu','Menü')}</button><div class="brand bl"><i class="blg">${LOGO.replace(/lgG/g,'lgG3')}</i><span>${esc(D.set.market)}</span></div><button class="tb sp" onclick="nav('satis')">${ic('satis',18)}Satış</button></div><main class="main" id="main"></main></div></div>`;
@@ -986,14 +1030,14 @@ function drawCart(){
  ${c.ret?`<div class="rethead">İADE MODU · okutulan ürünler iade alınır <button class="btn sm sp" style="min-height:32px;background:#fff;color:#A61E1E;border:0" onclick="toggleRet()">İadeyi kapat</button></div>`:''}
  ${la&&!isHid('last_band')?`<div class="last" id="lastb"${HA('last_band')}><div class="lic">${pimg(P(la.pid),40)||esc(ini(la.name))}</div><div class="lt"><small>${T('last_lbl','SON OKUTULAN')}</small><b>${esc(la.name)} ${la.unit==='kg'?'· '+qf(la.qty,'kg'):'× '+la.qty}</b></div><div class="lpr">${tl(la.price)}${la.unit==='kg'?'/kg':''}</div></div>`:''}
  <div class="lh"><span>${T('h_urun','ÜRÜN')}</span><span style="text-align:center">${T('h_adet','ADET')}</span><span class="r">${T('h_birim','BİRİM')}</span><span class="r">${T('h_tutar','TUTAR')}</span><span></span></div>
- <div class="lines">${c.items.length?c.items.map((l,i)=>`<div class="ln ${i===S.sel?'sel':''}" onclick="S.sel=${i};drawCart()"><div class="c1"><div class="nm">${esc(l.name)}${l.disc?` <span class="tag t-Nakit">%${l.disc} ind.</span>`:''}${!l.mul&&t.campBy&&t.campBy[l.pid]?` <span class="tag t-Havale">${esc(kampLbl(t.campBy[l.pid]))}</span>`:''}</div><div class="bc2 mono">${esc(l.bc||'')}</div></div>
+ <div class="lines">${c.items.length?c.items.map((l,i)=>`<div class="ln ${i===S.sel?'sel':''}" onclick="S.sel=${i};drawCart()"><div class="c1"><div class="nm">${esc(l.name)}${l.disc?` <span class="tag t-Nakit">%${l.disc} ind.</span>`:''}${!l.mul&&t.campBy&&t.campBy[l.pid]?` <span class="tag t-Havale">${esc(kampLbl(t.campBy[l.pid]))}</span>`:''}</div><div class="bc2 mono">${esc(l.bc||'')}${karOn()&&!c.ret?' '+karLine(l):''}</div></div>
  <div class="qty c2" onclick="event.stopPropagation()">${l.unit==='kg'?`<button aria-label="Miktarı değiştir" style="width:auto;padding:0 10px;font-size:.9rem;font-weight:800" onclick="askKg(${l.pid},${i})">${qf(l.qty,'kg')}</button>`:`<button aria-label="Azalt" onclick="chq(${i},-1)">${ic('minus',16)}</button><button class="lqc" aria-label="Adedi yaz" title="Adedi yazmak için dokun" onclick="lineQty(${i})">${l.qty}</button><button aria-label="Artır" onclick="chq(${i},1)">${ic('plus',16)}</button>`}</div>
  <span class="r c3 lpc" title="Fiyatı değiştirmek için dokun" onclick="event.stopPropagation();linePrice(${i})">${tl(l.price)}</span><b class="r c4">${tl(lineT(l))}</b><button class="ib ghost c5" aria-label="Satırı sil" onclick="event.stopPropagation();delLine(${i})">${ic('trash',18)}</button></div>`).join(''):`<div class="empty">Sepet boş. Barkod okut, ürün ara ya da hızlı ürünlerden seç.</div>`}</div>
- <div class="cfoot"${HA('cust_row')}>${ic('user',18)}<span style="font-size:.88rem">${T('cust_lbl','Müşteri')}: <b>${cu?esc(cu.name):'Seçilmedi'}</b>${cu?` <span class="muted">· borç ${tl(bal(cu))}${cu.limit?' / limit '+tl(cu.limit):''}</span>`:''}</span>${cu?`<button class="btn sm okb sp" onclick="tahsPos(${cu.id})">Tahsilat al</button>`:''}<button class="btn sm ${cu?'':'sp'}" onclick="pickCust()">${cu?T('cust_change','Değiştir'):T('cust_pick','Müşteri seç')} <span class="kbd">${kn(KL('cust'))}</span></button><span class="muted">${c.items.length} kalem</span></div>`;
+ ${karRow(c,t)}<div class="cfoot"${HA('cust_row')}>${ic('user',18)}<span style="font-size:.88rem">${T('cust_lbl','Müşteri')}: <b>${cu?esc(cu.name):'Seçilmedi'}</b>${cu?` <span class="muted">· borç ${tl(bal(cu))}${cu.limit?' / limit '+tl(cu.limit):''}</span>`:''}</span>${cu?`<button class="btn sm okb sp" onclick="tahsPos(${cu.id})">Tahsilat al</button>`:''}<button class="btn sm ${cu?'':'sp'}" onclick="pickCust()">${cu?T('cust_change','Değiştir'):T('cust_pick','Müşteri seç')} <span class="kbd">${kn(KL('cust'))}</span></button><span class="muted">${c.items.length} kalem</span></div>`;
  const ch=num(c.rec)-t.total;const [pbig,psm]=payBtns();
  const ls=D.sales.length?D.sales[D.sales.length-1]:null;const canUndo=ls&&S.undo&&S.undo.sid===ls.id;
  $('#payBox').innerHTML=`<div class="payhd"><button class="ib" aria-label="Sepete dön" onclick="payClose()">${ic('chl')}</button><h2>Ödeme</h2><span class="muted">${c.items.length} kalem</span></div>
- <div class="tot" data-ck="panel"><div class="l"><span>${T('tot_sub','Ara toplam')}</span><span>${tl(t.gross)}</span></div>${t.camp?`<div class="l" style="color:#9BE3B9"><span>Kampanya</span><span>−${tl(t.camp)}</span></div>`:''}${t.lineD+c.disc>0?`<div class="l" style="color:#9BE3B9"><span>${T('tot_disc','İndirim')}</span><span>−${tl(t.lineD+c.disc)}</span></div>`:''}<div class="big"><span style="font-weight:700">${c.ret?T('tot_ret','İADE TUTARI'):T('tot_total','TOPLAM')}</span><b>${tl(t.total)}</b></div></div>
+ <div class="tot" data-ck="panel"><div class="l"><span>${T('tot_sub','Ara toplam')}</span><span>${tl(t.gross)}</span></div>${t.camp?`<div class="l" style="color:#9BE3B9"><span>Kampanya</span><span>−${tl(t.camp)}</span></div>`:''}${t.lineD+c.disc>0?`<div class="l" style="color:#9BE3B9"><span>${T('tot_disc','İndirim')}</span><span>−${tl(t.lineD+c.disc)}</span></div>`:''}<div class="big" onclick="karTap()"><span style="font-weight:700">${c.ret?T('tot_ret','İADE TUTARI'):T('tot_total','TOPLAM')}</span><b>${tl(t.total)}</b></div></div>
  <div class="card" style="padding:12px;gap:10px"${HA('rec_box')}><div class="g2" style="gap:10px"><label class="f">${T('rec_lbl','Alınan')}<input class="in" id="rec" inputmode="decimal" value="${esc(c.rec)}" placeholder="${tl(t.total)}" oninput="C().rec=this.value;upCh()" onkeydown="if(event.key==='Enter')pay('Nakit')"></label><div class="f" style="font-size:.82rem;font-weight:600;color:var(--tx2)">${T('chg_lbl','Para üstü')}<div id="chg" style="min-height:46px;display:flex;align-items:center;padding:0 12px;border-radius:10px;background:var(--okSoft);color:var(--okTx);font-weight:800;font-size:1.1rem">${tl(Math.max(0,ch))}</div></div></div>
  ${!c.ret&&t.total>0?`<div class="cash"${HA('cash_chips')}><button class="ex" onclick="cashPay(${Math.round(t.total*100)/100})">Tam</button>${cashOpts(t.total).map(v=>`<button onclick="cashPay(${v})">${v.toLocaleString('tr-TR')}</button>`).join('')}</div>`:''}</div>
  <div class="paybig">${pbig}</div>
@@ -1001,7 +1045,7 @@ function drawCart(){
  ${ls?`<div class="card lsbox"${HA('last_sale')}><div class="row"><h2>${T('ls_title','Satış geçmişi')}</h2><a href="#" class="sp" style="font-size:.82rem;font-weight:700;color:var(--acc)" onclick="event.preventDefault();nav('gecmis',{gTyp:'Tümü'})">Tümünü gör</a></div>
  <div class="lsr" onclick="saleDet(${ls.id})"><span class="tag ${ls.ret?'t-iade':'t-'+ls.pay}">${ls.ret?'İade':esc(payName(ls.pay))}</span><div class="x"><b>${new Date(ls.date).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})} · #${ls.no}</b><span>${esc(ls.user)}</span></div><span class="a">${tl(ls.total)}</span>
  <button class="ib" aria-label="Yazdır" onclick="event.stopPropagation();printSale(${ls.id})">${ic('print',18)}</button>${canUndo?`<button class="ib" aria-label="Satışı geri al" title="Satışı geri al" onclick="event.stopPropagation();ask('Son satış geri alınsın mı? Ürünler sepete geri döner.',undoLast)">${ic('undo',18)}</button>`:(!ls.ret&&!D.sales.some(x=>x.refOf===ls.id)?`<button class="ib" aria-label="İade al" title="Bu fişten iade al" style="color:var(--badTx)" onclick="event.stopPropagation();refund(${ls.id})">${ic('x',18)}</button>`:'')}</div></div>`:''}`;
- $('#mbar').innerHTML=`<div><div style="font-size:.75rem;color:#C9D3E3">${c.ret?'İade':'Toplam'} · ${c.items.length} kalem</div><b>${tl(t.total)}</b></div><button class="btn okb sp" style="min-height:52px;font-size:1.05rem" onclick="payOpen()">Ödeme al ›</button>`;
+ $('#mbar').innerHTML=`<div onclick="karTap()"><div style="font-size:.75rem;color:#C9D3E3">${c.ret?'İade':'Toplam'} · ${c.items.length} kalem${karOn()&&!c.ret&&c.items.length?` · <span style="color:#9BE3B9;font-weight:800">kâr ${tl(karCalc(c,t).k)}</span>`:''}</div><b>${tl(t.total)}</b></div><button class="btn okb sp" style="min-height:52px;font-size:1.05rem" onclick="payOpen()">Ödeme al ›</button>`;
 }
 function printSale(id){saleDet(id);setTimeout(rcPrint,250)}
 function undoLast(){const u=S.undo;if(!u)return;const i=D.sales.findIndex(x=>x.id===u.sid);if(i<0){S.undo=null;return}const s=D.sales[i];
@@ -1084,7 +1128,7 @@ async function camScan(cb,opt){
  camSt('Barkodu sarı çerçeveye getir.');
  barLoop(v);ocrStart();
 }
-const rcv=()=>{const v=lsGet('rcv');return v===null?(!touch()||S.page==='satis'):v==='1'};
+const rcv=()=>{if(lsGet('termMode')==='1')return false;const v=lsGet('rcv');return v===null?(!touch()||S.page==='satis'):v==='1'};
 const devId=()=>{let v=lsGet('devId');if(!v){v='d'+nid();lsSet('devId',v)}return v};
 function processRemote(){if(!READY||!D||!D.remote||!D.remote.length)return;if(!rcv()||!S.user)return;const me=devId();
  const items=D.remote.filter(it=>it.dev!==me).sort((a,b)=>String(a.at).localeCompare(String(b.at)));if(!items.length)return;D.remote=D.remote.filter(it=>it.dev===me);save();
@@ -1097,7 +1141,7 @@ function termUpd(){const row=x=>{const done=!D.remote.some(r=>r.id===x.id);retur
  const l=S.sent||[];const a=$('#tlist');if(a)a.innerHTML=l.map(row).join('')||'<p class="muted" style="margin:0">Henüz okutma yok.</p>';const b=$('#ctl');if(b)b.innerHTML=l.slice(0,3).map(row).join('')}
 function pgTerminal(){$('#main').innerHTML=head('El terminali')+`<div class="card" style="max-width:640px"><p style="margin:0;line-height:1.6">Bu telefonla okuttuğun barkodlar, kasada (bilgisayar ya da tablet) açık olan <b>Satış ekranının</b> sepetine düşer. Kasadaki cihazda satış ekranı açık olsun, ikisi de aynı market hesabıyla girmiş olsun. Kamera açık kalır, ürünleri art arda okutabilirsin.</p>
  ${rcv()?'<p class="err" style="margin:0">Bu cihaz alıcı olarak ayarlı. El terminali olarak kullanacaksan Ayarlar › Satış ekranı bölümünden "Bu cihaz telefondan okutulanları alsın" ayarını kapat.</p>':''}
- <button class="btn pri" style="min-height:64px;font-size:1.15rem" onclick="camScan(termSend,{cont:true})">📷 Okutmaya başla</button>
+ <button class="btn pri" style="min-height:64px;font-size:1.15rem" onclick="termStart()">📷 El terminali modunu başlat</button>
  <div class="row" style="flex-wrap:nowrap"><input class="in mono" id="tin" inputmode="numeric" placeholder="Barkodu elle yaz" onkeydown="if(event.key==='Enter'){termSend(this.value);this.value=''}"><button class="btn" onclick="const i=$('#tin');termSend(i.value);i.value=''">Gönder</button></div>
  <h2>Son okutulanlar</h2><div id="tlist"></div></div>`;termUpd()}
 function camDone(code,src){if(!window._camOn)return;
@@ -1171,6 +1215,7 @@ document.addEventListener('keydown',e=>{
  if(S.capKey){e.preventDefault();setKey(e.key);return}
  if($('#modal').innerHTML){if(e.key==='Escape'){e.preventDefault();stopCam();closeM()}return}
  if(S.page!=='satis'||!S.user)return;
+ if((e.ctrlKey||e.metaKey)&&(e.key==='k'||e.key==='K')&&isY()){e.preventDefault();karTog();return}
  const a=document.activeElement,inInput=!!(a&&(a.tagName==='INPUT'||a.tagName==='SELECT'));
  for(const k in KEYDEF){if(KL(k)!==e.key)continue;
   if(e.key.length===1&&(inInput||e.ctrlKey||e.metaKey))break;
@@ -1810,7 +1855,8 @@ function pgAna(){const h=new Date().getHours();const sel=h<12?'Günaydın':h<18?
  const ver=D.customers.reduce((a,c)=>a+Math.max(0,bal(c)),0);const my=D.sales.filter(s=>!s.ret&&s.user===S.user.name&&inPer(s.date,'bugun'));
  const kpi=(l,v,c)=>`<div class="kpi"><span>${l}</span><b style="${c?'color:'+c:''}">${v}</b></div>`;
  const last=[...D.sales].reverse().slice(0,5);
- $('#main').innerHTML=`<div class="hhead"><div><h1>${sel}, ${esc(String(S.user.name).split(' ')[0])}</h1><p class="muted" style="margin:4px 0 0">${new Date().toLocaleDateString('tr-TR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})} · ${esc(D.set.market)}</p></div><div class="row sp" style="gap:8px"><span class="chip" style="min-height:40px">${ic('user',16)} ${esc(S.user.name)} · ${isY()?'Yönetici':'Kasiyer'}</span><button class="btn" onclick="nav('terminal')" title="Telefonu barkod okuyucu olarak kullan">📱 El terminali</button><button class="btn" onclick="logout()">Çıkış</button><button class="btn okb hgo" onclick="nav('satis')">${ic('satis',20)} Satışa başla</button></div></div>
+ $('#main').innerHTML=`<div class="hhead"><div><h1>${sel}, ${esc(String(S.user.name).split(' ')[0])}</h1><p class="muted" style="margin:4px 0 0">${new Date().toLocaleDateString('tr-TR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})} · ${esc(D.set.market)}</p></div><div class="row sp" style="gap:8px"><span class="chip" style="min-height:40px">${ic('user',16)} ${esc(S.user.name)} · ${isY()?'Yönetici':'Kasiyer'}</span>${touch()?'':`<button class="btn" onclick="nav('terminal')" title="Telefonu barkod okuyucu olarak kullan">📱 El terminali</button>`}<button class="btn" onclick="logout()">Çıkış</button><button class="btn okb hgo" onclick="nav('satis')">${ic('satis',20)} Satışa başla</button></div></div>
+ ${touch()?termCard():''}
  ${isY()?`<div class="kpis">${kpi('Bugünkü ciro',tl(st.ciro)+anaChg(st.ciro,dn.ciro))}${kpi('Fiş sayısı',st.fis+anaChg(st.fis,dn.fis))}${kpi('Ortalama sepet',tl(st.ort)+anaChg(st.ort,dn.ort))}${kpi('Brüt kâr',tl(st.brut)+anaChg(st.brut,dn.brut),'var(--okTx)')}${kpi('Veresiye alacağı',tl(ver),'var(--warnTx)')}${kpi('Kritik stok',low.length,low.length?'var(--badTx)':'')}</div>`:`<div class="kpis" style="grid-template-columns:repeat(2,1fr);max-width:520px">${kpi('Bugün kestiğin fiş',my.length)}${kpi('Bugünkü satışın',tl(my.reduce((a,s)=>a+s.total,0)))}</div>`}
  
  
@@ -2327,7 +2373,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.23';
+const APPV='3.24';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -2719,6 +2765,66 @@ function linePrice(i){const go=()=>{const l=C().items[i];if(!l)return;const p=P(
  ${p&&isY()&&!l.mul&&!l.unreg?`<label class="row" style="gap:10px;cursor:pointer;flex-wrap:nowrap"><input type="checkbox" class="tck" id="lpk"><span>Ürünün fiyatını da kalıcı olarak değiştir</span></label>`:''}
  <div class="row"><button class="btn sp" onclick="closeM()">Vazgeç</button><button class="btn pri" onclick="linePriceOk(${i})">Uygula</button></div>`)};
  if(!isY()&&!D.set.cashDisc)askPw('Fiyat değiştirmek için yönetici onayı gerekiyor.',go);else go()}
+/* ---------- el terminali modu (v3.24) ---------- */
+function termCard(){return `<div class="tmcard" onclick="termStart()" role="button" aria-label="El terminali modunu başlat"><div class="tmic">${ic('scan',26)}</div><div style="flex:1;min-width:0"><b>El terminali modu</b><small>Telefonu barkod okuyucu yap · okuttukların kasaya düşer</small></div><span class="tmgo">BAŞLAT</span></div>`}
+function termStart(){lsSet('termMode','1');termOpen()}
+function termKill(){const o=$('#tmode');if(o){stopCam();o.remove()}document.body.classList.remove('tmon');window._tmOpen=false;try{window._wl&&window._wl.release()}catch(e){}window._wl=null}
+function termAuto(){if(lsGet('termMode')==='1'&&!$('#tmode'))termOpen();else if($('#tmode'))termDraw()}
+async function termWake(){try{if('wakeLock' in navigator&&document.visibilityState==='visible'&&!window._wl){window._wl=await navigator.wakeLock.request('screen');window._wl.addEventListener('release',()=>{window._wl=null})}}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&$('#tmode')){termWake();if(!window._camOn)termCam()}});
+window.addEventListener('popstate',()=>{if($('#tmode')){try{history.pushState({tm:1},'')}catch(e){}}});
+function termOpen(){if($('#tmode'))return;S.tm=S.tm||{mode:'send',q:1,last:null};S.sent=S.sent||[];
+ const o=document.createElement('div');o.id='tmode';document.body.appendChild(o);document.body.classList.add('tmon');window._tmOpen=true;
+ o.innerHTML=`<div class="tmbar"><b>${esc(D.set.market||'Market')} · Terminal</b><span class="tmpill" id="tmpill"></span></div>
+ <div class="tmcam" id="tmcam"><video id="cv" playsinline muted></video><div class="tmwin"><i class="tmlaser"></i></div><button class="tmstart" id="tmstart" onclick="termCam()" style="display:none">📷 Kamerayı başlat</button></div>
+ <div class="tmst" id="tmst"></div><div id="tmlast"></div><div class="tmlist" id="tmlist"></div>
+ <div class="tmman"><input class="in mono" id="tmin" inputmode="numeric" placeholder="Barkodu elle yaz" onkeydown="if(event.key==='Enter'){termHit(this.value);this.value=''}"><button class="btn" onclick="const i=$('#tmin');termHit(i.value);i.value=''">Gönder</button></div>
+ <div class="tmbtm"><button id="tmtorch" onclick="termTorch()">🔦 Işık</button><button id="tmqty" onclick="termQty()">Adet ×</button><button id="tmfs" onclick="termMode()">Fiyat sor</button><button class="x" onclick="termClose()">Kapat</button></div>`;
+ try{history.pushState({tm:1},'')}catch(e){}termWake();termDraw();termCam()}
+async function termCam(){const b=$('#tmstart');if(b)b.style.display='none';stopCam();
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){if(b)b.style.display='';termSt('Bu tarayıcı kameraya erişemiyor','Barkodu aşağıya elle yazabilirsin');return}
+ window._camCb=termHit;window._camCont=true;const v=$('#cv');if(!v)return;let st;const vc={width:{ideal:1280},height:{ideal:720}};const id=await pickCam();
+ try{st=await navigator.mediaDevices.getUserMedia({audio:false,video:id?{...vc,deviceId:{exact:id}}:{...vc,facingMode:{ideal:'environment'}}})}
+ catch(e){try{st=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'}}})}catch(e2){if(b)b.style.display='';termSt('Kamera açılamadı','"Kamerayı başlat"a bas, izin ver');return}}
+ if(!$('#tmode')){st.getTracks().forEach(t=>t.stop());return}
+ window._cs=st;window._camOn=true;window._camCont=true;window._camCb=termHit;window._barSeen={};window._ocrSeen={};v.srcObject=st;try{await v.play()}catch(e){}
+ const tr=st.getVideoTracks()[0];window._ctr=tr;try{const c=tr.getCapabilities?tr.getCapabilities():{};if(c.focusMode&&c.focusMode.includes('continuous'))await tr.applyConstraints({advanced:[{focusMode:'continuous'}]});const t=$('#tmtorch');if(t)t.style.display=c.torch?'':'none'}catch(e){}
+ termDraw();barLoop(v);ocrStart()}
+function termSt(a,b){const e=$('#tmst');if(e)e.innerHTML=`<b>${a}</b><p>${b||''}</p>`}
+async function termTorch(){const tr=window._ctr;if(!tr)return;window._torch=!window._torch;try{await tr.applyConstraints({advanced:[{torch:window._torch}]})}catch(e){toast('Bu telefonda ışık açılamıyor')}const t=$('#tmtorch');if(t)t.classList.toggle('on',!!window._torch)}
+function termQty(){modal(mHead('Sıradaki ürün kaç adet?')+`<input class="in" id="tmqv" type="number" inputmode="numeric" min="1" value="${S.tm.q>1?S.tm.q:''}" placeholder="örn. 6" style="font-size:1.6rem;font-weight:800;text-align:center" onkeydown="if(event.key==='Enter')termQtyOk()">
+ <div class="row" style="gap:6px">${[2,3,4,5,6,10,12,24].map(n=>`<button class="chip" onclick="$('#tmqv').value=${n};termQtyOk()">${n}</button>`).join('')}</div>
+ <div class="row"><button class="btn sp" onclick="S.tm.q=1;closeM();termDraw()">Vazgeç</button><button class="btn pri" onclick="termQtyOk()">Tamam</button></div>`);setTimeout(()=>{const e=$('#tmqv');e&&e.focus()},60)}
+function termQtyOk(){const v=Math.round(num2($('#tmqv').value));S.tm.q=v>1?v:1;closeM();termDraw()}
+function termMode(){S.tm.mode=S.tm.mode==='fiyat'?'send':'fiyat';termDraw()}
+function termClose(){ask('El terminali modu kapatılsın mı?',()=>{lsSet('termMode','0');termKill();nav('ana')})}
+function termHit(code){code=String(code||'').trim().replace(/\s/g,'');if(!code)return;const p=findCode(code);const o=$('#tmode');
+ if(o){o.classList.remove('fl','fe');void o.offsetWidth;o.classList.add(p?'fl':'fe')}
+ if(!p){beep(false);if(navigator.vibrate)navigator.vibrate([80,60,80])}
+ if(S.tm.mode==='fiyat'){S.tm.last={code,p,fiyat:1};termDraw();return}
+ const q=S.tm.q||1;S.tm.q=1;
+ const it={id:nid(),code,qty:q,at:new Date().toISOString(),from:S.user?S.user.name:'',dev:devId()};D.remote.push(it);save();
+ S.sent=[{id:it.id,code,q,name:p?p.name:'Kayıtlı değil',price:p?p.price:0,ok:!!p,at:Date.now()},...(S.sent||[])].slice(0,30);
+ if(p&&navigator.vibrate)navigator.vibrate(60);S.tm.last={code,p,q,id:it.id};termDraw()}
+function termDraw(){if(!$('#tmode'))return;const tm=S.tm;const mine=(D.remote||[]).filter(r=>r.dev===devId());const now=Date.now();
+ const wait=mine.length,stale=mine.some(r=>now-new Date(r.at).getTime()>15000);
+ const pill=$('#tmpill');if(pill){pill.className='tmpill'+(!navigator.onLine?' bad':stale?' bad':'');pill.innerHTML=`<i></i>${!navigator.onLine?'İnternet yok':stale?'Kasa yanıt vermiyor':wait?'Kasaya gidiyor…':'Kasaya bağlı'}`}
+ if(!window._camOn&&!$('#tmst b'))termSt('Kamera açılıyor…','');
+ else if(window._camOn)termSt(tm.mode==='fiyat'?'Fiyat sor modu':'Okutmaya hazır',tm.mode==='fiyat'?'Okutunca sadece fiyat görünür, kasaya gitmez':tm.q>1?`Sıradaki ürün <b>${tm.q} adet</b> gidecek`:'Ürünü çerçeveye tut · otomatik okur');
+ const L=tm.last,lb=$('#tmlast');if(lb)lb.innerHTML=!L?'':L.p?`<div class="tmok${L.fiyat?' fs':''}"><div style="min-width:0"><b>${esc(L.p.name)}${L.q>1?' × '+L.q:''}</b><small>${L.fiyat?'Sadece fiyat · kasaya gönderilmedi':mine.some(r=>r.id===L.id)?'Kasaya gönderiliyor…':'Kasaya düştü ✓'}</small></div><span class="p">${tl(L.p.price)}${L.p.unit==='kg'?'<small>/kg</small>':''}</span></div>`
+  :`<div class="tmerr"><b>Kayıtlı değil: <span class="mono">${esc(L.code)}</span></b><small>${L.fiyat?'Bu barkod sistemde yok':'Kasada fiyatı sorulacak'}</small></div>`;
+ const ls=$('#tmlist');if(ls)ls.innerHTML=(S.sent||[]).slice(L&&!L.fiyat?1:0,6).map(x=>{const d=!mine.some(r=>r.id===x.id);return `<div><span>${esc(x.name)}${x.q>1?' × '+x.q:''}</span><span>${x.ok?tl(x.price*x.q):'—'} ${d?'✓':'…'}</span></div>`}).join('');
+ const q=$('#tmqty');if(q){q.textContent=tm.q>1?'Adet × '+tm.q:'Adet ×';q.classList.toggle('on',tm.q>1)}const f=$('#tmfs');if(f)f.classList.toggle('on',tm.mode==='fiyat')}
+setInterval(()=>{if($('#tmode'))termDraw()},3000);
+window.addEventListener('online',()=>$('#tmode')&&termDraw());window.addEventListener('offline',()=>$('#tmode')&&termDraw());
+/* ---------- gizli kâr (yönetici) ---------- */
+const karOn=()=>isY()&&lsGet('karOn')==='1';
+function karTap(e){if(!isY())return;const n=Date.now();if(n-(window._kt||0)<450){window._kt=0;karTog()}else window._kt=n}
+function karTog(){if(!isY())return;lsSet('karOn',karOn()?'0':'1');drawCart();toast(karOn()?'Kâr gösteriliyor (kapatmak için toplama çift dokun)':'Kâr gizlendi')}
+function karLine(l){if(!(l.cost>0))return '<span class="kch k0">alış yok</span>';const k=r2(lineT(l)-l.qty*l.cost);return `<span class="kch ${k<0?'kn':'kp'}">${k<0?'−':'+'}${tl(Math.abs(k))}</span>`}
+function karCalc(c,t){let cost=0,miss=0,noc=0;c.items.forEach(l=>{if(l.cost>0)cost+=l.qty*l.cost;else{miss++;noc+=lineT(l)}});const k=r2(t.total-cost-noc);return {k,cost:r2(cost),miss,pct:cost>0?Math.round(k/cost*100):null}}
+function karRow(c,t){if(!karOn()||c.ret||!c.items.length)return '';const r=karCalc(c,t);return `<div class="karrow"><span>Bu satıştan kâr</span><b class="${r.k<0?'kn':''}">${r.k<0?'−':''}${tl(Math.abs(r.k))}${r.pct!=null?` · %${r.pct}`:''}</b>${r.miss?`<span class="muted">${r.miss} üründe alış fiyatı yok</span>`:''}<button class="btn sm sp" onclick="karTog()">Gizle</button></div>`}
+
 function lineQty(i){const l=C().items[i];if(!l)return;
  modal(mHead('Adet: '+esc(l.name))+`<label class="f">Kaç adet<input class="in" id="lqv" type="number" inputmode="numeric" min="0" step="1" autofocus value="${l.qty}" style="font-size:1.6rem;font-weight:800;text-align:center" onfocus="this.select()" onkeydown="if(event.key==='Enter')lineQtyOk(${i})"></label>
  <div class="row" style="gap:6px">${[2,3,5,6,10,12,20,24].map(n=>`<button class="chip" onclick="$('#lqv').value=${n};lineQtyOk(${i})">${n}</button>`).join('')}</div>
