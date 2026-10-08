@@ -743,6 +743,29 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
  .pos:not(.qoff):not(.noquick){grid-template-rows:minmax(0,1fr) auto!important}
  .pos:not(.qoff) .qgrid{max-height:200px!important}
 }
+
+/* satışta canlı kamera v3.34 */
+.lvbtn{background:var(--acc)!important;color:#fff!important;border-radius:8px}
+.lvp{display:flex;flex-direction:column;gap:8px;height:100%;min-height:0}
+.lvcam{position:relative;flex:1;min-height:200px;border-radius:14px;overflow:hidden;background:radial-gradient(circle at 50% 45%,#2A3240,#10151D)}
+.lvcam video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.lvcam.fl{animation:tmfl .5s}.lvcam.fe{animation:tmfe .6s}
+.lvcam .tmwin{inset:24% 14%}
+.lvctl{position:absolute;top:8px;left:8px;right:8px;display:flex;gap:6px;align-items:center;z-index:2}
+.lvctl button,.lvlive{border:0;background:rgba(0,0,0,.55);color:#fff;font-size:.78rem;font-weight:700;border-radius:999px;padding:6px 11px}
+.lvctl button.on{background:#F2B705;color:#14181F}.lvlive{background:#A61E1E}
+.lvst{position:absolute;left:0;right:0;top:46%;text-align:center;color:#fff;font-weight:700;font-size:.9rem;z-index:2}
+#lvpop{position:absolute;left:8px;right:8px;bottom:8px;z-index:2}
+.lvpp{display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(18,61,37,.95);border:1px solid #2E9E5B;color:#fff;border-radius:12px;padding:8px 12px}
+.lvpp b{font-size:.95rem;display:block}.lvpp small{display:block;font-size:.72rem;opacity:.8}
+.lvpp .q{background:#3DDC84;color:#0B2A17;font-weight:900;border-radius:9px;padding:4px 10px;font-size:1.15rem;white-space:nowrap}
+.lvpp.nx{background:rgba(20,40,77,.95);border-color:#3B6FD8}.lvpp.nx .q{background:#9CC1FF;color:#0B1A33}
+.lvpp.er{background:rgba(61,18,18,.95);border-color:#D04545}
+.lvq{display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:.8rem;font-weight:700;color:var(--tx2)}
+.lvq span{margin-right:2px}.lvq .chip{padding:0 10px;min-width:34px;justify-content:center}@media (min-width:821px){.lvq span{display:none}}
+.pos.lvon .quick{display:flex;flex-direction:column;padding:10px}
+@media (min-width:821px){.pos.lvon,.pos.lvon.qoff{grid-template-columns:minmax(230px,27%) 1fr 330px!important;grid-template-areas:"quick cart pay"!important;grid-template-rows:minmax(0,1fr)!important}.pos.lvon .quick{max-height:none!important}}
+@media (max-width:820px){.pos.lvon .quick{order:0}.lvcam{min-height:0;height:36vh;flex:none}}
 </style>
 </head>
 <body>
@@ -752,7 +775,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.33 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.34 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1013,7 +1036,7 @@ function sideHTML(){
 function openSide(){const s=$('.shell')||$('.drawer');if(s)s.classList.add('open');const t=$('#app>header.top')||$('.mtop');document.documentElement.style.setProperty('--toph',(t&&innerWidth>820?t.offsetHeight:0)+'px');document.body.classList.add('mopen')}
 function closeSide(){const s=$('.shell')||$('.drawer');if(s)s.classList.remove('open');document.body.classList.remove('mopen')}
 function togSide(){document.body.classList.contains('mopen')?closeSide():openSide()}
-function nav(pg,opt){document.body.classList.remove('mopen');{const gNow=GRP[S.page]||S.page;if(pg==='urun'&&gNow!=='urun'){S.uq='';S.uCat='';S.uBr='';S.uf='Tümü';S.usel={};S.uLim=100}if(pg==='stok'&&gNow!=='urun'){S.sq='';S.sCat='';S.sf='Tümü'}if(pg==='etiket2'||pg==='etiket'){if(S.page!=='etiket2'&&S.e2){S.e2.q='';S.e2.cat='';S.e2.br=''}}}if(opt)Object.assign(S,opt);S.page=pg;document.body.classList.remove('paying');closeM();render();window.scrollTo(0,0)}
+function nav(pg,opt){document.body.classList.remove('mopen');if(S.lv&&pg!=='satis'){S.lv=false;stopCam()}{const gNow=GRP[S.page]||S.page;if(pg==='urun'&&gNow!=='urun'){S.uq='';S.uCat='';S.uBr='';S.uf='Tümü';S.usel={};S.uLim=100}if(pg==='stok'&&gNow!=='urun'){S.sq='';S.sCat='';S.sf='Tümü'}if(pg==='etiket2'||pg==='etiket'){if(S.page!=='etiket2'&&S.e2){S.e2.q='';S.e2.cat='';S.e2.br=''}}}if(opt)Object.assign(S,opt);S.page=pg;document.body.classList.remove('paying');closeM();render();window.scrollTo(0,0)}
 function subNav(){const g=GRP[S.page]||S.page;if(g!=='kasa'&&g!=='ayar')return;const m=MENU.find(x=>x[0]===g);if(!m||!m[3])return;const mn=$('#main');if(!mn)return;
  mn.insertAdjacentHTML('afterbegin',`<div class="seg subnav">${m[3].map(([l,pg,o])=>`<button class="${pg===S.page?'on':''}" onclick="nav('${pg}'${o?','+esc(JSON.stringify(o)):''})">${l}</button>`).join('')}</div>`)}
 function render(){
@@ -1038,20 +1061,20 @@ function renderSatis(){
  const qoff=lsGet('qOff')==='1';
  $('#app').innerHTML=`<div class="drawer"><div class="scrim" onclick="closeSide()"></div><nav class="side" aria-label="Menü">${sideHTML()}</nav></div>
  <header class="top" data-ck="panel"><button class="tbi" onclick="togSide()" aria-label="Menüyü aç">${ic('menu')}</button><div class="brand bl"><i class="blg">${LOGO.replace(/lgG/g,'lgG3')}</i><span>${esc(D.set.market)}</span></div>
- <div class="scan">${ic('satis',22)}<input id="scan" placeholder="Barkod okut veya ürün ara…" autocomplete="off" enterkeyhint="go" oninput="sugg()" onkeydown="scanKey(event)"><button class="ib ghost" aria-label="Kamerayla okut" onclick="camScan()" style="color:var(--acc)">${ic('cam')}</button><span class="kbd">${kn(KL('scan'))}</span><div id="sg" class="sugg"></div></div>
+ <div class="scan">${ic('satis',22)}<input id="scan" placeholder="Barkod okut veya ürün ara…" autocomplete="off" enterkeyhint="go" oninput="sugg()" onkeydown="scanKey(event)"><button class="ib ghost${S.lv?' lvbtn':''}" aria-label="Kamerayla sürekli okut" title="Kamerayla okut (açık kalır)" onclick="lvTog()" style="color:var(--acc)">${ic('cam')}</button><span class="kbd">${kn(KL('scan'))}</span><div id="sg" class="sugg"></div></div>
  <button class="tbi" onclick="togTheme()" aria-label="Açık / koyu tema">${ic(isDark()?'sun':'moon',20)}</button>
  <div class="net" id="net" title="İnternet bağlantısı"><i></i><span>Çevrimiçi</span></div>
  <button class="ordb"${HA('top_siparis')} data-ck="siparis" onclick="nav('siparis')">${ic('siparis',18)}${T('top_siparis','Siparişler')} ${yeni?`<b>${yeni}</b>`:''}</button>
  <div class="who">${esc(S.user.isim||S.user.name)}<br><small id="clk"></small></div></header>
- <div class="pos ${isHid('quick')?'noquick':''} ${qoff?'qoff':''}" id="pos">
- <section class="card quick"${HA('quick')}><button class="qopen" onclick="qTog(false)" aria-label="Hızlı ürünleri aç">${ic('grid',20)}<span>${esc(Tp('quick_title','Hızlı ürünler'))}</span></button>
+ <div class="pos ${S.lv?'lvon':(isHid('quick')?'noquick':'')} ${!S.lv&&qoff?'qoff':''}" id="pos">
+ <section class="card quick"${HA('quick')}>${S.lv?lvHTML():`<button class="qopen" onclick="qTog(false)" aria-label="Hızlı ürünleri aç">${ic('grid',20)}<span>${esc(Tp('quick_title','Hızlı ürünler'))}</span></button>
  <div class="qrow"><h2 class="qh">${T('quick_title','Hızlı ürünler')}</h2><span class="qact">${isY()?`<button class="ib ghost qed" title="Hızlı ürünleri düzenle" aria-label="Hızlı ürünleri düzenle" onclick="nav('urun',{uTab:'urun',uf:'Hızlı'})">${ic('edit',17)}</button>`:''}<button class="qtog" onclick="qTog(true)" aria-label="Hızlı ürünleri kapat">${ic('chl',16)}</button></span>${cats.map(c=>`<button class="chip ${S.qcat===c?'on':''}" onclick="S.qcat='${esc(c)}';renderSatis()">${esc(c)}</button>`).join('')}</div>
- <div class="qgrid">${D.products.filter(p=>p.quick&&(S.qcat==='Tümü'||p.cat===S.qcat)).sort(qSort).map(p=>`<button class="qp2 ${p.img?'im':''} ${p.stock<=0?'out':''}" style="--qc:${qcol(p.cat)}" onclick="addP(${p.id})" title="${esc(p.name)}">${p.img?`<img src="${esc(p.img)}" alt="" loading="lazy" onerror="this.parentNode.classList.remove('im');this.remove()">`:`<span class="qi">${esc((p.name.trim()[0]||'?').toLocaleUpperCase('tr'))}</span>`}<span class="qpr">${tl(p.price)}${p.unit==='kg'?'<small>/kg</small>':''}</span>${p.stock<=0?'<span class="qx">Stok yok</span>':''}<b class="qn">${esc(p.name)}</b></button>`).join('')||'<div class="muted">Bu kategoride hızlı ürün yok.</div>'}</div></section>
+ <div class="qgrid">${D.products.filter(p=>p.quick&&(S.qcat==='Tümü'||p.cat===S.qcat)).sort(qSort).map(p=>`<button class="qp2 ${p.img?'im':''} ${p.stock<=0?'out':''}" style="--qc:${qcol(p.cat)}" onclick="addP(${p.id})" title="${esc(p.name)}">${p.img?`<img src="${esc(p.img)}" alt="" loading="lazy" onerror="this.parentNode.classList.remove('im');this.remove()">`:`<span class="qi">${esc((p.name.trim()[0]||'?').toLocaleUpperCase('tr'))}</span>`}<span class="qpr">${tl(p.price)}${p.unit==='kg'?'<small>/kg</small>':''}</span>${p.stock<=0?'<span class="qx">Stok yok</span>':''}<b class="qn">${esc(p.name)}</b></button>`).join('')||'<div class="muted">Bu kategoride hızlı ürün yok.</div>'}</div>`}</section>
  <section class="card cart" id="cartBox"></section>
  <section class="pay" id="payBox"></section></div>
  <footer class="keys"${HA('keys')}>${keysBar()}</footer>
  <div class="mbar" id="mbar"></div>`;
- drawCart();tick();netUpd();focusScan();
+ drawCart();tick();netUpd();focusScan();if(S.lv)lvAttach();
 }
 function qTog(off){lsSet('qOff',off?'1':'0');$('#pos').classList.toggle('qoff',off)}
 const isDark=()=>D.set.theme==='dark'||(D.set.theme==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -1190,7 +1213,7 @@ function pgTerminal(){$('#main').innerHTML=head('El terminali')+`<div class="car
  <div class="row" style="flex-wrap:nowrap"><input class="in mono" id="tin" inputmode="numeric" placeholder="Barkodu elle yaz" onkeydown="if(event.key==='Enter'){termSend(this.value);this.value=''}"><button class="btn" onclick="const i=$('#tin');termSend(i.value);i.value=''">Gönder</button></div>
  <h2>Son okutulanlar</h2><div id="tlist"></div></div>`;termUpd()}
 function camDone(code,src){if(!window._camOn)return;
- if(window._camCont){const now=Date.now();if(now<(window._camPause||0))return;if(code===window._camLast&&now-window._camLastT<2500)return;window._camLast=code;window._camLastT=now;window._camPause=now+800;window._barSeen={};window._ocrSeen={};beep(true);const cb=window._camCb;cb&&cb(code);return}
+ if(window._camCont){const now=Date.now();if(now<(window._camPause||0))return;if(code===window._camLast&&now-window._camLastT<(S.lv?1500:2500))return;window._camLast=code;window._camLastT=now;window._camPause=now+(S.lv?450:800);window._barSeen={};window._ocrSeen={};beep(true);const cb=window._camCb;cb&&cb(code);return}
  window._camOn=false;stopCam();beep(true);closeM();const cb=window._camCb;cb&&cb(code)}
 async function getDet(){if(window._det!==undefined)return window._det;window._det=null;
  try{if('BarcodeDetector' in window){const f=await BarcodeDetector.getSupportedFormats();if(f.includes('ean_13'))return window._det=new BarcodeDetector({formats:f.filter(x=>['ean_13','ean_8','upc_a'].includes(x))})}}catch(e){}
@@ -1246,6 +1269,7 @@ function pay(type,parts,force){
  if(parts&&parts.Veresiye>0&&c.cust){const cu=D.customers.find(x=>x.id===c.cust);if(cu)cu.moves.push({date:s.date,t:c.ret?'Veresiye iade (parçalı)':'Veresiye satış (parçalı)',a:(c.ret?-1:1)*parts.Veresiye,sid:s.id})}
  const rec=num(c.rec);if(type==='Nakit'&&!c.ret&&rec>0){s.rec=r2(rec);s.chg=rec>t.total?r2(rec-t.total):0}save();
  S.carts.splice(S.ci,1);if(!S.carts.length)newCart();else S.ci=Math.min(S.ci,S.carts.length-1);S.sel=-1;
+ if(S.lv){S.lv=false;stopCam();renderSatis()}
  drawCart();tick();beep(true);
  if(type==='Veresiye'&&!c.ret&&D.set.waVer!==false&&s.cust)waAfter(s.id);else{if(D.set.autoRc)showRc(s,type==='Nakit'&&rec>t.total?rec-t.total:0);else toast((c.ret?'İade tamamlandı: ':'Satış tamamlandı: ')+tl(Math.abs(s.total)));if(RC().auto){if(D.set.autoRc)setTimeout(rcPrint,300);else printSale(s.id)}}
 }
@@ -2420,7 +2444,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.33';
+const APPV='3.34';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -2869,6 +2893,39 @@ function termDraw(){if(!$('#tmode'))return;const tm=S.tm;const mine=(D.remote||[
  const q=$('#tmqty');if(q){q.textContent=tm.q>1?'Adet × '+tm.q:'Adet ×';q.classList.toggle('on',tm.q>1)}const f=$('#tmfs');if(f)f.classList.toggle('on',tm.mode==='fiyat')}
 setInterval(()=>{if($('#tmode'))termDraw()},3000);
 window.addEventListener('online',()=>$('#tmode')&&termDraw());window.addEventListener('offline',()=>$('#tmode')&&termDraw());
+
+/* ---------- satış ekranında sürekli okuyan kamera (v3.34) ---------- */
+function lvTog(){S.lv?lvStop():lvStart()}
+function lvStart(){if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('Bu cihazda kamera açılamıyor');return}S.lv=true;S.lvq=1;S.lvLast=null;renderSatis()}
+function lvStop(){S.lv=false;stopCam();try{window._wl&&window._wl.release()}catch(e){}window._wl=null;renderSatis()}
+function lvHTML(){const q=S.lvq||1;return `<div class="lvp"><div class="lvcam" id="lvslot"><div class="lvctl"><span class="lvlive">● CANLI</span><span style="flex:1"></span><button id="lvtorch" onclick="lvTorch()" aria-label="Işık" style="display:none">🔦</button><button onclick="lvStop()" aria-label="Kamerayı kapat">✕ Kapat</button></div><div class="tmwin"><i class="tmlaser"></i></div><div class="lvst" id="lvst">Kamera açılıyor…</div><div id="lvpop"></div></div>
+ <div class="lvq"><span>Sıradaki adet:</span>${[1,2,3,6,12].map(n=>`<button class="chip ${q===n?'on':''}" onclick="lvQ(${n})">×${n}</button>`).join('')}<button class="chip ${[1,2,3,6,12].includes(q)?'':'on'}" onclick="lvQask()">${[1,2,3,6,12].includes(q)?'×?':'×'+q}</button></div></div>`}
+function lvQ(n){S.lvq=n>0?n:1;lvQdraw()}
+function lvQdraw(){const e=document.querySelector('.lvq');if(!e)return;const t=document.createElement('div');t.innerHTML=lvHTML();e.replaceWith(t.querySelector('.lvq'));lvPop()}
+function lvQask(){modal(mHead('Sıradaki ürün kaç adet?')+`<input class="in" id="lvqv" type="number" inputmode="numeric" min="1" placeholder="örn. 24" style="font-size:1.6rem;font-weight:800;text-align:center" onkeydown="if(event.key==='Enter'){lvQ(Math.round(num2(this.value)));closeM()}"><div class="row"><button class="btn sp" onclick="closeM()">Vazgeç</button><button class="btn pri" onclick="lvQ(Math.round(num2($('#lvqv').value)));closeM()">Tamam</button></div>`);setTimeout(()=>{const e=$('#lvqv');e&&e.focus()},60)}
+function lvVid(){let v=window._lvV;if(!v){v=document.createElement('video');v.setAttribute('playsinline','');v.muted=true;v.autoplay=true;window._lvV=v}v.id='cv';return v}
+function lvAttach(){const slot=$('#lvslot');if(!slot)return;const v=lvVid();slot.prepend(v);if(window._camOn&&window._cs){if(v.srcObject!==window._cs)v.srcObject=window._cs;try{v.play()}catch(e){}lvSt('');lvPop()}else lvCam()}
+function lvSt(t){const e=$('#lvst');if(e){e.textContent=t;e.style.display=t?'':'none'}}
+async function lvCam(){if(window._lvBusy)return;window._lvBusy=true;try{stopCam();const v=lvVid();const vc={width:{ideal:1280},height:{ideal:720}};const id=await pickCam();let st;
+ try{st=await navigator.mediaDevices.getUserMedia({audio:false,video:id?{...vc,deviceId:{exact:id}}:{...vc,facingMode:{ideal:'environment'}}})}
+ catch(e){try{st=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'}}})}catch(e2){lvSt('Kameraya izin verilmedi');return}}
+ if(!S.lv){st.getTracks().forEach(t=>t.stop());return}
+ window._cs=st;window._camOn=true;window._camCont=true;window._camCb=lvHit;window._barSeen={};window._ocrSeen={};v.srcObject=st;try{await v.play()}catch(e){}
+ const tr=st.getVideoTracks()[0];window._ctr=tr;try{const c=tr.getCapabilities?tr.getCapabilities():{};if(c.focusMode&&c.focusMode.includes('continuous'))await tr.applyConstraints({advanced:[{focusMode:'continuous'}]});const t=$('#lvtorch');if(t)t.style.display=c.torch?'':'none'}catch(e){}
+ lvSt('');termWake();barLoop(v);ocrStart()}finally{window._lvBusy=false}}
+async function lvTorch(){const tr=window._ctr;if(!tr)return;window._torch=!window._torch;try{await tr.applyConstraints({advanced:[{torch:window._torch}]})}catch(e){toast('Bu cihazda ışık açılamıyor')}const t=$('#lvtorch');if(t)t.classList.toggle('on',!!window._torch)}
+function lvHit(code){if(!S.lv||S.page!=='satis')return;if($('#modal').innerHTML){window._camLast='';return}code=String(code||'').trim();if(!code)return;
+ const q=S.lvq||1;S.lvq=1;const s=$('#scan');if(!s)return;const n0=C().items.length;s.value=(q>1?q+'*':'')+code;scanKey({key:'Enter',preventDefault(){}});
+ const p=findCode(code)||D.products.find(x=>x.packBc&&x.packBc===code);const L=p?C().items.find(l=>l.pid===p.id&&!l.unreg):null;
+ S.lvLast=L?{name:L.name,qty:L.qty,unit:L.unit,price:L.price,t:Date.now()}:p?null:{code,miss:1,t:Date.now()};
+ if(navigator.vibrate)navigator.vibrate(L?50:[80,60,80]);const c=$('#lvslot');if(c){c.classList.remove('fl','fe');void c.offsetWidth;c.classList.add(L?'fl':'fe')}
+ lvQdraw()}
+function lvPop(){const e=$('#lvpop');if(!e)return;const L=S.lvLast;const q=S.lvq||1;
+ if(q>1){e.innerHTML=`<div class="lvpp nx"><div><b>Sıradaki ürün: ${q} adet</b><small>Okuttuğun ürün ${q} adet eklenecek</small></div><span class="q">×${q}</span></div>`;return}
+ if(!L||Date.now()-L.t>6000){e.innerHTML='';return}
+ e.innerHTML=L.miss?`<div class="lvpp er"><div><b>Kayıtlı değil</b><small class="mono">${esc(L.code)}</small></div></div>`:`<div class="lvpp"><div><b>${esc(L.name)}</b><small>Sepete eklendi · ${tl(L.price)}${L.unit==='kg'?'/kg':''}</small></div><span class="q">${L.unit==='kg'?qf(L.qty,'kg'):'×'+L.qty}</span></div>`}
+setInterval(()=>{if(S.lv&&S.lvLast&&Date.now()-S.lvLast.t>6000&&(S.lvq||1)===1){const e=$('#lvpop');if(e&&e.innerHTML)e.innerHTML=''}},1000);
+document.addEventListener('visibilitychange',()=>{if(!S.lv)return;if(document.visibilityState==='hidden')stopCam();else if(S.page==='satis'&&$('#lvslot'))lvCam()});
 /* ---------- gizli kâr (yönetici) ---------- */
 const karOn=()=>isY()&&lsGet('karOn')==='1';
 function karTap(e){if(!isY())return;const n=Date.now();if(n-(window._kt||0)<450){window._kt=0;karTog()}else window._kt=n}
