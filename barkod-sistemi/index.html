@@ -766,6 +766,8 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .pos.lvon .quick{display:flex;flex-direction:column;padding:10px}
 @media (min-width:821px){.pos.lvon,.pos.lvon.qoff{grid-template-columns:minmax(230px,27%) 1fr 330px!important;grid-template-areas:"quick cart pay"!important;grid-template-rows:minmax(0,1fr)!important}.pos.lvon .quick{max-height:none!important}}
 @media (max-width:820px){.pos.lvon .quick{order:0}.lvcam{min-height:0;height:36vh;flex:none}}
+
+.lvhint{position:absolute;left:0;right:0;top:40px;text-align:center;color:#fff;font-size:.72rem;opacity:.85;text-shadow:0 1px 3px #000;z-index:2;pointer-events:none;padding:0 8px}
 </style>
 </head>
 <body>
@@ -775,7 +777,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.34 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.35 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1216,16 +1218,18 @@ function camDone(code,src){if(!window._camOn)return;
  if(window._camCont){const now=Date.now();if(now<(window._camPause||0))return;if(code===window._camLast&&now-window._camLastT<(S.lv?1500:2500))return;window._camLast=code;window._camLastT=now;window._camPause=now+(S.lv?450:800);window._barSeen={};window._ocrSeen={};beep(true);const cb=window._camCb;cb&&cb(code);return}
  window._camOn=false;stopCam();beep(true);closeM();const cb=window._camCb;cb&&cb(code)}
 async function getDet(){if(window._det!==undefined)return window._det;window._det=null;
- try{if('BarcodeDetector' in window){const f=await BarcodeDetector.getSupportedFormats();if(f.includes('ean_13'))return window._det=new BarcodeDetector({formats:f.filter(x=>['ean_13','ean_8','upc_a'].includes(x))})}}catch(e){}
- try{const m=await import('https://cdn.jsdelivr.net/npm/barcode-detector@2/dist/es/pure.min.js');window._det=new m.BarcodeDetector({formats:['ean_13','ean_8','upc_a']})}catch(e){window._det=null}
+ try{if('BarcodeDetector' in window){const f=await BarcodeDetector.getSupportedFormats();if(f.includes('ean_13'))return window._det=new BarcodeDetector({formats:f.filter(x=>['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf'].includes(x))})}}catch(e){}
+ try{const m=await import('https://cdn.jsdelivr.net/npm/barcode-detector@2/dist/es/pure.min.js');window._det=new m.BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf']})}catch(e){window._det=null}
  return window._det}
-function crop(v,cv,maxW){const sx=v.videoWidth*.10,sy=v.videoHeight*.32,sw=v.videoWidth*.80,sh=v.videoHeight*.36,sc=Math.min(1.5,maxW/sw);cv.width=Math.round(sw*sc);cv.height=Math.round(sh*sc);cv.getContext('2d',{willReadFrequently:true}).drawImage(v,sx,sy,sw,sh,0,0,cv.width,cv.height);return cv}
+function crop(v,cv,maxW){const sx=v.videoWidth*.06,sy=v.videoHeight*.25,sw=v.videoWidth*.88,sh=v.videoHeight*.50,sc=Math.min(1.5,maxW/sw);cv.width=Math.round(sw*sc);cv.height=Math.round(sh*sc);cv.getContext('2d',{willReadFrequently:true}).drawImage(v,sx,sy,sw,sh,0,0,cv.width,cv.height);return cv}
+function fullFr(v,cv,maxW){const sc=Math.min(1,maxW/v.videoWidth);cv.width=Math.round(v.videoWidth*sc);cv.height=Math.round(v.videoHeight*sc);cv.getContext('2d',{willReadFrequently:true}).drawImage(v,0,0,cv.width,cv.height);return cv}
+function bcKnown(c){return !!(findCode(c)||D.products.find(p=>p.packBc&&p.packBc===c)||(typeof scaleParse==='function'&&(scaleParse(c)||{}).p))}
 async function barLoop(v){const det=await getDet();if(!det)return;
- const cv=document.createElement('canvas');let last='';
- while(window._camOn){try{if(v.readyState>=2&&v.videoWidth){const r=await det.detect(crop(v,cv,900));let got='';
-   for(const x of (r||[])){const c=String(x.rawValue||'').trim();if(validEan(c)){got=c;break}}
-   if(got){if(got===last||findCode(got)&&window._barSeen[got]){camDone(got,'cizgi');if(!window._camCont)return;last='';continue}window._barSeen[got]=1;last=got}}}catch(e){}
-  await new Promise(r=>setTimeout(r,60))}}
+ const cv=document.createElement('canvas');let last='',flip=0;
+ while(window._camOn){try{if(v.readyState>=2&&v.videoWidth){flip=(flip+1)%3;const src=flip===0?crop(v,cv,1000):fullFr(v,cv,flip===1?1280:900);const r=await det.detect(src);let got='',kn=false;
+   for(const x of (r||[])){const c=String(x.rawValue||'').trim();if(!c)continue;const k=bcKnown(c);if(k){got=c;kn=true;break}if(validEan(c)&&!got)got=c}
+   if(got){if(kn||got===last){camDone(got,'cizgi');if(!window._camCont)return;last=''}else last=got}}}catch(e){}
+  await new Promise(r=>setTimeout(r,35))}}
 function loadTess(){if(window.Tesseract)return Promise.resolve();if(window._tessP)return window._tessP;window._tessP=new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';sc.onload=ok;sc.onerror=()=>{window._tessP=null;no()};document.head.appendChild(sc)});return window._tessP}
 async function getOcr(){if(window._ocr)return window._ocr;if(window._ocrP)return window._ocrP;
  window._ocrP=(async()=>{await loadTess();const w=await Tesseract.createWorker('eng');await w.setParameters({tessedit_char_whitelist:'0123456789',tessedit_pageseg_mode:'6'});window._ocr=w;return w})();
@@ -2444,7 +2448,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.34';
+const APPV='3.35';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -2864,7 +2868,7 @@ async function termCam(){const b=$('#tmstart');if(b)b.style.display='none';stopC
  catch(e){try{st=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'}}})}catch(e2){if(b)b.style.display='';termSt('Kamera açılamadı','"Kamerayı başlat"a bas, izin ver');return}}
  if(!$('#tmode')){st.getTracks().forEach(t=>t.stop());return}
  window._cs=st;window._camOn=true;window._camCont=true;window._camCb=termHit;window._barSeen={};window._ocrSeen={};v.srcObject=st;try{await v.play()}catch(e){}
- const tr=st.getVideoTracks()[0];window._ctr=tr;try{const c=tr.getCapabilities?tr.getCapabilities():{};if(c.focusMode&&c.focusMode.includes('continuous'))await tr.applyConstraints({advanced:[{focusMode:'continuous'}]});const t=$('#tmtorch');if(t)t.style.display=c.torch?'':'none'}catch(e){}
+ const tr=st.getVideoTracks()[0];window._ctr=tr;await camTune(tr);try{const c=tr.getCapabilities?tr.getCapabilities():{};const t=$('#tmtorch');if(t)t.style.display=c.torch?'':'none'}catch(e){}
  termDraw();barLoop(v);ocrStart()}
 function termSt(a,b){const e=$('#tmst');if(e)e.innerHTML=`<b>${a}</b><p>${b||''}</p>`}
 async function termTorch(){const tr=window._ctr;if(!tr)return;window._torch=!window._torch;try{await tr.applyConstraints({advanced:[{torch:window._torch}]})}catch(e){toast('Bu telefonda ışık açılamıyor')}const t=$('#tmtorch');if(t)t.classList.toggle('on',!!window._torch)}
@@ -2898,20 +2902,22 @@ window.addEventListener('online',()=>$('#tmode')&&termDraw());window.addEventLis
 function lvTog(){S.lv?lvStop():lvStart()}
 function lvStart(){if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('Bu cihazda kamera açılamıyor');return}S.lv=true;S.lvq=1;S.lvLast=null;renderSatis()}
 function lvStop(){S.lv=false;stopCam();try{window._wl&&window._wl.release()}catch(e){}window._wl=null;renderSatis()}
-function lvHTML(){const q=S.lvq||1;return `<div class="lvp"><div class="lvcam" id="lvslot"><div class="lvctl"><span class="lvlive">● CANLI</span><span style="flex:1"></span><button id="lvtorch" onclick="lvTorch()" aria-label="Işık" style="display:none">🔦</button><button onclick="lvStop()" aria-label="Kamerayı kapat">✕ Kapat</button></div><div class="tmwin"><i class="tmlaser"></i></div><div class="lvst" id="lvst">Kamera açılıyor…</div><div id="lvpop"></div></div>
+function lvHTML(){const q=S.lvq||1;return `<div class="lvp"><div class="lvcam" id="lvslot" onclick="if(event.target.closest('button'))return;camTap()"><div class="lvctl"><span class="lvlive">● CANLI</span><span style="flex:1"></span><button id="lvtorch" onclick="lvTorch()" aria-label="Işık" style="display:none">🔦</button><button onclick="lvStop()" aria-label="Kamerayı kapat">✕ Kapat</button></div><div class="tmwin"><i class="tmlaser"></i></div><div class="lvst" id="lvst">Kamera açılıyor…</div><div id="lvpop"></div><div class="lvhint">Barkodu ya da altındaki rakamları göster · netleşmezse ekrana dokun</div></div>
  <div class="lvq"><span>Sıradaki adet:</span>${[1,2,3,6,12].map(n=>`<button class="chip ${q===n?'on':''}" onclick="lvQ(${n})">×${n}</button>`).join('')}<button class="chip ${[1,2,3,6,12].includes(q)?'':'on'}" onclick="lvQask()">${[1,2,3,6,12].includes(q)?'×?':'×'+q}</button></div></div>`}
 function lvQ(n){S.lvq=n>0?n:1;lvQdraw()}
 function lvQdraw(){const e=document.querySelector('.lvq');if(!e)return;const t=document.createElement('div');t.innerHTML=lvHTML();e.replaceWith(t.querySelector('.lvq'));lvPop()}
 function lvQask(){modal(mHead('Sıradaki ürün kaç adet?')+`<input class="in" id="lvqv" type="number" inputmode="numeric" min="1" placeholder="örn. 24" style="font-size:1.6rem;font-weight:800;text-align:center" onkeydown="if(event.key==='Enter'){lvQ(Math.round(num2(this.value)));closeM()}"><div class="row"><button class="btn sp" onclick="closeM()">Vazgeç</button><button class="btn pri" onclick="lvQ(Math.round(num2($('#lvqv').value)));closeM()">Tamam</button></div>`);setTimeout(()=>{const e=$('#lvqv');e&&e.focus()},60)}
 function lvVid(){let v=window._lvV;if(!v){v=document.createElement('video');v.setAttribute('playsinline','');v.muted=true;v.autoplay=true;window._lvV=v}v.id='cv';return v}
 function lvAttach(){const slot=$('#lvslot');if(!slot)return;const v=lvVid();slot.prepend(v);if(window._camOn&&window._cs){if(v.srcObject!==window._cs)v.srcObject=window._cs;try{v.play()}catch(e){}lvSt('');lvPop()}else lvCam()}
+async function camTune(tr){try{const c=tr.getCapabilities?tr.getCapabilities():{};const adv={};if(c.focusMode&&c.focusMode.includes('continuous'))adv.focusMode='continuous';if(c.zoom&&c.zoom.max>=1.4)adv.zoom=Math.min(c.zoom.max,Math.max(c.zoom.min||1,1.6));if(Object.keys(adv).length)await tr.applyConstraints({advanced:[adv]})}catch(e){}}
+async function camTap(){const tr=window._ctr;if(!tr)return;try{const c=tr.getCapabilities?tr.getCapabilities():{};if(c.focusMode&&c.focusMode.includes('single-shot')){await tr.applyConstraints({advanced:[{focusMode:'single-shot'}]});setTimeout(()=>camTune(tr),900)}}catch(e){}}
 function lvSt(t){const e=$('#lvst');if(e){e.textContent=t;e.style.display=t?'':'none'}}
-async function lvCam(){if(window._lvBusy)return;window._lvBusy=true;try{stopCam();const v=lvVid();const vc={width:{ideal:1280},height:{ideal:720}};const id=await pickCam();let st;
+async function lvCam(){if(window._lvBusy)return;window._lvBusy=true;try{stopCam();const v=lvVid();const vc={width:{ideal:1920},height:{ideal:1080}};const id=await pickCam();let st;
  try{st=await navigator.mediaDevices.getUserMedia({audio:false,video:id?{...vc,deviceId:{exact:id}}:{...vc,facingMode:{ideal:'environment'}}})}
  catch(e){try{st=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'}}})}catch(e2){lvSt('Kameraya izin verilmedi');return}}
  if(!S.lv){st.getTracks().forEach(t=>t.stop());return}
  window._cs=st;window._camOn=true;window._camCont=true;window._camCb=lvHit;window._barSeen={};window._ocrSeen={};v.srcObject=st;try{await v.play()}catch(e){}
- const tr=st.getVideoTracks()[0];window._ctr=tr;try{const c=tr.getCapabilities?tr.getCapabilities():{};if(c.focusMode&&c.focusMode.includes('continuous'))await tr.applyConstraints({advanced:[{focusMode:'continuous'}]});const t=$('#lvtorch');if(t)t.style.display=c.torch?'':'none'}catch(e){}
+ const tr=st.getVideoTracks()[0];window._ctr=tr;await camTune(tr);try{const c=tr.getCapabilities?tr.getCapabilities():{};const t=$('#lvtorch');if(t)t.style.display=c.torch?'':'none'}catch(e){}
  lvSt('');termWake();barLoop(v);ocrStart()}finally{window._lvBusy=false}}
 async function lvTorch(){const tr=window._ctr;if(!tr)return;window._torch=!window._torch;try{await tr.applyConstraints({advanced:[{torch:window._torch}]})}catch(e){toast('Bu cihazda ışık açılamıyor')}const t=$('#lvtorch');if(t)t.classList.toggle('on',!!window._torch)}
 function lvHit(code){if(!S.lv||S.page!=='satis')return;if($('#modal').innerHTML){window._camLast='';return}code=String(code||'').trim();if(!code)return;
