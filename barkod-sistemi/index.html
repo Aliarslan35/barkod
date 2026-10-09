@@ -768,6 +768,15 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 @media (max-width:820px){.pos.lvon .quick{order:0}.lvcam{min-height:0;height:36vh;flex:none}}
 
 .lvhint{position:absolute;left:0;right:0;top:40px;text-align:center;color:#fff;font-size:.72rem;opacity:.85;text-shadow:0 1px 3px #000;z-index:2;pointer-events:none;padding:0 8px}
+
+.lvinfo{position:absolute;left:8px;right:8px;bottom:62px;text-align:center;color:#fff;font-size:.68rem;opacity:.75;text-shadow:0 1px 3px #000;z-index:2;pointer-events:none}
+
+/* hızlı ürünler başlığı düğme v3.37 */
+.qrow .qhb{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px 0 12px;border:1px solid var(--line2);border-radius:8px;background:var(--surf2);color:var(--tx);font-weight:800;font-size:.9rem;cursor:pointer;margin:0 2px 0 0}
+.qrow .qhb:hover{border-color:var(--acc)}
+.qrow .qhc{display:inline-flex;color:var(--tx3)}@media (max-width:1250px){.qrow .qhc svg{transform:rotate(-90deg)}}
+.qrow .qed{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line2);border-radius:8px;background:var(--surf);color:var(--acc);padding:0;cursor:pointer}
+.qrow .qed:hover{border-color:var(--acc)}
 </style>
 </head>
 <body>
@@ -777,7 +786,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.35 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.38 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -839,9 +848,11 @@ const defSet=()=>({market:'[MARKET ADI]',theme:'auto',acc:'#1F5FD6',fs:16,cols:3
 const metaOf=()=>({cats:D.cats,brands:D.brands,tags:D.tags,set:D.set});
 function seedCloud(){const d=seed();d.sales=[];d.expenses=[];d.customers=[];d.orders=[];d.remote=[];d.products.forEach(p=>p.demo=true);return d}
 function save(){dirty=true;clearTimeout(saveT);saveT=setTimeout(flush,60);if(typeof webPubSoon==='function')webPubSoon()}
+const ABS=new Set();function absStock(id){if(id!=null)ABS.add(String(id))}
 function flush(){clearTimeout(saveT);dirty=false;if(!MID||!window.FB||!D)return;const ops=[];try{upFix()}catch(e){}try{phTrack()}catch(e){}
  const mj=JSON.stringify(metaOf());if(mj!==metaJ){metaJ=mj;ops.push(['set','meta','main',JSON.parse(mj)])}
- for(const c of COLS){const seen=new Set();for(const it of D[c]){const id=String(it.id);seen.add(id);const j=JSON.stringify(it);if(CACHE[c][id]!==j){CACHE[c][id]=j;ops.push(['set',c,id,JSON.parse(j)])}}
+ for(const c of COLS){const seen=new Set();for(const it of D[c]){const id=String(it.id);seen.add(id);const j=JSON.stringify(it);if(CACHE[c][id]!==j){const oj=CACHE[c][id];CACHE[c][id]=j;const nw=JSON.parse(j);
+  if(c==='products'&&oj&&!ABS.has(id)){const ol=JSON.parse(oj);const up={};let inc=null;for(const k of new Set([...Object.keys(ol),...Object.keys(nw)])){if(JSON.stringify(ol[k])===JSON.stringify(nw[k]))continue;if(k==='stock'&&typeof ol.stock==='number'&&typeof nw.stock==='number')inc=Math.round((nw.stock-ol.stock)*1000)/1000;else up[k]=nw[k]===undefined?null:nw[k]}ops.push(['merge',c,id,up,inc])}else ops.push(['set',c,id,nw]);ABS.delete(id)}}
   for(const id in CACHE[c])if(!seen.has(id)){delete CACHE[c][id];ops.push(['del',c,id])}}
  if(ops.length)window.FB.write(MID,ops).catch(e=>{toast('Kaydedilemedi: '+(e.code||e.message));onErr(e)})}
 window.addEventListener('pagehide',()=>{if(dirty)flush()});
@@ -1070,7 +1081,7 @@ function renderSatis(){
  <div class="who">${esc(S.user.isim||S.user.name)}<br><small id="clk"></small></div></header>
  <div class="pos ${S.lv?'lvon':(isHid('quick')?'noquick':'')} ${!S.lv&&qoff?'qoff':''}" id="pos">
  <section class="card quick"${HA('quick')}>${S.lv?lvHTML():`<button class="qopen" onclick="qTog(false)" aria-label="Hızlı ürünleri aç">${ic('grid',20)}<span>${esc(Tp('quick_title','Hızlı ürünler'))}</span></button>
- <div class="qrow"><h2 class="qh">${T('quick_title','Hızlı ürünler')}</h2><span class="qact">${isY()?`<button class="ib ghost qed" title="Hızlı ürünleri düzenle" aria-label="Hızlı ürünleri düzenle" onclick="nav('urun',{uTab:'urun',uf:'Hızlı'})">${ic('edit',17)}</button>`:''}<button class="qtog" onclick="qTog(true)" aria-label="Hızlı ürünleri kapat">${ic('chl',16)}</button></span>${cats.map(c=>`<button class="chip ${S.qcat===c?'on':''}" onclick="S.qcat='${esc(c)}';renderSatis()">${esc(c)}</button>`).join('')}</div>
+ <div class="qrow"><button class="qh qhb" onclick="qTog(true)" title="Hızlı ürünleri kapat" aria-label="Hızlı ürünleri kapat">${T('quick_title','Hızlı ürünler')}<span class="qhc">${ic('chl',14)}</span></button>${isY()?`<span class="qact"><button class="qed" title="Hızlı ürünleri düzenle" aria-label="Hızlı ürünleri düzenle" onclick="nav('urun',{uTab:'urun',uf:'Hızlı'})">${ic('edit',16)}</button></span>`:''}${cats.map(c=>`<button class="chip ${S.qcat===c?'on':''}" onclick="S.qcat='${esc(c)}';renderSatis()">${esc(c)}</button>`).join('')}</div>
  <div class="qgrid">${D.products.filter(p=>p.quick&&(S.qcat==='Tümü'||p.cat===S.qcat)).sort(qSort).map(p=>`<button class="qp2 ${p.img?'im':''} ${p.stock<=0?'out':''}" style="--qc:${qcol(p.cat)}" onclick="addP(${p.id})" title="${esc(p.name)}">${p.img?`<img src="${esc(p.img)}" alt="" loading="lazy" onerror="this.parentNode.classList.remove('im');this.remove()">`:`<span class="qi">${esc((p.name.trim()[0]||'?').toLocaleUpperCase('tr'))}</span>`}<span class="qpr">${tl(p.price)}${p.unit==='kg'?'<small>/kg</small>':''}</span>${p.stock<=0?'<span class="qx">Stok yok</span>':''}<b class="qn">${esc(p.name)}</b></button>`).join('')||'<div class="muted">Bu kategoride hızlı ürün yok.</div>'}</div>`}</section>
  <section class="card cart" id="cartBox"></section>
  <section class="pay" id="payBox"></section></div>
@@ -1218,8 +1229,8 @@ function camDone(code,src){if(!window._camOn)return;
  if(window._camCont){const now=Date.now();if(now<(window._camPause||0))return;if(code===window._camLast&&now-window._camLastT<(S.lv?1500:2500))return;window._camLast=code;window._camLastT=now;window._camPause=now+(S.lv?450:800);window._barSeen={};window._ocrSeen={};beep(true);const cb=window._camCb;cb&&cb(code);return}
  window._camOn=false;stopCam();beep(true);closeM();const cb=window._camCb;cb&&cb(code)}
 async function getDet(){if(window._det!==undefined)return window._det;window._det=null;
- try{if('BarcodeDetector' in window){const f=await BarcodeDetector.getSupportedFormats();if(f.includes('ean_13'))return window._det=new BarcodeDetector({formats:f.filter(x=>['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf'].includes(x))})}}catch(e){}
- try{const m=await import('https://cdn.jsdelivr.net/npm/barcode-detector@2/dist/es/pure.min.js');window._det=new m.BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf']})}catch(e){window._det=null}
+ try{if('BarcodeDetector' in window){const f=await BarcodeDetector.getSupportedFormats();if(f.includes('ean_13')){window._detK='hızlı';return window._det=new BarcodeDetector({formats:f.filter(x=>['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf'].includes(x))})}}}catch(e){}
+ try{window._detK='yükleniyor';const m=await import('https://cdn.jsdelivr.net/npm/barcode-detector@2/dist/es/pure.min.js');window._det=new m.BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf']});window._detK='yedek'}catch(e){window._det=null;window._detK='yok'}
  return window._det}
 function crop(v,cv,maxW){const sx=v.videoWidth*.06,sy=v.videoHeight*.25,sw=v.videoWidth*.88,sh=v.videoHeight*.50,sc=Math.min(1.5,maxW/sw);cv.width=Math.round(sw*sc);cv.height=Math.round(sh*sc);cv.getContext('2d',{willReadFrequently:true}).drawImage(v,sx,sy,sw,sh,0,0,cv.width,cv.height);return cv}
 function fullFr(v,cv,maxW){const sc=Math.min(1,maxW/v.videoWidth);cv.width=Math.round(v.videoWidth*sc);cv.height=Math.round(v.videoHeight*sc);cv.getContext('2d',{willReadFrequently:true}).drawImage(v,0,0,cv.width,cv.height);return cv}
@@ -1668,7 +1679,7 @@ function saveProd(id){const name=$('#pn').value.trim();const price=num2($('#pc2'
  {const br=$('#pm').value;if(br&&!D.brands.includes(br))D.brands.push(br)}const rey=($('#prey')||{}).value;
  const o={name,barcode:bc,cat:$('#pk').value,brand:$('#pm').value,tags:[...window._ft],cost:num2($('#pc1').value),price,vat:+$('#pv').value,unit:$('#pu').value,stock:num2($('#ps').value),crit:num2($('#pcr').value),quick:$('#pq').classList.contains('on'),img:window._pimg||'',pack:Math.round(num2($('#ppk').value))>1?Math.round(num2($('#ppk').value)):0,packBc:$('#ppb').value.trim(),packPrice:num2($('#ppp').value),reyon:(rey||'').trim()};
  if(o.packBc&&D.products.some(x=>(x.barcode===o.packBc||x.packBc===o.packBc)&&x.id!==id)){toast('Koli barkodu başka üründe kayıtlı');return}
- if(id)Object.assign(P(id),o);else D.products.push({id:nid(),...o});unregLink(id?P(id):D.products[D.products.length-1]);save();closeM();if(!id&&S.page==='alisF'){afAddLine(D.products[D.products.length-1].id);render();toast('Ürün eklendi ve faturaya yazıldı');return}if(!id&&window._pfNext){const lp=D.products[D.products.length-1];render();prodForm();$('#pk').value=lp.cat;$('#pm').value=lp.brand;toast('Kaydedildi: '+lp.name+' · sıradaki ürün');return}toast(id?'Ürün güncellendi':'Ürün eklendi');if(S.page==='satis'){renderSatis();if(!id)addP(D.products[D.products.length-1].id)}else render()}
+ if(id){if(P(id).stock!==o.stock)absStock(id);Object.assign(P(id),o)}else D.products.push({id:nid(),...o});unregLink(id?P(id):D.products[D.products.length-1]);save();closeM();if(!id&&S.page==='alisF'){afAddLine(D.products[D.products.length-1].id);render();toast('Ürün eklendi ve faturaya yazıldı');return}if(!id&&window._pfNext){const lp=D.products[D.products.length-1];render();prodForm();$('#pk').value=lp.cat;$('#pm').value=lp.brand;toast('Kaydedildi: '+lp.name+' · sıradaki ürün');return}toast(id?'Ürün güncellendi':'Ürün eklendi');if(S.page==='satis'){renderSatis();if(!id)addP(D.products[D.products.length-1].id)}else render()}
 /* ---------- hızlı toplu ürün kaydı ---------- */
 function hkFix(){let f=null;try{f=JSON.parse(lsGet('hkFix')||'null')}catch(e){}f=f||{};return {cat:D.cats.includes(f.cat)?f.cat:(D.cats[0]||''),brand:f.brand&&D.brands.includes(f.brand)?f.brand:'',vat:f.vat!=null?f.vat:10,unit:f.unit||'adet',crit:f.crit!=null?f.crit:5,quick:!!f.quick,noCost:!!f.noCost,pk:!!f.pk,rey:f.rey||''}}
 function hkFixSet(k,v){const f=hkFix();f[k]=v;lsSet('hkFix',JSON.stringify(f));if(k==='noCost'||k==='pk'){render();hkFocus()}}
@@ -1697,7 +1708,7 @@ function hkSave(){const h=hkD(),f=hkFix();const name=h.name.trim(),price=num2(h.
  const bc=h.bc.trim()||window.genBc();const pkn=Math.round(num2(h.pack||''));const pkb=String(h.packBc||'').trim();if(f.pk&&pkb){if(pkb===bc){toast('Koli barkodu ürün barkoduyla aynı olamaz');hkFocus('hkkb');return}if(D.products.some(x=>(x.barcode===pkb||x.packBc===pkb)&&x.id!==h.id)){toast('Bu koli barkodu başka üründe kayıtlı');hkFocus('hkkb');return}if(!(pkn>1)){toast('Koli içi adedi yaz');hkFocus('hkkp');return}}
  if(D.products.some(p=>(p.barcode===bc||p.packBc===bc)&&p.id!==h.id)){toast('Bu barkod başka üründe kayıtlı');hkFocus('hkb');return}
  let p;
- if(h.id){p=P(h.id);Object.assign(p,{name,barcode:bc,cost:num2(h.cost),price,stock:num2(h.stock)});if(f.pk){p.pack=pkn>1?pkn:0;p.packBc=pkb}if(h.img&&!p.img)p.img=h.img}
+ if(h.id){p=P(h.id);Object.assign(p,{name,barcode:bc,cost:num2(h.cost),price,stock:num2(h.stock)});absStock(p.id);if(f.pk){p.pack=pkn>1?pkn:0;p.packBc=pkb}if(h.img&&!p.img)p.img=h.img}
  else{if(f.brand&&!D.brands.includes(f.brand))D.brands.push(f.brand);
   p={id:nid(),name,barcode:bc,cat:f.cat,brand:f.brand,tags:[],cost:num2(h.cost),price,vat:+f.vat,unit:f.unit,stock:num2(h.stock),crit:num2(f.crit),quick:f.quick,img:h.img||'',reyon:f.rey||'',pack:f.pk&&pkn>1?pkn:0,packBc:f.pk?pkb:'',packPrice:0};D.products.push(p)}
  unregLink(p);save();
@@ -1869,7 +1880,7 @@ async function xlRead(inp){const f=inp.files[0];if(!f)return;try{await loadXLSX(
  catch(e){toast('Dosya okunamadı. Excel (.xlsx) dosyası seçtiğinden emin ol.')}}
 function xlApply(){const {add,upd}=window._xl||{add:[],upd:[]};const addList=(k,v)=>{if(v&&!D[k].includes(v))D[k].push(v)};
  for(const {p} of add){const unit=p.unit||'adet';const o={name:p.name,barcode:p.barcode||window.genBc(),cat:p.cat||'Diğer',brand:p.brand||'',tags:p.tags||[],cost:p.cost||0,price:p.price,vat:p.vat??(unit==='kg'?1:10),unit,stock:p.stock??0,crit:p.crit??5,quick:!!p.quick};if(p.pack>1)o.pack=p.pack;if(p.packBc)o.packBc=p.packBc;if(p.packPrice)o.packPrice=p.packPrice;if(p.img)o.img=p.img;D.products.push({id:nid(),...o});addList('cats',o.cat);addList('brands',o.brand);o.tags.forEach(t=>addList('tags',t))}
- for(const {p,ex} of upd){for(const k in p){if(p[k]===null||k==='barcode')continue;if(k==='tags'&&!p.tags.length)continue;ex[k]=p[k]}if(p.barcode)ex.barcode=p.barcode;addList('cats',ex.cat);addList('brands',ex.brand);(ex.tags||[]).forEach(t=>addList('tags',t))}
+ for(const {p,ex} of upd){if(p.stock!=null)absStock(ex.id);for(const k in p){if(p[k]===null||k==='barcode')continue;if(k==='tags'&&!p.tags.length)continue;ex[k]=p[k]}if(p.barcode)ex.barcode=p.barcode;addList('cats',ex.cat);addList('brands',ex.brand);(ex.tags||[]).forEach(t=>addList('tags',t))}
  save();closeM();render();toast(add.length+' ürün eklendi, '+upd.length+' ürün güncellendi')}
 /* ---------- satış geçmişi ---------- */
 function setAPer(v){S.aPer=v;if(v==='ozel'&&!S.pFrom)S.pFrom=S.pTo=ymd(new Date());render()}
@@ -2350,7 +2361,7 @@ function syFinish(){const d=syGet();const all=syScope(d);const ch=[];let up=0,dn
  <p class="muted">${ch.length} ürünün stoğu değişecek.${d.zero?` Sayılmayan ${all.length-done} ürün 0 olacak.`:all.length-done?` Sayılmayan ${all.length-done} ürüne dokunulmayacak.`:''}</p>
  <div class="row"><button class="btn" onclick="closeM()">Saymaya devam et</button><button class="btn pri sp" onclick="syApply()">Stoğa işle</button></div>`)}
 function syApply(){const d=syGet();if(!d)return;const ls=[];let val=0;
- syScope(d).forEach(p=>{if(d.c[p.id]==null&&!d.zero)return;const k=syCalc(p,d);if(k.df===0)return;ls.push([p.id,p.stock,k.nw]);val+=k.df*(p.cost||0);p.stock=k.nw});
+ syScope(d).forEach(p=>{if(d.c[p.id]==null&&!d.zero)return;const k=syCalc(p,d);if(k.df===0)return;ls.push([p.id,p.stock,k.nw]);val+=k.df*(p.cost||0);p.stock=k.nw;absStock(p.id)});
  SAYS().push({id:d.id,date:d.date,txt:syTxt(d),mode:d.mode,lines:ls,val:r2(val),user:S.user.name});if(D.set.sayims.length>40)D.set.sayims=D.set.sayims.slice(-40);
  syPut(null);save();closeM();render();toast('Sayım işlendi, '+ls.length+' ürünün stoğu güncellendi')}
 function syView(id){const h=SAYS().find(x=>x.id===id);if(!h)return;
@@ -2448,7 +2459,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.35';
+const APPV='3.38';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -2902,23 +2913,26 @@ window.addEventListener('online',()=>$('#tmode')&&termDraw());window.addEventLis
 function lvTog(){S.lv?lvStop():lvStart()}
 function lvStart(){if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('Bu cihazda kamera açılamıyor');return}S.lv=true;S.lvq=1;S.lvLast=null;renderSatis()}
 function lvStop(){S.lv=false;stopCam();try{window._wl&&window._wl.release()}catch(e){}window._wl=null;renderSatis()}
-function lvHTML(){const q=S.lvq||1;return `<div class="lvp"><div class="lvcam" id="lvslot" onclick="if(event.target.closest('button'))return;camTap()"><div class="lvctl"><span class="lvlive">● CANLI</span><span style="flex:1"></span><button id="lvtorch" onclick="lvTorch()" aria-label="Işık" style="display:none">🔦</button><button onclick="lvStop()" aria-label="Kamerayı kapat">✕ Kapat</button></div><div class="tmwin"><i class="tmlaser"></i></div><div class="lvst" id="lvst">Kamera açılıyor…</div><div id="lvpop"></div><div class="lvhint">Barkodu ya da altındaki rakamları göster · netleşmezse ekrana dokun</div></div>
+function lvHTML(){const q=S.lvq||1;return `<div class="lvp"><div class="lvcam" id="lvslot" onclick="if(event.target.closest('button'))return;camTap()"><div class="lvctl"><span class="lvlive">● CANLI</span><span style="flex:1"></span><button onclick="lvSwitch()" aria-label="Kamerayı değiştir" title="Ön / arka kamera">🔄</button><button id="lvtorch" onclick="lvTorch()" aria-label="Işık" style="display:none">🔦</button><button onclick="lvStop()" aria-label="Kamerayı kapat">✕ Kapat</button></div><div class="tmwin"><i class="tmlaser"></i></div><div class="lvst" id="lvst">Kamera açılıyor…</div><div id="lvpop"></div><div class="lvhint">Barkodu ya da altındaki rakamları göster · netleşmezse ekrana dokun</div><div class="lvinfo" id="lvinfo"></div></div>
  <div class="lvq"><span>Sıradaki adet:</span>${[1,2,3,6,12].map(n=>`<button class="chip ${q===n?'on':''}" onclick="lvQ(${n})">×${n}</button>`).join('')}<button class="chip ${[1,2,3,6,12].includes(q)?'':'on'}" onclick="lvQask()">${[1,2,3,6,12].includes(q)?'×?':'×'+q}</button></div></div>`}
 function lvQ(n){S.lvq=n>0?n:1;lvQdraw()}
 function lvQdraw(){const e=document.querySelector('.lvq');if(!e)return;const t=document.createElement('div');t.innerHTML=lvHTML();e.replaceWith(t.querySelector('.lvq'));lvPop()}
 function lvQask(){modal(mHead('Sıradaki ürün kaç adet?')+`<input class="in" id="lvqv" type="number" inputmode="numeric" min="1" placeholder="örn. 24" style="font-size:1.6rem;font-weight:800;text-align:center" onkeydown="if(event.key==='Enter'){lvQ(Math.round(num2(this.value)));closeM()}"><div class="row"><button class="btn sp" onclick="closeM()">Vazgeç</button><button class="btn pri" onclick="lvQ(Math.round(num2($('#lvqv').value)));closeM()">Tamam</button></div>`);setTimeout(()=>{const e=$('#lvqv');e&&e.focus()},60)}
 function lvVid(){let v=window._lvV;if(!v){v=document.createElement('video');v.setAttribute('playsinline','');v.muted=true;v.autoplay=true;window._lvV=v}v.id='cv';return v}
 function lvAttach(){const slot=$('#lvslot');if(!slot)return;const v=lvVid();slot.prepend(v);if(window._camOn&&window._cs){if(v.srcObject!==window._cs)v.srcObject=window._cs;try{v.play()}catch(e){}lvSt('');lvPop()}else lvCam()}
-async function camTune(tr){try{const c=tr.getCapabilities?tr.getCapabilities():{};const adv={};if(c.focusMode&&c.focusMode.includes('continuous'))adv.focusMode='continuous';if(c.zoom&&c.zoom.max>=1.4)adv.zoom=Math.min(c.zoom.max,Math.max(c.zoom.min||1,1.6));if(Object.keys(adv).length)await tr.applyConstraints({advanced:[adv]})}catch(e){}}
+async function camTune(tr){try{const c=tr.getCapabilities?tr.getCapabilities():{};const adv={};if(c.focusMode&&c.focusMode.includes('continuous'))adv.focusMode='continuous';if(c.zoom&&c.zoom.min!=null)adv.zoom=Math.max(c.zoom.min,1);if(Object.keys(adv).length)await tr.applyConstraints({advanced:[adv]})}catch(e){}}
 async function camTap(){const tr=window._ctr;if(!tr)return;try{const c=tr.getCapabilities?tr.getCapabilities():{};if(c.focusMode&&c.focusMode.includes('single-shot')){await tr.applyConstraints({advanced:[{focusMode:'single-shot'}]});setTimeout(()=>camTune(tr),900)}}catch(e){}}
 function lvSt(t){const e=$('#lvst');if(e){e.textContent=t;e.style.display=t?'':'none'}}
 async function lvCam(){if(window._lvBusy)return;window._lvBusy=true;try{stopCam();const v=lvVid();const vc={width:{ideal:1920},height:{ideal:1080}};const id=await pickCam();let st;
  try{st=await navigator.mediaDevices.getUserMedia({audio:false,video:id?{...vc,deviceId:{exact:id}}:{...vc,facingMode:{ideal:'environment'}}})}
  catch(e){try{st=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'}}})}catch(e2){lvSt('Kameraya izin verilmedi');return}}
  if(!S.lv){st.getTracks().forEach(t=>t.stop());return}
- window._cs=st;window._camOn=true;window._camCont=true;window._camCb=lvHit;window._barSeen={};window._ocrSeen={};v.srcObject=st;try{await v.play()}catch(e){}
+ window._cs=st;window._camOn=true;window._camCont=true;window._camCb=lvHit;try{const tl0=st.getVideoTracks()[0];const lb=tl0.label||'';const fm=(tl0.getSettings&&tl0.getSettings().facingMode)||'';window._camFront=fm==='user'||/front|ön|user|facetime/i.test(lb);window._camLbl=lb;v.style.transform=window._camFront?'scaleX(-1)':''}catch(e){}window._barSeen={};window._ocrSeen={};v.srcObject=st;try{await v.play()}catch(e){}
  const tr=st.getVideoTracks()[0];window._ctr=tr;await camTune(tr);try{const c=tr.getCapabilities?tr.getCapabilities():{};const t=$('#lvtorch');if(t)t.style.display=c.torch?'':'none'}catch(e){}
- lvSt('');termWake();barLoop(v);ocrStart()}finally{window._lvBusy=false}}
+ lvSt('');termWake();barLoop(v);ocrStart();lvInfo()}finally{window._lvBusy=false}}
+async function lvInfo(){const e=$('#lvinfo');if(!e)return;const d=await getDet();const k=window._detK||'';const o=window._ocr?'rakam okuma hazır':window._ocrP?'rakam okuma yükleniyor':'';e.textContent=(window._camFront?'Ön kamera':'Arka kamera')+' · '+(d?('barkod okuyucu '+(k||'hazır')):'barkod okuyucu yüklenemedi (internet?)')+(o?' · '+o:'')}
+setInterval(()=>{if(S.lv&&$('#lvinfo'))lvInfo()},3000);
+async function lvSwitch(){let devs=[];try{devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput')}catch(e){}if(devs.length<2){toast('Bu cihazda tek kamera var');return}const cur=(window._cs&&window._cs.getVideoTracks()[0].getSettings().deviceId)||lsGet('camId');let i=devs.findIndex(d=>d.deviceId===cur);const nx=devs[(i+1)%devs.length];lsSet('camId',nx.deviceId);lsSet('camV','3');toast((nx.label||'Kamera '+((i+1)%devs.length+1)));lvCam()}
 async function lvTorch(){const tr=window._ctr;if(!tr)return;window._torch=!window._torch;try{await tr.applyConstraints({advanced:[{torch:window._torch}]})}catch(e){toast('Bu cihazda ışık açılamıyor')}const t=$('#lvtorch');if(t)t.classList.toggle('on',!!window._torch)}
 function lvHit(code){if(!S.lv||S.page!=='satis')return;if($('#modal').innerHTML){window._camLast='';return}code=String(code||'').trim();if(!code)return;
  const q=S.lvq||1;S.lvq=1;const s=$('#scan');if(!s)return;const n0=C().items.length;s.value=(q>1?q+'*':'')+code;scanKey({key:'Enter',preventDefault(){}});
@@ -2996,7 +3010,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js',{update
 <script type="module">
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut,sendPasswordResetEmail} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import {initializeFirestore,persistentLocalCache,persistentMultipleTabManager,collection,doc,onSnapshot,writeBatch,query,orderBy,limit,updateDoc} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import {initializeFirestore,persistentLocalCache,persistentMultipleTabManager,collection,doc,onSnapshot,writeBatch,query,orderBy,limit,updateDoc,increment} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 const app=initializeApp({apiKey:"AIzaSyACrApSGsB84Y5bLjsjFc39vjLq0WYDq-U",authDomain:"barkod-sistemi-v1.firebaseapp.com",projectId:"barkod-sistemi-v1",storageBucket:"barkod-sistemi-v1.firebasestorage.app",messagingSenderId:"628617167908",appId:"1:628617167908:web:9a1a53a471a958d79b84b1"});
 const auth=getAuth(app);
 let db;try{db=initializeFirestore(app,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()}),ignoreUndefinedProperties:true})}catch(e){db=initializeFirestore(app,{ignoreUndefinedProperties:true})}
@@ -3004,7 +3018,7 @@ const COLS=['products','customers','users','sales','expenses','purchases','order
 window.FB={login:(e,p)=>signInWithEmailAndPassword(auth,e,p),signup:(e,p)=>createUserWithEmailAndPassword(auth,e,p),logout:()=>signOut(auth),reset:e=>sendPasswordResetEmail(auth,e),
  async shopPub(mid,meta,parts,old){const b=writeBatch(db);b.set(doc(db,'shops',mid),meta);parts.forEach((p,i)=>b.set(doc(db,'shops',mid,'cat',String(i)),{items:p}));for(let i=parts.length;i<old;i++)b.delete(doc(db,'shops',mid,'cat',String(i)));await b.commit()},
  webSt:(mid,wid,st)=>updateDoc(doc(db,'shops',mid,'orders',String(wid)),{st}),
- async write(mid,ops){for(let i=0;i<ops.length;i+=400){const b=writeBatch(db);for(const [t,c,id,data] of ops.slice(i,i+400)){const r=doc(db,'markets',mid,c,id);if(t==='set')b.set(r,data);else b.delete(r)}await b.commit()}}};
+ async write(mid,ops){for(let i=0;i<ops.length;i+=400){const b=writeBatch(db);for(const [t,c,id,data,inc] of ops.slice(i,i+400)){const r=doc(db,'markets',mid,c,id);if(t==='set')b.set(r,data);else if(t==='merge'){const d={...data};if(inc!=null)d.stock=increment(inc);b.set(r,d,{merge:true})}else b.delete(r)}await b.commit()}}};
 onAuthStateChanged(auth,u=>{uns.forEach(f=>f());uns=[];if(!u){window.cloudOut();return}window.cloudIn(u);
  for(const c of COLS)uns.push(onSnapshot(collection(db,'markets',u.uid,c),s=>window.onCol(c,s.docs.map(d=>d.data()),s.metadata.hasPendingWrites,s.metadata.fromCache),e=>window.onErr(e)));
  uns.push(onSnapshot(query(collection(db,'shops',u.uid,'orders'),orderBy('ts','desc'),limit(60)),s=>window.onWebOrders(s.docs.map(d=>({...d.data(),_id:d.id}))),e=>window.onWebErr&&window.onWebErr(e)));
