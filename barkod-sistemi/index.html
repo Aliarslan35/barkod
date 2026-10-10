@@ -777,6 +777,26 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .qrow .qhc{display:inline-flex;color:var(--tx3)}@media (max-width:1250px){.qrow .qhc svg{transform:rotate(-90deg)}}
 .qrow .qed{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line2);border-radius:8px;background:var(--surf);color:var(--acc);padding:0;cursor:pointer}
 .qrow .qed:hover{border-color:var(--acc)}
+
+/* tuş takımı v3.39 */
+.nptabs{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+.nptabs button{border:1px solid var(--line2);background:var(--surf);border-radius:8px;padding:0 10px;height:32px;font-weight:700;font-size:.82rem;color:var(--tx2)}
+.nptabs button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.npd{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--surf2);border:1px solid var(--line2);border-radius:10px;padding:4px 12px;margin-bottom:6px;min-height:40px}
+.npd span{font-size:.72rem;color:var(--tx3);line-height:1.2}.npd .npq{color:var(--acc);font-size:.95rem}
+.npd .npv{font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.5px}
+.np{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.np button{height:40px;border:1px solid var(--line2);border-radius:10px;background:var(--surf);font-size:1.2rem;font-weight:800;color:var(--tx);touch-action:manipulation}
+.np button:active{background:var(--surf2);transform:scale(.97)}
+.np button.fn{color:var(--tx2);background:var(--surf2)}
+.np button.ac{font-size:.82rem;color:var(--acc);border-color:var(--acc)}
+.np button.wide{grid-column:1/-1;height:44px;font-size:.95rem}
+.np button.ok{background:var(--acc);border-color:var(--acc);color:#fff;font-size:.85rem}
+
+.pos.npmode .cash{display:none}
+.pos.npmode .paysm{gap:6px}.pos.npmode .paysm button{min-height:40px}
+.pos.npmode .paybig{grid-auto-rows:54px!important;gap:8px}
+@media (pointer:coarse){body:has(.pos.npmode) .keys{display:none}}
 </style>
 </head>
 <body>
@@ -786,7 +806,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.38 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.39 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1079,7 +1099,7 @@ function renderSatis(){
  <div class="net" id="net" title="İnternet bağlantısı"><i></i><span>Çevrimiçi</span></div>
  <button class="ordb"${HA('top_siparis')} data-ck="siparis" onclick="nav('siparis')">${ic('siparis',18)}${T('top_siparis','Siparişler')} ${yeni?`<b>${yeni}</b>`:''}</button>
  <div class="who">${esc(S.user.isim||S.user.name)}<br><small id="clk"></small></div></header>
- <div class="pos ${S.lv?'lvon':(isHid('quick')?'noquick':'')} ${!S.lv&&qoff?'qoff':''}" id="pos">
+ <div class="pos ${lsGet('npOn')==='1'?'npmode ':''}${S.lv?'lvon':(isHid('quick')?'noquick':'')} ${!S.lv&&qoff?'qoff':''}" id="pos">
  <section class="card quick"${HA('quick')}>${S.lv?lvHTML():`<button class="qopen" onclick="qTog(false)" aria-label="Hızlı ürünleri aç">${ic('grid',20)}<span>${esc(Tp('quick_title','Hızlı ürünler'))}</span></button>
  <div class="qrow"><button class="qh qhb" onclick="qTog(true)" title="Hızlı ürünleri kapat" aria-label="Hızlı ürünleri kapat">${T('quick_title','Hızlı ürünler')}<span class="qhc">${ic('chl',14)}</span></button>${isY()?`<span class="qact"><button class="qed" title="Hızlı ürünleri düzenle" aria-label="Hızlı ürünleri düzenle" onclick="nav('urun',{uTab:'urun',uf:'Hızlı'})">${ic('edit',16)}</button></span>`:''}${cats.map(c=>`<button class="chip ${S.qcat===c?'on':''}" onclick="S.qcat='${esc(c)}';renderSatis()">${esc(c)}</button>`).join('')}</div>
  <div class="qgrid">${D.products.filter(p=>p.quick&&(S.qcat==='Tümü'||p.cat===S.qcat)).sort(qSort).map(p=>`<button class="qp2 ${p.img?'im':''} ${p.stock<=0?'out':''}" style="--qc:${qcol(p.cat)}" onclick="addP(${p.id})" title="${esc(p.name)}">${p.img?`<img src="${esc(p.img)}" alt="" loading="lazy" onerror="this.parentNode.classList.remove('im');this.remove()">`:`<span class="qi">${esc((p.name.trim()[0]||'?').toLocaleUpperCase('tr'))}</span>`}<span class="qpr">${tl(p.price)}${p.unit==='kg'?'<small>/kg</small>':''}</span>${p.stock<=0?'<span class="qx">Stok yok</span>':''}<b class="qn">${esc(p.name)}</b></button>`).join('')||'<div class="muted">Bu kategoride hızlı ürün yok.</div>'}</div>`}</section>
@@ -1123,9 +1143,9 @@ function drawCart(){
  ${!c.ret&&t.total>0?`<div class="cash"${HA('cash_chips')}><button class="ex" onclick="cashPay(${Math.round(t.total*100)/100})">Tam</button>${cashOpts(t.total).map(v=>`<button onclick="cashPay(${v})">${v.toLocaleString('tr-TR')}</button>`).join('')}</div>`:''}</div>
  <div class="paybig">${pbig}</div>
  <div class="paysm">${psm}${auxBtns()}</div>
- ${ls?`<div class="card lsbox"${HA('last_sale')}><div class="row"><h2>${T('ls_title','Satış geçmişi')}</h2><a href="#" class="sp" style="font-size:.82rem;font-weight:700;color:var(--acc)" onclick="event.preventDefault();nav('gecmis',{gTyp:'Tümü'})">Tümünü gör</a></div>
+ ${(()=>{const np=lsGet('npOn')==='1';return `<div class="card lsbox npbox"${HA('last_sale')}><div class="nptabs"><button class="${np?'':'on'}" onclick="npTab(0)">${T('ls_title','Satış geçmişi')}</button><button class="${np?'on':''}" onclick="npTab(1)">⌨ Tuş takımı</button>${np?'':`<a href="#" class="sp" style="font-size:.8rem;font-weight:700;color:var(--acc)" onclick="event.preventDefault();nav('gecmis',{gTyp:'Tümü'})">Tümü</a>`}</div>${np?npHTML():(ls?`
  <div class="lsr" onclick="saleDet(${ls.id})"><span class="tag ${ls.ret?'t-iade':'t-'+ls.pay}">${ls.ret?'İade':esc(payName(ls.pay))}</span><div class="x"><b>${new Date(ls.date).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})} · #${ls.no}</b><span>${esc(ls.user)}</span></div><span class="a">${tl(ls.total)}</span>
- <button class="ib" aria-label="Yazdır" onclick="event.stopPropagation();printSale(${ls.id})">${ic('print',18)}</button>${canUndo?`<button class="ib" aria-label="Satışı geri al" title="Satışı geri al" onclick="event.stopPropagation();ask('Son satış geri alınsın mı? Ürünler sepete geri döner.',undoLast)">${ic('undo',18)}</button>`:(!ls.ret&&!D.sales.some(x=>x.refOf===ls.id)?`<button class="ib" aria-label="İade al" title="Bu fişten iade al" style="color:var(--badTx)" onclick="event.stopPropagation();refund(${ls.id})">${ic('x',18)}</button>`:'')}</div></div>`:''}`;
+ <button class="ib" aria-label="Yazdır" onclick="event.stopPropagation();printSale(${ls.id})">${ic('print',18)}</button>${canUndo?`<button class="ib" aria-label="Satışı geri al" title="Satışı geri al" onclick="event.stopPropagation();ask('Son satış geri alınsın mı? Ürünler sepete geri döner.',undoLast)">${ic('undo',18)}</button>`:(!ls.ret&&!D.sales.some(x=>x.refOf===ls.id)?`<button class="ib" aria-label="İade al" title="Bu fişten iade al" style="color:var(--badTx)" onclick="event.stopPropagation();refund(${ls.id})">${ic('x',18)}</button>`:'')}</div>`:'<p class="muted" style="margin:6px 0 0">Henüz satış yok.</p>')}</div>`})()}`;
  $('#mbar').innerHTML=`<div onclick="karTap()"><div style="font-size:.75rem;color:#C9D3E3">${c.ret?'İade':'Toplam'} · ${c.items.length} kalem${karOn()&&!c.ret&&c.items.length?` · <span style="color:#9BE3B9;font-weight:800">kâr ${tl(karCalc(c,t).k)}</span>`:''}</div><b>${tl(t.total)}</b></div><button class="btn okb sp" style="min-height:52px;font-size:1.05rem" onclick="payOpen()">Ödeme al ›</button>`;
 }
 function printSale(id){saleDet(id);setTimeout(rcPrint,250)}
@@ -1140,6 +1160,7 @@ function upCh(){const t=cartTot(C());$('#chg').textContent=tl(Math.max(0,num(C()
 function addP(id,q){
  const p=P(id);if(!p)return;
  if(p.unit==='kg'&&q==null)return askKg(id);
+ if(q==null&&S.npq>1){q=S.npq;S.npq=0;setTimeout(npUp,0)}
  q=q||1;const c=C();
  if(!c.ret&&!D.set.neg){const inCart=c.items.filter(l=>l.pid===id).reduce((a,l)=>a+l.qty,0);if(p.stock-inCart<q){toast(p.name+': stok yetersiz ('+qf(p.stock,p.unit)+')');beep(false);return}}
  const ex=p.unit!=='kg'&&c.items.findIndex(l=>l.pid===id&&!l.mul);
@@ -2459,7 +2480,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.38';
+const APPV='3.39';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -2946,6 +2967,19 @@ function lvPop(){const e=$('#lvpop');if(!e)return;const L=S.lvLast;const q=S.lvq
  e.innerHTML=L.miss?`<div class="lvpp er"><div><b>Kayıtlı değil</b><small class="mono">${esc(L.code)}</small></div></div>`:`<div class="lvpp"><div><b>${esc(L.name)}</b><small>Sepete eklendi · ${tl(L.price)}${L.unit==='kg'?'/kg':''}</small></div><span class="q">${L.unit==='kg'?qf(L.qty,'kg'):'×'+L.qty}</span></div>`}
 setInterval(()=>{if(S.lv&&S.lvLast&&Date.now()-S.lvLast.t>6000&&(S.lvq||1)===1){const e=$('#lvpop');if(e&&e.innerHTML)e.innerHTML=''}},1000);
 document.addEventListener('visibilitychange',()=>{if(!S.lv)return;if(document.visibilityState==='hidden')stopCam();else if(S.page==='satis'&&$('#lvslot'))lvCam()});
+
+/* ---------- satış ekranı tuş takımı (v3.39) ---------- */
+function npTab(n){lsSet('npOn',n?'1':'0');const p=$('#pos');if(p)p.classList.toggle('npmode',!!n);drawCart()}
+function npHTML(){const b=S.npb||'',q=S.npq||0;const k=(t,f,c)=>`<button class="${c||''}" onclick="${f}">${t}</button>`;
+ return `<div class="npd" id="npd">${npDisp()}</div><div class="np">${['7','8','9'].map(x=>k(x,`npK('${x}')`)).join('')}${k('⌫','npDel()','fn')}${['4','5','6'].map(x=>k(x,`npK('${x}')`)).join('')}${k('× Adet','npX()','ac')}${['1','2','3'].map(x=>k(x,`npK('${x}')`)).join('')}${k('Alınan','npRec()','ac')}${k('C','npClr()','fn')}${k('0',`npK('0')`)}${k('00',`npK('00')`)}${k('Ekle ↵','npAdd()','ok')}</div>`}
+function npDisp(){const b=S.npb||'',q=S.npq||0;return `<span>${q>1?`<b class="npq">×${q}</b> sıradaki ürün`:'Sayı yaz, sonra seç'}</span><b class="npv">${esc(b||'0')}</b>`}
+function npUp(){const e=$('#npd');if(e)e.innerHTML=npDisp()}
+function npK(k){let b=S.npb||'';if(k===','&&b.includes(','))return;if(b.length>=14)return;if(b==='0'&&k!==',')b='';S.npb=b+k;npUp()}
+function npDel(){S.npb=(S.npb||'').slice(0,-1);npUp()}
+function npClr(){S.npb='';S.npq=0;npUp()}
+function npX(){const q=Math.round(num2(S.npb||''));if(!(q>1)){if(S.npq){S.npq=0;npUp();return}toast('Önce adedi yaz, sonra × Adet');return}S.npq=q;S.npb='';npUp();toast('Sıradaki ürün '+q+' adet eklenecek — okut ya da seç')}
+function npRec(){const v=S.npb||'';if(!v){toast('Önce müşterinin verdiği parayı yaz');return}C().rec=v;S.npb='';drawCart();if(typeof upCh==='function')upCh()}
+function npAdd(){const v=(S.npb||'').replace(/\D/g,'');if(!v){toast('Barkod numarasını yaz');return}S.npb='';const s=$('#scan');if(!s)return;s.value=v;scanKey({key:'Enter',preventDefault(){}});npUp()}
 /* ---------- gizli kâr (yönetici) ---------- */
 const karOn=()=>isY()&&lsGet('karOn')==='1';
 function karTap(e){if(!isY())return;const n=Date.now();if(n-(window._kt||0)<450){window._kt=0;karTog()}else window._kt=n}
