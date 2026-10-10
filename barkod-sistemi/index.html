@@ -798,6 +798,9 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .pos.npmode .paybig{grid-auto-rows:54px!important;gap:8px}
 @media (pointer:coarse){body:has(.pos.npmode) .keys{display:none}}
 
+.np button.ac.on{background:var(--acc);color:#fff}
+.np.kp{margin:6px 0 4px}.np.kp button{height:50px;font-size:1.3rem}.np.kp .kpok{grid-row:span 2;height:auto;font-size:1rem}.np.kp .kp0{grid-column:span 2}
+.in.kpon{border-color:var(--acc);box-shadow:0 0 0 2px color-mix(in srgb,var(--acc) 25%,transparent)}
 .paysm button.npt{border-color:var(--acc);color:var(--acc)}.paysm button.npt.on{background:var(--acc);color:#fff}.paysm button.npt.on small{color:#DDE6FF}
 </style>
 </head>
@@ -808,7 +811,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.40 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.41 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -2296,9 +2299,10 @@ function unregGroups(){const m={};D.sales.forEach(s=>s.items.forEach(l=>{if(!l.u
  return Object.values(m).filter(g=>!D.products.some(p=>p.barcode===g.bc)).sort((a,b)=>a.last<b.last?1:-1)}
 function unregAsk(v,q){const bc=/^\d{6,14}$/.test(v)?v:'';const cl=bc&&(S.carts||[]).flatMap(c=>c.items).find(l=>l.unreg&&l.bc===bc);const last=cl?{price:cl.price,name:cl.name==='Kayıtsız ürün'?'':cl.name}:bc&&unregGroups().find(g=>g.bc===bc);window._unbc=bc;
  modal(mHead('Ürün kayıtlı değil')+`<p style="margin:0 0 8px">${bc?`<b class="mono">${esc(bc)}</b> barkodlu ürün sistemde yok.`:`"<b>${esc(v)}</b>" bulunamadı.`} Fiyatını yazıp satışa devam et, ürünü sonra kaydedersin${bc?'; kaydedince bu satışlar barkoddan ürüne bağlanır':''}.</p>
- <div class="g2"><label class="f">Fiyat<input class="in" id="unp" inputmode="decimal" autofocus value="${last?String(last.price).replace('.',','):''}" placeholder="0,00" onkeydown="if(event.key==='Enter')unregOk()" style="font-size:1.4rem;font-weight:800"></label><label class="f">Adet<input class="in" id="unq" inputmode="decimal" value="${q||1}" onkeydown="if(event.key==='Enter')unregOk()"></label></div>
+ <div class="g2"><label class="f">Fiyat<input class="in" id="unp" inputmode="${kpIM()}" autofocus onfocus="kpSet(this)" value="${last?String(last.price).replace('.',','):''}" placeholder="0,00" onkeydown="if(event.key==='Enter')unregOk()" style="font-size:1.4rem;font-weight:800"></label><label class="f">Adet<input class="in" id="unq" inputmode="${kpIM()}" onfocus="kpSet(this)" value="${q||1}" onkeydown="if(event.key==='Enter')unregOk()"></label></div>
+ ${kpHTML('unregOk()',true)}
  <label class="f">Ürün adı <span class="muted" style="font-weight:500">(isteğe bağlı)</span><input class="in" id="unn" value="${esc(last?last.name:(bc?'':v))}" placeholder="Kayıtsız ürün" onkeydown="if(event.key==='Enter')unregOk()"></label>
- <div class="row"><button class="btn" onclick="closeM()">Vazgeç</button>${isY()?`<button class="btn" onclick="closeM();prodForm(null,'${esc(bc)}')">Şimdi kaydet</button>`:''}<button class="btn okb sp" onclick="unregOk()">Fiyatla sat</button></div>`)}
+ <div class="row"><button class="btn" onclick="closeM()">Vazgeç</button>${isY()?`<button class="btn" onclick="closeM();prodForm(null,'${esc(bc)}')">Şimdi kaydet</button>`:''}<button class="btn okb sp" onclick="unregOk()">Fiyatla sat</button></div>`);window._kpOk=unregOk;const _u=$('#unp');if(_u)kpSet(_u)}
 function unregOk(){const pr=num($('#unp').value),q=num2($('#unq').value)||1,nm=$('#unn').value.trim();if(!(pr>0)){toast('Fiyatı yaz');$('#unp').focus();return}closeM();sellUnreg(window._unbc||'',r2(pr),nm,q)}
 function sellUnreg(bc,price,name,q){const c=C();const nm=name||'Kayıtsız ürün';let i=bc?c.items.findIndex(l=>l.unreg&&l.bc===bc&&l.price===price):-1;
  if(i>-1)c.items[i].qty+=q;else{c.items.push({pid:0,name:nm,unit:'adet',qty:q,price,cost:0,cat:'',brand:'',tags:[],disc:0,bc,unreg:true});i=c.items.length-1}
@@ -2483,7 +2487,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.40';
+const APPV='3.41';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -2973,16 +2977,27 @@ document.addEventListener('visibilitychange',()=>{if(!S.lv)return;if(document.vi
 
 /* ---------- satış ekranı tuş takımı (v3.39) ---------- */
 function npTab(n){lsSet('npOn',n?'1':'0');const p=$('#pos');if(p)p.classList.toggle('npmode',!!n);drawCart()}
-function npHTML(){const b=S.npb||'',q=S.npq||0;const k=(t,f,c)=>`<button class="${c||''}" onclick="${f}">${t}</button>`;
- return `<div class="npd" id="npd">${npDisp()}</div><div class="np">${['7','8','9'].map(x=>k(x,`npK('${x}')`)).join('')}${k('⌫','npDel()','fn')}${['4','5','6'].map(x=>k(x,`npK('${x}')`)).join('')}${k('× Adet','npX()','ac')}${['1','2','3'].map(x=>k(x,`npK('${x}')`)).join('')}${k('Alınan','npRec()','ac')}${k('C','npClr()','fn')}${k('0',`npK('0')`)}${k('00',`npK('00')`)}${k('Ekle ↵','npAdd()','ok')}</div>`}
-function npDisp(){const b=S.npb||'',q=S.npq||0;return `<span>${q>1?`<b class="npq">×${q}</b> sıradaki ürün`:'Sayı yaz, sonra seç'}</span><b class="npv">${esc(b||'0')}</b>`}
-function npUp(){const e=$('#npd');if(e)e.innerHTML=npDisp()}
-function npK(k){let b=S.npb||'';if(k===','&&b.includes(','))return;if(b.length>=14)return;if(b==='0'&&k!==',')b='';S.npb=b+k;npUp()}
-function npDel(){S.npb=(S.npb||'').slice(0,-1);npUp()}
-function npClr(){S.npb='';S.npq=0;npUp()}
-function npX(){const q=Math.round(num2(S.npb||''));if(!(q>1)){if(S.npq){S.npq=0;npUp();return}toast('Önce adedi yaz, sonra × Adet');return}S.npq=q;S.npb='';npUp();toast('Sıradaki ürün '+q+' adet eklenecek — okut ya da seç')}
-function npRec(){const v=S.npb||'';if(!v){toast('Önce müşterinin verdiği parayı yaz');return}C().rec=v;S.npb='';drawCart();if(typeof upCh==='function')upCh()}
-function npAdd(){const v=(S.npb||'').replace(/\D/g,'');if(!v){toast('Barkod numarasını yaz');return}S.npb='';const s=$('#scan');if(!s)return;s.value=v;scanKey({key:'Enter',preventDefault(){}});npUp()}
+function npHTML(){const q=S.npq||0;const k=(t,f,c,id)=>`<button class="${c||''}"${id?` id="${id}"`:''} onclick="${f}">${t}</button>`;
+ return `<div class="np">${['7','8','9'].map(x=>k(x,`npK('${x}')`)).join('')}${k('⌫','npDel()','fn')}${['4','5','6'].map(x=>k(x,`npK('${x}')`)).join('')}${k(q>1?'×'+q+' Adet':'× Adet','npX()','ac'+(q>1?' on':''),'npxb')}${['1','2','3'].map(x=>k(x,`npK('${x}')`)).join('')}${k('Alınan','npRec()','ac')}${k('C','npClr()','fn')}${k('0',`npK('0')`)}${k('00',`npK('00')`)}${k('Ekle ↵','npAdd()','ok')}</div>`}
+function npS(){return $('#scan')}
+function npUp(){const b=$('#npxb'),q=S.npq||0;if(b){b.textContent=q>1?'×'+q+' Adet':'× Adet';b.classList.toggle('on',q>1)}}
+function npSet(v){const s=npS();if(!s)return;s.value=v;if(typeof sugg==='function')sugg()}
+function npK(k){const s=npS();if(!s)return;if(s.value.length>=20)return;npSet(s.value+k)}
+function npDel(){const s=npS();if(s)npSet(s.value.slice(0,-1))}
+function npClr(){S.npq=0;npSet('');npUp()}
+function npX(){const s=npS();const q=Math.round(num2(s?s.value:''));if(!(q>1)){if(S.npq){S.npq=0;npUp();return}toast('Önce adedi yaz, sonra × Adet');return}S.npq=q;npSet('');npUp();toast('Sıradaki ürün '+q+' adet eklenecek — okut ya da seç')}
+function npRec(){const s=npS();const v=s?s.value.trim():'';if(!v){toast('Önce müşterinin verdiği parayı yaz');return}npSet('');C().rec=v;drawCart();if(typeof upCh==='function')upCh()}
+function npAdd(){const s=npS();if(!s||!s.value.trim()){toast('Barkod numarasını yaz');return}scanKey({key:'Enter',preventDefault(){}});npUp()}
+/* ekran tuş takımı (pencerelerde) v3.41 */
+function kpHTML(ok,dec){const k=(t,f,c)=>`<button type="button" class="${c||''}" onclick="${f}">${t}</button>`;
+ return `<div class="np kp">${['7','8','9'].map(v=>k(v,`kpK('${v}')`)).join('')}${k('⌫','kpDel()','fn')}${['4','5','6'].map(v=>k(v,`kpK('${v}')`)).join('')}${k('C','kpClr()','fn')}${['1','2','3'].map(v=>k(v,`kpK('${v}')`)).join('')}${k('Tamam','kpOk()','ok kpok')}${k('0',`kpK('0')`,'kp0')}${dec?k(',',`kpK(',')`):k('00',`kpK('00')`)}</div>`}
+function kpIM(d){return touch()?'none':(d||'decimal')}
+function kpSet(el){window._kpT=el.id;window._kpF=true;document.querySelectorAll('.kpon').forEach(e=>e.classList.remove('kpon'));el.classList.add('kpon')}
+function kpEl(){return $('#'+(window._kpT||''))}
+function kpK(v){const t=kpEl();if(!t)return;let b=window._kpF?'':t.value;window._kpF=false;if(v===','&&b.includes(','))return;if(b.length>=12)return;if(b==='0'&&v!==',')b='';t.value=b+v}
+function kpDel(){const t=kpEl();if(!t)return;window._kpF=false;t.value=t.value.slice(0,-1)}
+function kpClr(){const t=kpEl();if(!t)return;window._kpF=false;t.value=''}
+function kpOk(){const f=window._kpOk;if(typeof f==='function')f()}
 /* ---------- gizli kâr (yönetici) ---------- */
 const karOn=()=>isY()&&lsGet('karOn')==='1';
 function karTap(e){if(!isY())return;const n=Date.now();if(n-(window._kt||0)<450){window._kt=0;karTog()}else window._kt=n}
@@ -2992,9 +3007,10 @@ function karCalc(c,t){let cost=0,miss=0,noc=0;c.items.forEach(l=>{if(l.cost>0)co
 function karRow(c,t){if(!karOn()||c.ret||!c.items.length)return '';const r=karCalc(c,t);return `<div class="karrow"><span>Bu satıştan kâr</span><b class="${r.k<0?'kn':''}">${r.k<0?'−':''}${tl(Math.abs(r.k))}${r.pct!=null?` · %${r.pct}`:''}</b>${r.miss?`<span class="muted">${r.miss} üründe alış fiyatı yok</span>`:''}<button class="btn sm sp" onclick="karTog()">Gizle</button></div>`}
 
 function lineQty(i){const l=C().items[i];if(!l)return;
- modal(mHead('Adet: '+esc(l.name))+`<label class="f">Kaç adet<input class="in" id="lqv" type="number" inputmode="numeric" min="0" step="1" autofocus value="${l.qty}" style="font-size:1.6rem;font-weight:800;text-align:center" onfocus="this.select()" onkeydown="if(event.key==='Enter')lineQtyOk(${i})"></label>
+ modal(mHead('Adet: '+esc(l.name))+`<label class="f">Kaç adet<input class="in" id="lqv" inputmode="${kpIM('numeric')}" autofocus value="${l.qty}" style="font-size:1.6rem;font-weight:800;text-align:center" onfocus="kpSet(this);this.select()" onkeydown="if(event.key==='Enter')lineQtyOk(${i})"></label>
  <div class="row" style="gap:6px">${[2,3,5,6,10,12,20,24].map(n=>`<button class="chip" onclick="$('#lqv').value=${n};lineQtyOk(${i})">${n}</button>`).join('')}</div>
- <div class="row"><button class="btn sp" onclick="closeM()">Vazgeç</button><button class="btn pri" onclick="lineQtyOk(${i})">Uygula</button></div>`);setTimeout(()=>{const e=$('#lqv');if(e){e.focus();e.select()}},50)}
+ ${kpHTML()}
+ <div class="row"><button class="btn sp" onclick="closeM()">Vazgeç</button><button class="btn pri" onclick="lineQtyOk(${i})">Uygula</button></div>`);window._kpOk=()=>lineQtyOk(i);{const e=$('#lqv');if(e)kpSet(e)}setTimeout(()=>{const e=$('#lqv');if(e){e.focus();e.select()}},50)}
 function lineQtyOk(i){const l=C().items[i];if(!l)return closeM();const v=Math.round(num2($('#lqv').value));if(!(v>=0)||isNaN(v)){toast('Adedi yaz');return}
  closeM();if(v===0){C().items.splice(i,1);S.sel=Math.min(i,C().items.length-1)}else{l.qty=v;S.sel=i}drawCart();if(typeof focusScan==='function')focusScan()}
 function linePriceOk(i){const l=C().items[i];const v=num2($('#lpv').value);if(!(v>0)){toast('Fiyatı yaz');return}l.price=r2(v);const k=$('#lpk');if(k&&k.checked){const p=P(l.pid);if(p){p.price=r2(v);save();toast('Ürünün fiyatı kalıcı olarak değişti')}}else toast('Bu satış için fiyat değişti');closeM();drawCart()}
