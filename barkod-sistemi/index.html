@@ -797,6 +797,8 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .pos.npmode .paysm{gap:6px}.pos.npmode .paysm button{min-height:40px}
 .pos.npmode .paybig{grid-auto-rows:54px!important;gap:8px}
 @media (pointer:coarse){body:has(.pos.npmode) .keys{display:none}}
+
+.paysm button.npt{border-color:var(--acc);color:var(--acc)}.paysm button.npt.on{background:var(--acc);color:#fff}.paysm button.npt.on small{color:#DDE6FF}
 </style>
 </head>
 <body>
@@ -806,7 +808,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.39 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.40 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -976,6 +978,7 @@ function payBtns(){const u=UI();const o=ordSort(PAYK,u.order.pay).filter(k=>!isH
  const sm=o.filter(k=>k!=='nakit'&&k!=='kart').map(k=>k==='parcali'?`<button${HA('pay_parcali')} onclick="${PAYD[k][1]}">${T('pay_parcali','Parçalı')}<small>${kn(KL('parcali'))}</small></button>`:`<button class="pc"${HA('pay_'+k)} data-ck="${k}" style="--pc:var(--c-${k})" onclick="${PAYD[k][1]}">${T('pay_'+k,PAYD[k][0])}<small>${kn(KL(k))}</small></button>`).join('');
  return [big,sm]}
 function auxBtns(){const u=UI();return ordSort(AUXK,u.order.aux).map(k=>{if(isHid('aux_'+k))return '';const d=AUXD[k];
+ if(k==='beklet'){const np=lsGet('npOn')==='1';return `<button${HA('aux_'+k)} class="npt ${np?'on':''}" onclick="npTab(${np?0:1})">${np?'Satış geçmişi':'⌨ Tuş takımı'}<small>${np?'geri dön':'rakamlar'}</small></button>`}
  return `<button${HA('aux_'+k)} ${k==='iade'?`data-ck="iade" class="rb ${C().ret?'on':''}"`:''} onclick="${d[1]}">${T('aux_'+k,d[0])}<small>${kn(KL(d[2]))}</small></button>`}).join('')}
 function keysBar(){return Object.keys(KEYDEF).filter(a=>!(ACTHIDE[a]&&UI().hide[ACTHIDE[a]])).map(a=>`<span><b>${kn(KL(a))}</b> ${esc(keyLbl(a))}</span>`).join('')+'<span><b>3*</b> Adet çarp</span><span class="sp" id="fcount"></span>'}
 function capKey(a){S.capKey=a;modal(mHead('Kısayol: '+esc(keyLbl(a)))+`<p style="margin:0;line-height:1.6">Şimdi bu işlem için kullanmak istediğin tuşa bas. F1–F12 tuşları önerilir; harf tuşları sadece imleç bir kutuda değilken çalışır.</p><p class="muted" style="margin:0">Şu anki tuş: <b class="mono">${kn(KL(a))}</b></p><div class="row"><button class="btn" onclick="S.capKey=null;delete UI().keys['${a}'];save();closeM();render()">Varsayılana dön (${kn(KEYDEF[a][0])})</button><button class="btn sp" onclick="S.capKey=null;closeM()">Vazgeç</button></div>`)}
@@ -1143,7 +1146,7 @@ function drawCart(){
  ${!c.ret&&t.total>0?`<div class="cash"${HA('cash_chips')}><button class="ex" onclick="cashPay(${Math.round(t.total*100)/100})">Tam</button>${cashOpts(t.total).map(v=>`<button onclick="cashPay(${v})">${v.toLocaleString('tr-TR')}</button>`).join('')}</div>`:''}</div>
  <div class="paybig">${pbig}</div>
  <div class="paysm">${psm}${auxBtns()}</div>
- ${(()=>{const np=lsGet('npOn')==='1';return `<div class="card lsbox npbox"${HA('last_sale')}><div class="nptabs"><button class="${np?'':'on'}" onclick="npTab(0)">${T('ls_title','Satış geçmişi')}</button><button class="${np?'on':''}" onclick="npTab(1)">⌨ Tuş takımı</button>${np?'':`<a href="#" class="sp" style="font-size:.8rem;font-weight:700;color:var(--acc)" onclick="event.preventDefault();nav('gecmis',{gTyp:'Tümü'})">Tümü</a>`}</div>${np?npHTML():(ls?`
+ ${(()=>{const np=lsGet('npOn')==='1';return `<div class="card lsbox npbox"${HA('last_sale')}>${np?'':`<div class="row" style="margin-bottom:4px"><h2>${T('ls_title','Satış geçmişi')}</h2><a href="#" class="sp" style="font-size:.82rem;font-weight:700;color:var(--acc)" onclick="event.preventDefault();nav('gecmis',{gTyp:'Tümü'})">Tümünü gör</a></div>`}${np?npHTML():(ls?`
  <div class="lsr" onclick="saleDet(${ls.id})"><span class="tag ${ls.ret?'t-iade':'t-'+ls.pay}">${ls.ret?'İade':esc(payName(ls.pay))}</span><div class="x"><b>${new Date(ls.date).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})} · #${ls.no}</b><span>${esc(ls.user)}</span></div><span class="a">${tl(ls.total)}</span>
  <button class="ib" aria-label="Yazdır" onclick="event.stopPropagation();printSale(${ls.id})">${ic('print',18)}</button>${canUndo?`<button class="ib" aria-label="Satışı geri al" title="Satışı geri al" onclick="event.stopPropagation();ask('Son satış geri alınsın mı? Ürünler sepete geri döner.',undoLast)">${ic('undo',18)}</button>`:(!ls.ret&&!D.sales.some(x=>x.refOf===ls.id)?`<button class="ib" aria-label="İade al" title="Bu fişten iade al" style="color:var(--badTx)" onclick="event.stopPropagation();refund(${ls.id})">${ic('x',18)}</button>`:'')}</div>`:'<p class="muted" style="margin:6px 0 0">Henüz satış yok.</p>')}</div>`})()}`;
  $('#mbar').innerHTML=`<div onclick="karTap()"><div style="font-size:.75rem;color:#C9D3E3">${c.ret?'İade':'Toplam'} · ${c.items.length} kalem${karOn()&&!c.ret&&c.items.length?` · <span style="color:#9BE3B9;font-weight:800">kâr ${tl(karCalc(c,t).k)}</span>`:''}</div><b>${tl(t.total)}</b></div><button class="btn okb sp" style="min-height:52px;font-size:1.05rem" onclick="payOpen()">Ödeme al ›</button>`;
@@ -2480,7 +2483,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.39';
+const APPV='3.40';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
