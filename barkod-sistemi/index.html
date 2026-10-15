@@ -812,6 +812,14 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 #vkb .vfn{color:var(--tx2);font-size:.95rem}#vkb .vgo{background:var(--acc);border-color:var(--acc);color:#fff;font-size:1rem}
 @media (max-width:600px){#vkb button{height:44px;font-size:1rem}#vkb .vr{gap:3px}}
 html{touch-action:manipulation}
+.scq{display:inline-flex;align-items:center;gap:6px;flex:none;height:34px;padding:0 4px 0 12px;border-radius:17px;background:var(--acc);color:#fff;box-shadow:0 2px 8px color-mix(in srgb,var(--acc) 40%,transparent)}
+.scq b{font-size:1.15rem;font-weight:800;letter-spacing:-.3px}.scq small{font-size:.75rem;font-weight:700;opacity:.85}
+.scq button{width:26px;height:26px;border:0;border-radius:50%;background:rgba(255,255,255,.22);color:#fff;font-size:.8rem;font-weight:800;padding:0;display:grid;place-items:center}
+.scq.pop{animation:scqp .25s}@keyframes scqp{50%{transform:scale(1.12)}}
+/* v3.43 ekran karartma */
+#dimv{position:fixed;inset:0;z-index:9000;background:#000;opacity:0;pointer-events:none;transition:opacity 1.2s ease;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#fff}
+#dimv.on{opacity:.88;pointer-events:auto}
+#dimv b{font-size:4rem;font-weight:800;letter-spacing:-2px;opacity:.55;font-variant-numeric:tabular-nums}#dimv span{font-size:1rem;font-weight:700;opacity:.4}#dimv small{font-size:.8rem;opacity:.3;margin-top:18px}
 @media (pointer:coarse){body:has(.pos.npmode) .keys{display:none}}
 
 .np button.ac.on{background:var(--acc);color:#fff}
@@ -827,7 +835,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.42 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.43 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1116,7 +1124,7 @@ function renderSatis(){
  const qoff=lsGet('qOff')==='1';
  $('#app').innerHTML=`<div class="drawer"><div class="scrim" onclick="closeSide()"></div><nav class="side" aria-label="Menü">${sideHTML()}</nav></div>
  <header class="top" data-ck="panel"><button class="tbi" onclick="togSide()" aria-label="Menüyü aç">${ic('menu')}</button><div class="brand bl"><i class="blg">${LOGO.replace(/lgG/g,'lgG3')}</i><span>${esc(D.set.market)}</span></div>
- <div class="scan">${ic('satis',22)}<input id="scan" placeholder="Barkod okut veya ürün ara…" autocomplete="off" enterkeyhint="go" inputmode="${touch()?'none':'search'}" onfocus="vkbOpen()" onclick="vkbOpen()" oninput="sugg()" onkeydown="scanKey(event)"><button class="ib ghost${S.lv?' lvbtn':''}" aria-label="Kamerayla sürekli okut" title="Kamerayla okut (açık kalır)" onclick="lvTog()" style="color:var(--acc)">${ic('cam')}</button><span class="kbd">${kn(KL('scan'))}</span><div id="sg" class="sugg"></div></div>
+ <div class="scan">${ic('satis',22)}<span id="scq" class="scq"${S.npq>1?'':' hidden'}><b>×${S.npq||''}</b><small>adet</small><button type="button" aria-label="Adedi iptal et" onclick="npClr()">✕</button></span><input id="scan" placeholder="Barkod okut veya ürün ara…" autocomplete="off" enterkeyhint="go" inputmode="${touch()?'none':'search'}" onfocus="vkbOpen()" onclick="vkbOpen()" oninput="sugg()" onkeydown="scanKey(event)"><button class="ib ghost${S.lv?' lvbtn':''}" aria-label="Kamerayla sürekli okut" title="Kamerayla okut (açık kalır)" onclick="lvTog()" style="color:var(--acc)">${ic('cam')}</button><span class="kbd">${kn(KL('scan'))}</span><div id="sg" class="sugg"></div></div>
  <button class="tbi" onclick="togTheme()" aria-label="Açık / koyu tema">${ic(isDark()?'sun':'moon',20)}</button>
  <div class="net" id="net" title="İnternet bağlantısı"><i></i><span>Çevrimiçi</span></div>
  <button class="ordb"${HA('top_siparis')} data-ck="siparis" onclick="nav('siparis')">${ic('siparis',18)}${T('top_siparis','Siparişler')} ${yeni?`<b>${yeni}</b>`:''}</button>
@@ -1258,7 +1266,7 @@ function processRemote(){if(!READY||!D||!D.remote||!D.remote.length)return;if(!r
  const items=D.remote.filter(it=>it.dev!==me).sort((a,b)=>String(a.at).localeCompare(String(b.at)));if(!items.length)return;D.remote=D.remote.filter(it=>it.dev===me);save();
  const now=Date.now();let n=0;
  S.remQ=S.remQ||[];for(const it of items){if(Math.abs(now-new Date(it.at).getTime())>600000)continue;S.remQ.push({code:it.code,qty:it.qty||1});n++}
- if(n){if(S.page!=='satis'){S.page='satis';render()}remPump()}if(n>1)toast(n+' ürün telefondan geldi')}
+ if(n){dimPoke();dimOff();if(S.page!=='satis'){S.page='satis';render()}remPump()}if(n>1)toast(n+' ürün telefondan geldi')}
 function termSend(code){code=String(code||'').trim();if(!code)return;const p=findCode(code);const it={id:nid(),code,qty:1,at:new Date().toISOString(),from:S.user?S.user.name:'',dev:devId()};
  D.remote.push(it);save();S.sent=[{id:it.id,code,name:p?p.name+' · '+tl(p.price):'Kayıtlı değil · kasada fiyatı sorulacak'},...(S.sent||[])].slice(0,30);if(navigator.vibrate)navigator.vibrate(60);termUpd()}
 function termUpd(){const row=x=>{const done=!D.remote.some(r=>r.id===x.id);return `<div class="row" style="flex-wrap:nowrap;padding:8px 0;border-bottom:1px solid var(--line)"><span style="flex:1;min-width:0"><b>${esc(x.name)}</b><br><span class="muted mono">${esc(x.code)}</span></span><span class="tag ${done?'t-Nakit':'t-Veresiye'}">${done?'Kasada ✓':'Gönderiliyor…'}</span></div>`};
@@ -1278,9 +1286,9 @@ async function getDet(){if(window._det!==undefined)return window._det;window._de
 function crop(v,cv,maxW){const sx=v.videoWidth*.06,sy=v.videoHeight*.25,sw=v.videoWidth*.88,sh=v.videoHeight*.50,sc=Math.min(1.5,maxW/sw);cv.width=Math.round(sw*sc);cv.height=Math.round(sh*sc);cv.getContext('2d',{willReadFrequently:true}).drawImage(v,sx,sy,sw,sh,0,0,cv.width,cv.height);return cv}
 function fullFr(v,cv,maxW){const sc=Math.min(1,maxW/v.videoWidth);cv.width=Math.round(v.videoWidth*sc);cv.height=Math.round(v.videoHeight*sc);cv.getContext('2d',{willReadFrequently:true}).drawImage(v,0,0,cv.width,cv.height);return cv}
 function bcKnown(c){return !!(findCode(c)||D.products.find(p=>p.packBc&&p.packBc===c)||(typeof scaleParse==='function'&&(scaleParse(c)||{}).p))}
-async function barLoop(v){const det=await getDet();if(!det)return;
+async function barLoop(v){const g=window._camGen;const det=await getDet();if(!det)return;
  const cv=document.createElement('canvas');let last='',flip=0;
- while(window._camOn){try{if(v.readyState>=2&&v.videoWidth){flip=(flip+1)%3;const src=flip===0?crop(v,cv,1000):fullFr(v,cv,flip===1?1280:900);const r=await det.detect(src);let got='',kn=false;
+ while(window._camOn&&g===window._camGen){try{if(v.paused&&document.visibilityState==='visible'){try{v.play()}catch(e){}}if(v.readyState>=2&&v.videoWidth){flip=(flip+1)%3;const src=flip===0?crop(v,cv,1000):fullFr(v,cv,flip===1?1280:900);const r=await Promise.race([det.detect(src),new Promise(z=>setTimeout(()=>z(null),1500))]);if(g!==window._camGen)return;let got='',kn=false;
    for(const x of (r||[])){const c=String(x.rawValue||'').trim();if(!c)continue;const k=bcKnown(c);if(k){got=c;kn=true;break}if(validEan(c)&&!got)got=c}
    if(got){if(kn||got===last){camDone(got,'cizgi');if(!window._camCont)return;last=''}else last=got}}}catch(e){}
   await new Promise(r=>setTimeout(r,35))}}
@@ -1292,13 +1300,13 @@ function ocrPick(text){const seen=window._ocrSeen;const lines=text.split('\n').m
  for(const l of lines)for(const n of [13,12,8])for(let i=0;i+n<=l.length;i++){const c=l.slice(i,i+n);if(!validEan(c))continue;
   if(window._barSeen[c]||findCode(c))return c;if(l.length===n){seen[c]=(seen[c]||0)+1;if(seen[c]>=2)return c}}
  return null}
-async function ocrStart(){if(window._ocrOn)return;window._ocrOn=true;const v=$('#cv');
+async function ocrStart(){const g=window._camGen;if(window._ocrOn)return;window._ocrOn=true;const v=$('#cv');
  let w;try{w=await getOcr()}catch(e){window._ocrOn=false;return}
  const cv=document.createElement('canvas');const t0=Date.now();
- while(window._camOn){try{if(v&&v.readyState>=2&&v.videoWidth){crop(v,cv,1000);const cx=cv.getContext('2d',{willReadFrequently:true});const im=cx.getImageData(0,0,cv.width,cv.height),d=im.data;let sum=0;for(let i=0;i<d.length;i+=4){const g=d[i]*.3+d[i+1]*.59+d[i+2]*.11;d[i]=g;sum+=g}const avg=sum/(d.length/4);for(let i=0;i<d.length;i+=4){const g=d[i]>avg*.85?255:0;d[i]=d[i+1]=d[i+2]=g}cx.putImageData(im,0,0);
-   const r=await w.recognize(cv);const c=ocrPick(r.data.text||'');if(c){camDone(c,'rakam');if(!window._camCont){window._ocrOn=false;return}}}}catch(e){}await new Promise(r=>setTimeout(r,150))}
- window._ocrOn=false}
-function stopCam(){window._camOn=false;window._camCont=false;window._ocrOn=false;window._torch=false;if(window._cs){window._cs.getTracks().forEach(t=>t.stop());window._cs=null}}
+ while(window._camOn&&g===window._camGen){try{if(document.visibilityState==='visible'&&v&&v.readyState>=2&&v.videoWidth&&Date.now()-(window._camLastT||0)>1200){crop(v,cv,1000);const cx=cv.getContext('2d',{willReadFrequently:true});const im=cx.getImageData(0,0,cv.width,cv.height),d=im.data;let sum=0;for(let i=0;i<d.length;i+=4){const g=d[i]*.3+d[i+1]*.59+d[i+2]*.11;d[i]=g;sum+=g}const avg=sum/(d.length/4);for(let i=0;i<d.length;i+=4){const g=d[i]>avg*.85?255:0;d[i]=d[i+1]=d[i+2]=g}cx.putImageData(im,0,0);
+   const r=await w.recognize(cv);const c=ocrPick(r.data.text||'');if(c&&g===window._camGen){camDone(c,'rakam');if(!window._camCont){window._ocrOn=false;return}}}}catch(e){}await new Promise(r=>setTimeout(r,400))}
+ if(g===window._camGen)window._ocrOn=false}
+function stopCam(){window._camGen=(window._camGen||0)+1;window._camOn=false;window._camCont=false;window._ocrOn=false;window._torch=false;if(window._cs){window._cs.getTracks().forEach(t=>t.stop());window._cs=null}}
 function hold(){newCart();drawCart();toast('Yeni satış sekmesi açıldı');focusScan()}
 function closeCart(){const go=()=>{S.carts.splice(S.ci,1);if(!S.carts.length)newCart();S.ci=Math.max(0,Math.min(S.ci,S.carts.length-1));drawCart()};if(C().items.length)ask('Bu sekmedeki ürünler silinsin mi?',go);else go()}
 function clearCart(){const c=C();if(!c.items.length)return;c.items=[];c.disc=0;c.rec='';c.cust=null;S.sel=-1;drawCart();toast('Sepet temizlendi')}
@@ -2485,7 +2493,7 @@ function pgAyar(){const s=D.set;const tg=(k,l,d)=>`<div class="tgl" onclick="D.s
  <div class="f" style="font-size:.82rem;font-weight:600;color:var(--tx2)">Yazı boyutu${seg([['14','Küçük'],['16','Normal'],['18','Büyük'],['20','Çok büyük']],String(s.fs),'setFs')}</div></div>
  <div class="card"><h2>Kâr ve stok</h2><div class="g3"><label class="f">Hedef kâr oranı (%)<input class="in" inputmode="decimal" value="${KT().hedef}" onchange="setKT('karHedef',this.value)"></label><label class="f">En düşük kâr uyarısı (%)<input class="in" inputmode="decimal" value="${KT().min}" onchange="setKT('karMin',this.value)"></label><label class="f">SKT uyarısı (gün önce)<input class="in" inputmode="numeric" value="${KT().skt}" onchange="setKT('sktGun',this.value)"></label></div><p class="muted" style="margin:0;font-size:.82rem">Kâr oranı alış fiyatına göre hesaplanır: 10 TL'ye alınıp 12 TL'ye satılan ürün %20.</p></div>
  <div class="card"><h2>Satış ekranı</h2><div class="f" style="font-size:.82rem;font-weight:600;color:var(--tx2)">Hızlı ürün sütun sayısı${seg([['2','2'],['3','3'],['4','4'],['5','5']],String(s.cols),'setCols')}</div>
- ${tg('autoRc','Satıştan sonra fişi göster','Kapalıysa sadece kısa bildirim çıkar')}${tg('waVer','Veresiye satışında WhatsApp fişi öner','Satıştan sonra fişi ve toplam borcu müşteriye gönderme penceresi çıkar')}${tg('sound','Sesli uyarılar','Barkod okununca ve hata olunca ses')}${tg('neg','Stokta olmayan ürünü satmaya izin ver')}${tg('cashDisc','Kasiyer indirim yapabilsin','Kapalıysa yönetici şifresi istenir')}<div class="tgl" onclick="lsSet('rcv',rcv()?'0':'1');render()"><div>Bu cihaz telefondan okutulanları alsın<small>Bilgisayarda hep açık. Tablet ve telefonda satış ekranı açıkken kendiliğinden alır; burayı açarsan her ekranda alır. El terminali olarak kullanılan telefonda kapalı kalsın. Sadece bu cihaz için geçerli.</small></div><span class="sw ${rcv()?'on':''}"><i></i></span></div></div>
+ ${tg('autoRc','Satıştan sonra fişi göster','Kapalıysa sadece kısa bildirim çıkar')}${tg('waVer','Veresiye satışında WhatsApp fişi öner','Satıştan sonra fişi ve toplam borcu müşteriye gönderme penceresi çıkar')}${tg('sound','Sesli uyarılar','Barkod okununca ve hata olunca ses')}${tg('neg','Stokta olmayan ürünü satmaya izin ver')}${tg('cashDisc','Kasiyer indirim yapabilsin','Kapalıysa yönetici şifresi istenir')}<div class="tgl" style="cursor:default"><div>Ekran kararması<small>Satış ekranında ekran hiç kapanmaz; bu kadar süre dokunulmazsa kararır, dokununca ya da barkod okutunca açılır. Sadece bu cihaz için geçerli.</small></div><select class="in" style="width:auto;min-height:40px" onchange="dimSet(+this.value)">${[[0,'Kararmasın'],[15,'15 saniye'],[30,'30 saniye'],[60,'1 dakika'],[120,'2 dakika']].map(([v,l])=>`<option value="${v}" ${dimSec()===v?'selected':''}>${l}</option>`).join('')}</select></div><div class="tgl" onclick="lsSet('rcv',rcv()?'0':'1');render()"><div>Bu cihaz telefondan okutulanları alsın<small>Bilgisayarda hep açık. Tablet ve telefonda satış ekranı açıkken kendiliğinden alır; burayı açarsan her ekranda alır. El terminali olarak kullanılan telefonda kapalı kalsın. Sadece bu cihaz için geçerli.</small></div><span class="sw ${rcv()?'on':''}"><i></i></span></div></div>
  <div class="card"><h2>Fiş yazıcı</h2><div class="f" style="font-size:.82rem;font-weight:600;color:var(--tx2)">Kâğıt genişliği${seg([['58','58 mm'],['80','80 mm'],['a4','Normal yazıcı (A4)']],RC().w,'rcW')}</div>
  <label class="f">Fişin üstüne yazılacaklar <span class="muted" style="font-weight:500">(adres, telefon, vergi no)</span><textarea class="in" rows="3" style="min-height:80px;padding-top:10px;font:inherit" onchange="rcSet('head',this.value.trim())" placeholder="Örnek Mah. 1. Sok. No:5\nTel: 0232 000 00 00">${esc(RC().head)}</textarea></label>
  <label class="f">Fişin altına yazılacak<input class="in" value="${esc(RC().foot)}" onchange="rcSet('foot',this.value.trim())" placeholder="Teşekkür ederiz"></label>
@@ -2503,7 +2511,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.42';
+const APPV='3.43';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -2976,9 +2984,11 @@ async function lvCam(){if(window._lvBusy)return;window._lvBusy=true;try{stopCam(
  lvSt('');termWake();barLoop(v);ocrStart();lvInfo()}finally{window._lvBusy=false}}
 async function lvInfo(){const e=$('#lvinfo');if(!e)return;const d=await getDet();const k=window._detK||'';const o=window._ocr?'rakam okuma hazır':window._ocrP?'rakam okuma yükleniyor':'';e.textContent=(window._camFront?'Ön kamera':'Arka kamera')+' · '+(d?('barkod okuyucu '+(k||'hazır')):'barkod okuyucu yüklenemedi (internet?)')+(o?' · '+o:'')}
 setInterval(()=>{if(S.lv&&$('#lvinfo'))lvInfo()},3000);
+/* kamera bekçisi (v3.43): görüntü donar ya da kamera kapanırsa kendiliğinden yeniden aç */
+setInterval(()=>{if(!S.lv||S.page!=='satis'||document.visibilityState!=='visible'||window._lvBusy||$('#modal').innerHTML)return;const tr=window._ctr,v=window._lvV;const dead=!window._camOn||!tr||tr.readyState==='ended'||!v||!v.isConnected;if(dead){window._lvDead=(window._lvDead||0)+1}else{const t=v.currentTime;window._lvDead=(t===window._lvT&&!v.paused)?(window._lvDead||0)+1:0;window._lvT=t;if(v.paused){try{v.play()}catch(e){}}}if(window._lvDead>=3){window._lvDead=0;if($('#lvslot'))lvCam()}},1000);
 async function lvSwitch(){let devs=[];try{devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput')}catch(e){}if(devs.length<2){toast('Bu cihazda tek kamera var');return}const cur=(window._cs&&window._cs.getVideoTracks()[0].getSettings().deviceId)||lsGet('camId');let i=devs.findIndex(d=>d.deviceId===cur);const nx=devs[(i+1)%devs.length];lsSet('camId',nx.deviceId);lsSet('camV','3');toast((nx.label||'Kamera '+((i+1)%devs.length+1)));lvCam()}
 async function lvTorch(){const tr=window._ctr;if(!tr)return;window._torch=!window._torch;try{await tr.applyConstraints({advanced:[{torch:window._torch}]})}catch(e){toast('Bu cihazda ışık açılamıyor')}const t=$('#lvtorch');if(t)t.classList.toggle('on',!!window._torch)}
-function lvHit(code){if(!S.lv||S.page!=='satis')return;if($('#modal').innerHTML){window._camLast='';return}code=String(code||'').trim();if(!code)return;
+function lvHit(code){dimPoke();dimOff();if(!S.lv||S.page!=='satis')return;if($('#modal').innerHTML){window._camLast='';return}code=String(code||'').trim();if(!code)return;
  const q=S.lvq||1;S.lvq=1;const s=$('#scan');if(!s)return;const n0=C().items.length;s.value=(q>1?q+'*':'')+code;scanKey({key:'Enter',preventDefault(){}});
  const p=findCode(code)||D.products.find(x=>x.packBc&&x.packBc===code);const L=p?C().items.find(l=>l.pid===p.id&&!l.unreg):null;
  S.lvLast=L?{name:L.name,qty:L.qty,unit:L.unit,price:L.price,t:Date.now()}:p?null:{code,miss:1,t:Date.now()};
@@ -2996,7 +3006,7 @@ function npTab(n){lsSet('npOn',n?'1':'0');const p=$('#pos');if(p)p.classList.tog
 function npHTML(){const q=S.npq||0;const k=(t,f,c,id)=>`<button class="${c||''}"${id?` id="${id}"`:''} onclick="${f}">${t}</button>`;
  return `<div class="np np2">${['7','8','9'].map(x=>k(x,`npK('${x}')`)).join('')}${k('⌫','npDel()','fn')}${['4','5','6'].map(x=>k(x,`npK('${x}')`)).join('')}${k(q>1?'×'+q:'×','npX()','ac'+(q>1?' on':''),'npxb')}${['1','2','3'].map(x=>k(x,`npK('${x}')`)).join('')}${k('Ekle','npAdd()','ok npok')}${k('0',`npK('0')`,'np0')}${k('Sil','npClr()','fn')}</div>`}
 function npS(){return $('#scan')}
-function npUp(){const b=$('#npxb'),q=S.npq||0;if(b){b.textContent=q>1?'×'+q:'×';b.classList.toggle('on',q>1)}}
+function npUp(){const b=$('#npxb'),q=S.npq||0;const z=$('#scq');if(z){z.hidden=!(q>1);z.querySelector('b').textContent='×'+q;z.classList.remove('pop');void z.offsetWidth;z.classList.add('pop')}if(b){b.textContent=q>1?'×'+q:'×';b.classList.toggle('on',q>1)}}
 function npSet(v){const s=npS();if(!s)return;s.value=v;if(typeof sugg==='function')sugg()}
 function npK(k){const s=npS();if(!s)return;if(s.value.length>=20)return;npSet(s.value+k)}
 function npDel(){const s=npS();if(s)npSet(s.value.slice(0,-1))}
@@ -3018,6 +3028,19 @@ function vkDel(){const s=$('#scan');if(!s)return;s.value=s.value.slice(0,-1);sug
 function vkClr(){const s=$('#scan');if(!s)return;s.value='';sugg()}
 function vkGo(){const s=$('#scan');if(!s||!s.value.trim())return;scanKey({key:'Enter',preventDefault(){}})}
 document.addEventListener('pointerdown',e=>{const k=$('#vkb');if(!k||!k.classList.contains('on'))return;if(e.target.closest('#vkb,.scan,#modal'))return;vkbClose()},true);
+
+/* ---------- ekranı açık tut + karart (v3.43) ---------- */
+const dimSec=()=>{const v=lsGet('dimS');return v===null?30:+v};
+let _dimT=0;
+function dimEl(){let e=$('#dimv');if(!e){e=document.createElement('div');e.id='dimv';e.innerHTML='<b id="dimc"></b><span id="dimm"></span><small>Devam etmek için dokun</small>';document.body.appendChild(e)}return e}
+function dimOn(){if(!S.user||S.page!=='satis'||$('#modal').innerHTML||document.visibilityState!=='visible')return;const e=dimEl();$('#dimc').textContent=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});$('#dimm').textContent=D&&D.set?D.set.market:'';e.classList.add('on')}
+function dimOff(){const e=$('#dimv');if(e&&e.classList.contains('on')){e.classList.remove('on');return true}return false}
+function dimPoke(){_dimT=Date.now()}
+async function keepAwake(){try{if(S.user&&S.page==='satis'&&dimSec()>=0&&lsGet('awake')!=='0'&&'wakeLock' in navigator&&document.visibilityState==='visible'&&!window._wl){window._wl=await navigator.wakeLock.request('screen');window._wl.addEventListener('release',()=>{window._wl=null})}}catch(e){}}
+['pointerdown','keydown','wheel','touchstart'].forEach(ev=>document.addEventListener(ev,e=>{dimPoke();if(dimOff()&&ev==='pointerdown'){e.preventDefault();e.stopPropagation()}},true));
+document.addEventListener('visibilitychange',()=>{dimPoke();if(document.visibilityState==='visible')keepAwake()});
+setInterval(()=>{keepAwake();const s=dimSec();if(s>0&&!(S.lv)&&Date.now()-_dimT>s*1000)dimOn();const c=$('#dimc');if(c&&$('#dimv').classList.contains('on'))c.textContent=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})},1000);
+function dimSet(v){lsSet('dimS',String(v));dimPoke();render()}
 /* ekran tuş takımı (pencerelerde) v3.41 */
 function kpHTML(ok,dec){const k=(t,f,c)=>`<button type="button" class="${c||''}" onclick="${f}">${t}</button>`;
  return `<div class="np kp">${['7','8','9'].map(v=>k(v,`kpK('${v}')`)).join('')}${k('⌫','kpDel()','fn')}${['4','5','6'].map(v=>k(v,`kpK('${v}')`)).join('')}${k('C','kpClr()','fn')}${['1','2','3'].map(v=>k(v,`kpK('${v}')`)).join('')}${k('Tamam','kpOk()','ok kpok')}${k('0',`kpK('0')`,'kp0')}${dec?k(',',`kpK(',')`):k('00',`kpK('00')`)}</div>`}
