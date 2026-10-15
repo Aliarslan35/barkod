@@ -829,6 +829,7 @@ html{touch-action:manipulation}
 @media (max-width:600px){.stmi>div{grid-template-columns:minmax(0,1fr) 80px}.stmi>div>span:nth-child(2){display:none}}
 .cdact{display:grid;grid-template-columns:1fr 1fr;gap:10px}.cdact .btn{min-height:54px;font-size:1rem}
 @media (max-width:520px){.cdact{grid-template-columns:1fr}}
+.lg-ver{color:#4A5263;font-size:.75rem;font-weight:700;margin-top:2px}.verb{display:inline-block;padding:1px 7px;border-radius:6px;background:var(--surf2);color:var(--tx3);font-size:.75rem;font-weight:700}
 /* v3.43 ekran karartma */
 #dimv{position:fixed;inset:0;z-index:9000;background:#000;opacity:0;pointer-events:none;transition:opacity 1.2s ease;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#fff}
 #dimv.on{opacity:.88;pointer-events:auto}
@@ -848,7 +849,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.45 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.46 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1075,7 +1076,7 @@ function renderLogin(){
   <div class="lg-pad">${['1','2','3','4','5','6','7','8','9',fp?'fp':'','0','⌫'].map(key).join('')}</div>
   ${def?`<p class="lg-hint">İlk şifre <b>${esc(u.pw)}</b>. Girişten sonra Ayarlar'dan değiştir.</p>`:''}`;
  }
- $('#app').innerHTML=`<div class="lg"><div class="lg-top"><i class="lg-logo">${LOGO.replace(/lgG/g,'lgG4')}</i><b>${esc(D.set.market)}</b></div><div class="lg-box">${box}</div><button class="lg-out" onclick="acctOut()">Market hesabından çık</button></div>`;
+ $('#app').innerHTML=`<div class="lg"><div class="lg-top"><i class="lg-logo">${LOGO.replace(/lgG/g,'lgG4')}</i><b>${esc(D.set.market)}</b></div><div class="lg-box">${box}</div><button class="lg-out" onclick="acctOut()">Market hesabından çık</button><div class="lg-ver">Sürüm ${APPV}</div></div>`;
 }
 function pinK(k){const u=D.users.find(x=>x.id===S.uSel);if(!u)return;
  if(k==='Sil')S.pin='';else if(k==='⌫')S.pin=S.pin.slice(0,-1);else S.pin+=k;
@@ -2005,7 +2006,7 @@ function pgAna(){const h=new Date().getHours();const sel=h<12?'Günaydın':h<18?
  const ver=D.customers.reduce((a,c)=>a+Math.max(0,bal(c)),0);const my=D.sales.filter(s=>!s.ret&&s.user===S.user.name&&inPer(s.date,'bugun'));
  const kpi=(l,v,c)=>`<div class="kpi"><span>${l}</span><b style="${c?'color:'+c:''}">${v}</b></div>`;
  const last=[...D.sales].reverse().slice(0,5);
- $('#main').innerHTML=`<div class="hhead"><div><h1>${sel}, ${esc(String(S.user.name).split(' ')[0])}</h1><p class="muted" style="margin:4px 0 0">${new Date().toLocaleDateString('tr-TR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})} · ${esc(D.set.market)}</p></div><div class="row sp" style="gap:8px"><span class="chip" style="min-height:40px">${ic('user',16)} ${esc(S.user.name)} · ${isY()?'Yönetici':'Kasiyer'}</span>${touch()?'':`<button class="btn" onclick="nav('terminal')" title="Telefonu barkod okuyucu olarak kullan">📱 El terminali</button>`}<button class="btn" onclick="logout()">Çıkış</button><button class="btn okb hgo" onclick="nav('satis')">${ic('satis',20)} Satışa başla</button></div></div>
+ $('#main').innerHTML=`<div class="hhead"><div><h1>${sel}, ${esc(String(S.user.name).split(' ')[0])}</h1><p class="muted" style="margin:4px 0 0">${new Date().toLocaleDateString('tr-TR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})} · ${esc(D.set.market)} · <span class="verb">v${APPV}</span></p></div><div class="row sp" style="gap:8px"><span class="chip" style="min-height:40px">${ic('user',16)} ${esc(S.user.name)} · ${isY()?'Yönetici':'Kasiyer'}</span>${touch()?'':`<button class="btn" onclick="nav('terminal')" title="Telefonu barkod okuyucu olarak kullan">📱 El terminali</button>`}<button class="btn" onclick="logout()">Çıkış</button><button class="btn okb hgo" onclick="nav('satis')">${ic('satis',20)} Satışa başla</button></div></div>
  ${touch()?termCard():''}
  ${isY()?`<div class="kpis">${kpi('Bugünkü ciro',tl(st.ciro)+anaChg(st.ciro,dn.ciro))}${kpi('Fiş sayısı',st.fis+anaChg(st.fis,dn.fis))}${kpi('Ortalama sepet',tl(st.ort)+anaChg(st.ort,dn.ort))}${kpi('Brüt kâr',tl(st.brut)+anaChg(st.brut,dn.brut),'var(--okTx)')}${kpi('Veresiye alacağı',tl(ver),'var(--warnTx)')}${kpi('Kritik stok',low.length,low.length?'var(--badTx)':'')}</div>`:`<div class="kpis" style="grid-template-columns:repeat(2,1fr);max-width:520px">${kpi('Bugün kestiğin fiş',my.length)}${kpi('Bugünkü satışın',tl(my.reduce((a,s)=>a+s.total,0)))}</div>`}
  
@@ -2565,7 +2566,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.45';
+const APPV='3.46';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
