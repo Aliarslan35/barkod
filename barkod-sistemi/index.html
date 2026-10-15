@@ -827,6 +827,8 @@ html{touch-action:manipulation}
 .stmb{font-size:.78rem;color:var(--tx3);text-align:right}.stmb b{color:var(--tx)}
 .stmpv{max-height:46vh;overflow:auto;border-radius:12px;background:var(--surf2);padding:10px;display:flex;justify-content:center}.stmpv img{width:100%;max-width:380px;height:auto;box-shadow:0 2px 10px rgba(0,0,0,.15);border-radius:4px}
 @media (max-width:600px){.stmi>div{grid-template-columns:minmax(0,1fr) 80px}.stmi>div>span:nth-child(2){display:none}}
+.cdact{display:grid;grid-template-columns:1fr 1fr;gap:10px}.cdact .btn{min-height:54px;font-size:1rem}
+@media (max-width:520px){.cdact{grid-template-columns:1fr}}
 /* v3.43 ekran karartma */
 #dimv{position:fixed;inset:0;z-index:9000;background:#000;opacity:0;pointer-events:none;transition:opacity 1.2s ease;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#fff}
 #dimv.on{opacity:.88;pointer-events:auto}
@@ -846,7 +848,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.44 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.45 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1966,10 +1968,10 @@ function setMf(v){S.mf=v;render()}
 function custForm(fromPos,id){const c=id?D.customers.find(x=>x.id===id):{name:'',phone:'',addr:'',limit:''};modal(mHead(id?'Müşteriyi düzenle':'Yeni müşteri')+`<label class="f">Ad soyad<input class="in" id="cn" autofocus value="${esc(c.name)}"></label><div class="g2"><label class="f">Telefon<input class="in" id="cp" inputmode="tel" value="${esc(c.phone)}"></label><label class="f">Veresiye limiti<input class="in" id="cli" inputmode="decimal" value="${c.limit||''}" placeholder="boş = limitsiz"></label></div><label class="f">Adres<input class="in" id="ca" value="${esc(c.addr)}"></label><label class="row" style="gap:10px;margin:2px 0 12px;cursor:pointer;flex-wrap:nowrap"><input type="checkbox" id="ciz" class="tck" ${c.izin?'checked':''}><span>Kampanya / duyuru mesajı almayı kabul etti</span></label><button class="btn pri" onclick="saveCust(${fromPos?1:0},${id||0})">Kaydet</button>`)}
 function saveCust(fp,id){const n=$('#cn').value.trim();if(!n){toast('Ad gerekli');return}const o={name:n,phone:$('#cp').value.trim(),addr:$('#ca').value.trim(),limit:num2($('#cli').value),izin:!!($('#ciz')&&$('#ciz').checked)};let c;if(id){c=D.customers.find(x=>x.id===id);Object.assign(c,o)}else{c={id:nid(),...o,moves:[]};D.customers.push(c)}save();closeM();if(fp){C().cust=c.id;drawCart()}else render();toast('Müşteri kaydedildi')}
 function custDet(id){const c=D.customers.find(x=>x.id===id);modal(mHead(esc(c.name))+`<div class="muted">${esc(c.phone)}${c.addr?' · '+esc(c.addr):''}${c.izin?' · <span class="tag t-Nakit">Kampanya mesajı izni var</span>':''}</div><div class="g2"><div style="background:var(--badSoft);border-radius:12px;padding:14px"><div style="font-size:.75rem;font-weight:700;color:var(--badTx)">Veresiye borcu</div><b style="font-size:1.6rem;color:var(--badTx)">${tl(bal(c))}</b></div><div style="background:var(--surf2);border-radius:12px;padding:14px"><div style="font-size:.75rem;font-weight:700;color:var(--tx3)">Limit</div><b style="font-size:1.6rem">${c.limit?tl(c.limit):'Limitsiz'}</b></div></div>
- <button class="btn okb" style="min-height:50px" onclick="tahsPos(${id})">Tahsilat al</button>
+ <div class="cdact"><button class="btn okb" onclick="tahsPos(${id})">Tahsilat al</button><button class="btn wab" onclick="waStatement(${id})">${ic('wa',20)} Hesap dökümü gönder</button></div>
  ${(()=>{const st=custStats()[id];const b=custBuys(id).slice(0,5);const g=bal(c)>0?debtAge(c):null;if(!st&&!b.length)return '';return `<div class="cdst"><div><small>Toplam alışveriş</small><b>${tl(st?st.t:0)}</b></div><div><small>Fiş</small><b>${st?st.n:0}</b></div><div><small>Son gelişi</small><b>${st&&st.last?fdd(st.last):'—'}</b></div>${g!=null?`<div><small>En eski borç</small><b>${g} gün</b></div>`:''}</div>${b.length?`<div><b style="font-size:.85rem">En çok aldıkları</b>${b.map(x=>`<div class="row" style="font-size:.88rem;padding:3px 0"><span>${esc(x.n)} <span class="muted">× ${Math.round(x.q*100)/100}</span></span><span class="sp">${tl(x.c)}</span></div>`).join('')}</div>`:''}`})()}
  <h2>Hesap dökümü</h2>${stmListHTML(c)}
- <div class="row">${c.phone?`<button class="btn wab" onclick="waOpen(${esc(JSON.stringify(c.phone))},waFill(WAT().borc,D.customers.find(x=>x.id===${id})))">${ic('wa',18)} Borç hatırlat</button><button class="btn wab" onclick="waStatement(${id})">${ic('wa',18)} Hesap dökümü gönder</button>`:''}<button class="btn" onclick="custForm(false,${id})">Düzenle</button>${isY()?`<button class="btn danger sp" onclick="delCust(${id})">Sil</button>`:''}</div>`)}
+ <div class="row"><button class="btn" onclick="waOpen(${esc(JSON.stringify(c.phone||''))},waFill(WAT().borc,D.customers.find(x=>x.id===${id})))">${ic('wa',18)} Kısa borç hatırlatma</button><button class="btn" onclick="custForm(false,${id})">Düzenle</button>${isY()?`<button class="btn danger sp" onclick="delCust(${id})">Sil</button>`:''}</div>`)}
 function collect(id){const c=D.customers.find(x=>x.id===id);const v=num2($('#th').value)||bal(c);if(v<=0)return;c.moves.push({date:new Date().toISOString(),t:'Tahsilat',a:-v});save();toast('Tahsilat alındı: '+tl(v));if(c.phone&&D.set.waVer!==false)waPaid(id,v);else custDet(id);if(S.page==='musteri')pgMusteri()}
 function delCust(id){ask('Müşteri silinsin mi?',()=>{D.customers=D.customers.filter(c=>c.id!==id);save();render()})}
 
@@ -2505,7 +2507,7 @@ function stmDraw(id){const c=D.customers.find(x=>x.id===id);const per=S.stmPer;c
 function stmPerSet(v){S.stmPer=v;stmDraw(window._stmId)}
 function stmShare(id){const c=D.customers.find(x=>x.id===id);const cv=stmCanvas(c,S.stmPer);cv.toBlob(async b=>{const f=new File([b],'hesap-'+c.name.replace(/\s+/g,'-')+'.png',{type:'image/png'});
  try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Hesap dökümü',text:D.set.market+' · Kalan borç: '+tlw(Math.max(0,bal(c)))});return}}catch(e){if(e&&e.name==='AbortError')return}
- const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=f.name;document.body.appendChild(a);a.click();a.remove();toast('Resim indirildi. WhatsApp\'ta müşteriye ek olarak gönder.');if(c.phone)setTimeout(()=>waOpen(c.phone,''),600)},'image/png')}
+ const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=f.name;document.body.appendChild(a);a.click();a.remove();toast('Resim indirildi. WhatsApp\'ta kişiyi seçip ek olarak gönder.');setTimeout(()=>waOpen(c.phone||'',''),600)},'image/png')}
 /* toplu mesaj */
 function msTog(id,on){S.msel=S.msel||{};if(on)S.msel[id]=1;else delete S.msel[id];const b=$('#msbtn');if(b)b.textContent=msBtnTxt()}
 function msAll(on,ids){S.msel=S.msel||{};ids.forEach(i=>on?S.msel[i]=1:delete S.msel[i]);render()}
@@ -2563,7 +2565,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.44';
+const APPV='3.45';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
