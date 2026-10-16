@@ -860,7 +860,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.50 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.51 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -2627,7 +2627,7 @@ function pgAyar(){const s=D.set;const tg=(k,l,d)=>`<div class="tgl" onclick="D.s
  <div class="f" style="font-size:.82rem;font-weight:600;color:var(--tx2)">Yazı boyutu${seg([['14','Küçük'],['16','Normal'],['18','Büyük'],['20','Çok büyük']],String(s.fs),'setFs')}</div></div>
  <div class="card"><h2>Kâr ve stok</h2><div class="g3"><label class="f">Hedef kâr oranı (%)<input class="in" inputmode="decimal" value="${KT().hedef}" onchange="setKT('karHedef',this.value)"></label><label class="f">En düşük kâr uyarısı (%)<input class="in" inputmode="decimal" value="${KT().min}" onchange="setKT('karMin',this.value)"></label><label class="f">SKT uyarısı (gün önce)<input class="in" inputmode="numeric" value="${KT().skt}" onchange="setKT('sktGun',this.value)"></label></div><p class="muted" style="margin:0;font-size:.82rem">Kâr oranı alış fiyatına göre hesaplanır: 10 TL'ye alınıp 12 TL'ye satılan ürün %20.</p></div>
  <div class="card"><h2>Satış ekranı</h2><div class="f" style="font-size:.82rem;font-weight:600;color:var(--tx2)">Hızlı ürün sütun sayısı${seg([['2','2'],['3','3'],['4','4'],['5','5']],String(s.cols),'setCols')}</div>
- ${tg('autoRc','Satıştan sonra fişi göster','Kapalıysa sadece kısa bildirim çıkar')}${tg('waVer','Veresiye satışında WhatsApp fişi öner','Satıştan sonra fişi ve toplam borcu müşteriye gönderme penceresi çıkar')}${tg('sound','Sesli uyarılar','Barkod okununca ve hata olunca ses')}${tg('neg','Stokta olmayan ürünü satmaya izin ver')}${tg('cashDisc','Kasiyer indirim yapabilsin','Kapalıysa yönetici şifresi istenir')}<div class="tgl" style="cursor:default"><div>Ekran klavyesi<small>Otomatik: tablete klavye bağlıyken harf yazınca ekran klavyesi kendiliğinden kapanır. Barkod tabancası bunu etkilemez. Sadece bu cihaz için geçerli.</small></div><select class="in" style="width:auto;min-height:40px" onchange="vkbSet(this.value)">${[['oto','Otomatik'],['acik','Hep açılsın'],['kapali','Açılmasın']].map(([v,l])=>`<option value="${v}" ${vkbMode()===v?'selected':''}>${l}</option>`).join('')}</select></div><div class="tgl" onclick="if(event.target.closest('select'))return;dimSet(dimSec()>0?0:30)"><div>Ekran kararması<small>Açıksa satış ekranında dokunulmazsa ekran kararır, dokununca ya da barkod okutunca açılır. Kapalıyken ekran hiç kararmaz. Sadece bu cihaz için geçerli.</small></div>${dimSec()>0?`<select class="in" style="width:auto;min-height:40px;margin-right:10px" onchange="dimSet(+this.value)">${[[15,'15 sn'],[30,'30 sn'],[60,'1 dk'],[120,'2 dk']].map(([v,l])=>`<option value="${v}" ${dimSec()===v?'selected':''}>${l}</option>`).join('')}</select>`:''}<span class="sw ${dimSec()>0?'on':''}"><i></i></span></div><div class="tgl" onclick="lsSet('rcv',rcv()?'0':'1');render()"><div>Bu cihaz telefondan okutulanları alsın<small>Bilgisayarda hep açık. Tablet ve telefonda satış ekranı açıkken kendiliğinden alır; burayı açarsan her ekranda alır. El terminali olarak kullanılan telefonda kapalı kalsın. Sadece bu cihaz için geçerli.</small></div><span class="sw ${rcv()?'on':''}"><i></i></span></div></div>
+ ${tg('autoRc','Satıştan sonra fişi göster','Kapalıysa sadece kısa bildirim çıkar')}${tg('waVer','Veresiye satışında WhatsApp fişi öner','Satıştan sonra fişi ve toplam borcu müşteriye gönderme penceresi çıkar')}${tg('sound','Sesli uyarılar','Barkod okununca ve hata olunca ses')}${tg('neg','Stokta olmayan ürünü satmaya izin ver')}${tg('cashDisc','Kasiyer indirim yapabilsin','Kapalıysa yönetici şifresi istenir')}<div class="tgl" style="cursor:default"><div>Ekran klavyesi<small>Otomatik: tablete klavye ya da barkod tabancası bağlıyken ilk tuşta ekran klavyesi kapanır ve bir gün boyunca açılmaz. Sadece bu cihaz için geçerli.</small></div><select class="in" style="width:auto;min-height:40px" onchange="vkbSet(this.value)">${[['oto','Otomatik'],['acik','Hep açılsın'],['kapali','Açılmasın']].map(([v,l])=>`<option value="${v}" ${vkbMode()===v?'selected':''}>${l}</option>`).join('')}</select></div><div class="tgl" onclick="if(event.target.closest('select'))return;dimSet(dimSec()>0?0:30)"><div>Ekran kararması<small>Açıksa satış ekranında dokunulmazsa ekran kararır, dokununca ya da barkod okutunca açılır. Kapalıyken ekran hiç kararmaz. Sadece bu cihaz için geçerli.</small></div>${dimSec()>0?`<select class="in" style="width:auto;min-height:40px;margin-right:10px" onchange="dimSet(+this.value)">${[[15,'15 sn'],[30,'30 sn'],[60,'1 dk'],[120,'2 dk']].map(([v,l])=>`<option value="${v}" ${dimSec()===v?'selected':''}>${l}</option>`).join('')}</select>`:''}<span class="sw ${dimSec()>0?'on':''}"><i></i></span></div><div class="tgl" onclick="lsSet('rcv',rcv()?'0':'1');render()"><div>Bu cihaz telefondan okutulanları alsın<small>Bilgisayarda hep açık. Tablet ve telefonda satış ekranı açıkken kendiliğinden alır; burayı açarsan her ekranda alır. El terminali olarak kullanılan telefonda kapalı kalsın. Sadece bu cihaz için geçerli.</small></div><span class="sw ${rcv()?'on':''}"><i></i></span></div></div>
  <div class="card"><h2>Fiş yazıcı</h2><div class="f" style="font-size:.82rem;font-weight:600;color:var(--tx2)">Kâğıt genişliği${seg([['58','58 mm'],['80','80 mm'],['a4','Normal yazıcı (A4)']],RC().w,'rcW')}</div>
  <label class="f">Fişin üstüne yazılacaklar <span class="muted" style="font-weight:500">(adres, telefon, vergi no)</span><textarea class="in" rows="3" style="min-height:80px;padding-top:10px;font:inherit" onchange="rcSet('head',this.value.trim())" placeholder="Örnek Mah. 1. Sok. No:5\nTel: 0232 000 00 00">${esc(RC().head)}</textarea></label>
  <label class="f">Fişin altına yazılacak<input class="in" value="${esc(RC().foot)}" onchange="rcSet('foot',this.value.trim())" placeholder="Teşekkür ederiz"></label>
@@ -2645,7 +2645,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.50';
+const APPV='3.51';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -3158,11 +3158,10 @@ function vkbEl(){let e=$('#vkb');if(e)return e;e=document.createElement('div');e
 function vkbOpen(){if(!touch()||hwKb()||S.page!=='satis')return;vkbEl().classList.add('on')}
 /* v3.48 harici (Bluetooth) klavye: elle harf yazılınca ekran klavyesi kapanır */
 const vkbMode=()=>lsGet('vkbM')||'oto';
-const hwKb=()=>vkbMode()==='kapali'||(vkbMode()==='oto'&&!!window._hwKb);
-let _hwT=0;
-document.addEventListener('keydown',e=>{if(!e.isTrusted||window._hwKb||vkbMode()!=='oto')return;const k=e.key||'';const now=Date.now(),gap=now-_hwT;_hwT=now;
- if((/^[a-zçğıöşü ]$/i.test(k)||k==='Backspace')&&gap>60){window._hwKb=true;vkbClose();const sc=$('#scan');if(sc)sc.setAttribute('inputmode','search')}},true);
-function vkbSet(v){lsSet('vkbM',v);window._hwKb=false;vkbClose();render()}
+const hwKb=()=>vkbMode()==='kapali'||(vkbMode()==='oto'&&(!!window._hwKb||Date.now()-(+lsGet('hwKbT')||0)<864e5));
+document.addEventListener('keydown',e=>{if(!e.isTrusted||vkbMode()!=='oto')return;const k=e.key||'';if(k.length!==1&&k!=='Backspace'&&k!=='Enter')return;
+ lsSet('hwKbT',String(Date.now()));if(window._hwKb)return;window._hwKb=true;vkbClose();const sc=$('#scan');if(sc)sc.setAttribute('inputmode','search')},true);
+function vkbSet(v){lsSet('vkbM',v);lsSet('hwKbT','0');window._hwKb=false;vkbClose();render()}
 function vkbClose(){const e=$('#vkb');if(e)e.classList.remove('on');const s=$('#scan');if(s)s.blur()}
 function vkK(c){const s=$('#scan');if(!s||s.value.length>=40)return;s.value+=c;sugg()}
 function vkDel(){const s=$('#scan');if(!s)return;s.value=s.value.slice(0,-1);sugg()}
