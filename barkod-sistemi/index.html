@@ -860,7 +860,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.54 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.55 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -2645,7 +2645,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.54';
+const APPV='3.55';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -3161,15 +3161,6 @@ const vkbMode=()=>lsGet('vkbM')||'oto';
 const hwKb=()=>vkbMode()==='kapali'||(vkbMode()==='oto'&&(!!window._hwKb||Date.now()-(+lsGet('hwKbT')||0)<864e5));
 document.addEventListener('keydown',e=>{if(!e.isTrusted||vkbMode()!=='oto')return;const k=e.key||'';if(k.length!==1&&k!=='Backspace'&&k!=='Enter')return;
  lsSet('hwKbT',String(Date.now()));if(window._hwKb)return;window._hwKb=true;vkbClose()},true);
-/* v3.53 Ctrl+A/C/X/V/Z yedeği: tablet klavyesi bunları yutarsa biz yaparız */
-let _pasteT=0;document.addEventListener('paste',()=>{_pasteT=Date.now()},true);
-document.addEventListener('keydown',e=>{if(!(e.ctrlKey||e.metaKey)||e.altKey)return;const el=document.activeElement;if(!el||!(el.tagName==='INPUT'||el.tagName==='TEXTAREA')||el.type==='password')return;
- const k=(e.key||'').toLowerCase(),c=e.code;const sel=()=>el.value.slice(el.selectionStart??0,el.selectionEnd??0);
- const put=t=>{const a=el.selectionStart??el.value.length,b=el.selectionEnd??el.value.length;el.value=el.value.slice(0,a)+t+el.value.slice(b);const p=a+t.length;try{el.setSelectionRange(p,p)}catch(x){}el.dispatchEvent(new Event('input',{bubbles:true}))};
- if(k==='a'||c==='KeyA'){e.preventDefault();try{el.select()}catch(x){}return}
- if(k==='c'||c==='KeyC'||k==='x'||c==='KeyX'){const t=sel();if(!t)return;e.preventDefault();try{navigator.clipboard.writeText(t)}catch(x){}window._clip=t;if(k==='x'||c==='KeyX')put('');return}
- if(k==='v'||c==='KeyV'){const t0=Date.now();setTimeout(async()=>{if(_pasteT>=t0)return;let t='';try{t=await navigator.clipboard.readText()}catch(x){t=window._clip||''}if(t)put(t)},150);return}
-},true);
 /* v3.52 Alt+K: kamerayı aç/kapa */
 document.addEventListener('keydown',e=>{if(e.altKey&&!e.ctrlKey&&(e.code==='KeyK'||/^k$/i.test(e.key||''))){if(!S.user)return;e.preventDefault();e.stopPropagation();if(S.page!=='satis')nav('satis');lvTog()}},true);
 function vkbSet(v){lsSet('vkbM',v);lsSet('hwKbT','0');window._hwKb=false;vkbClose();render()}
