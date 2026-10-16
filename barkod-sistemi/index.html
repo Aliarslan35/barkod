@@ -860,7 +860,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.59 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.60 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -2645,7 +2645,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.59';
+const APPV='3.60';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -3098,7 +3098,7 @@ window.addEventListener('online',()=>$('#tmode')&&termDraw());window.addEventLis
 /* ---------- satış ekranında sürekli okuyan kamera (v3.34) ---------- */
 function lvTog(){S.lv?lvStop():lvStart()}
 function lvStart(){if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('Bu cihazda kamera açılamıyor');return}S.lv=true;S.lvq=1;S.lvLast=null;renderSatis()}
-function lvStop(){S.lv=false;stopCam();try{window._wl&&window._wl.release()}catch(e){}window._wl=null;renderSatis()}
+function lvStop(){S.lv=false;stopCam();wlFree();renderSatis()}
 function lvHTML(){const q=S.lvq||1;return `<div class="lvp"><div class="lvcam" id="lvslot" onclick="if(event.target.closest('button'))return;camTap()"><div class="lvctl"><span class="lvlive">● CANLI</span><span style="flex:1"></span><button onclick="lvSwitch()" aria-label="Kamerayı değiştir" title="Ön / arka kamera">🔄</button><button id="lvtorch" onclick="lvTorch()" aria-label="Işık" style="display:none">🔦</button><button onclick="lvStop()" aria-label="Kamerayı kapat">✕ Kapat</button></div><div class="tmwin"><i class="tmlaser"></i></div><div class="lvst" id="lvst">Kamera açılıyor…</div><div id="lvpop"></div><div class="lvhint">Barkodu ya da altındaki rakamları göster · netleşmezse ekrana dokun</div><div class="lvinfo" id="lvinfo"></div></div>
  <div class="lvq"><span>Sıradaki adet:</span>${[1,2,3,6,12].map(n=>`<button class="chip ${q===n?'on':''}" onclick="lvQ(${n})">×${n}</button>`).join('')}<button class="chip ${[1,2,3,6,12].includes(q)?'':'on'}" onclick="lvQask()">${[1,2,3,6,12].includes(q)?'×?':'×'+q}</button></div></div>`}
 function lvQ(n){S.lvq=n>0?n:1;lvQdraw()}
@@ -3180,11 +3180,12 @@ function dimEl(){let e=$('#dimv');if(!e){e=document.createElement('div');e.id='d
 function dimOn(){if(!S.user||S.page!=='satis'||$('#modal').innerHTML||document.visibilityState!=='visible')return;const e=dimEl();$('#dimc').textContent=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});$('#dimm').textContent=D&&D.set?D.set.market:'';e.classList.add('on')}
 function dimOff(){const e=$('#dimv');if(e&&e.classList.contains('on')){e.classList.remove('on');return true}return false}
 function dimPoke(){_dimT=Date.now()}
-async function keepAwake(){try{if(S.user&&lsGet('awake')!=='0'&&!awakeIdle()&&'wakeLock' in navigator&&document.visibilityState==='visible'&&!window._wl){window._wl=await navigator.wakeLock.request('screen');window._wl.addEventListener('release',()=>{window._wl=null})}}catch(e){}}
+function wlFree(){const a=(window._wls||[]).splice(0);if(window._wl&&!a.includes(window._wl))a.push(window._wl);window._wl=null;a.forEach(l=>{try{l.release()}catch(e){}})}
+async function keepAwake(){if(window._wlBusy)return;window._wlBusy=true;try{if(S.user&&lsGet('awake')!=='0'&&!awakeIdle()&&'wakeLock' in navigator&&document.visibilityState==='visible'&&!window._wl){const l=await navigator.wakeLock.request('screen');(window._wls=window._wls||[]).push(l);l.addEventListener('release',()=>{if(window._wl===l)window._wl=null;const i=window._wls.indexOf(l);if(i>-1)window._wls.splice(i,1)});if(window._wl||lsGet('awake')==='0'||awakeIdle()){try{l.release()}catch(e){}}else window._wl=l}}catch(e){}window._wlBusy=false}
 ['pointerdown','keydown','wheel','touchstart'].forEach(ev=>document.addEventListener(ev,e=>{dimPoke();if(dimOff()&&ev==='pointerdown'){e.preventDefault();e.stopPropagation()}},true));
 document.addEventListener('visibilitychange',()=>{dimPoke();if(document.visibilityState==='visible')keepAwake()});
-setInterval(()=>{if(awakeIdle()){if(window._wl){try{window._wl.release()}catch(e){}window._wl=null}if(S.lv&&!$('#modal').innerHTML)lvStop()}keepAwake();const s=dimSec();if(s>0&&!(S.lv)&&Date.now()-_dimT>s*1000)dimOn();const c=$('#dimc');if(c&&$('#dimv').classList.contains('on'))c.textContent=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})},1000);
-function awakeSet(on){lsSet('awake',on?'1':'0');if(!on&&window._wl){try{window._wl.release()}catch(e){}window._wl=null}else keepAwake();render()}
+setInterval(()=>{if(awakeIdle()){wlFree();if(S.lv&&!$('#modal').innerHTML)lvStop()}keepAwake();const s=dimSec();if(s>0&&!(S.lv)&&Date.now()-_dimT>s*1000)dimOn();const c=$('#dimc');if(c&&$('#dimv').classList.contains('on'))c.textContent=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})},1000);
+function awakeSet(on){lsSet('awake',on?'1':'0');if(!on)wlFree();else keepAwake();render()}
 function dimSet(v){lsSet('dimS2',String(v));dimOff();dimPoke();render()}
 /* ekran tuş takımı (pencerelerde) v3.41 */
 function kpHTML(ok,dec){const k=(t,f,c)=>`<button type="button" class="${c||''}" onclick="${f}">${t}</button>`;
