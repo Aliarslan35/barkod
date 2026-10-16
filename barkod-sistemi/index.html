@@ -860,7 +860,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.58 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.59 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -2645,7 +2645,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.58';
+const APPV='3.59';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -3183,7 +3183,7 @@ function dimPoke(){_dimT=Date.now()}
 async function keepAwake(){try{if(S.user&&lsGet('awake')!=='0'&&!awakeIdle()&&'wakeLock' in navigator&&document.visibilityState==='visible'&&!window._wl){window._wl=await navigator.wakeLock.request('screen');window._wl.addEventListener('release',()=>{window._wl=null})}}catch(e){}}
 ['pointerdown','keydown','wheel','touchstart'].forEach(ev=>document.addEventListener(ev,e=>{dimPoke();if(dimOff()&&ev==='pointerdown'){e.preventDefault();e.stopPropagation()}},true));
 document.addEventListener('visibilitychange',()=>{dimPoke();if(document.visibilityState==='visible')keepAwake()});
-setInterval(()=>{if(awakeIdle()&&window._wl){try{window._wl.release()}catch(e){}window._wl=null}keepAwake();const s=dimSec();if(s>0&&!(S.lv)&&Date.now()-_dimT>s*1000)dimOn();const c=$('#dimc');if(c&&$('#dimv').classList.contains('on'))c.textContent=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})},1000);
+setInterval(()=>{if(awakeIdle()){if(window._wl){try{window._wl.release()}catch(e){}window._wl=null}if(S.lv&&!$('#modal').innerHTML)lvStop()}keepAwake();const s=dimSec();if(s>0&&!(S.lv)&&Date.now()-_dimT>s*1000)dimOn();const c=$('#dimc');if(c&&$('#dimv').classList.contains('on'))c.textContent=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})},1000);
 function awakeSet(on){lsSet('awake',on?'1':'0');if(!on&&window._wl){try{window._wl.release()}catch(e){}window._wl=null}else keepAwake();render()}
 function dimSet(v){lsSet('dimS2',String(v));dimOff();dimPoke();render()}
 /* ekran tuş takımı (pencerelerde) v3.41 */
