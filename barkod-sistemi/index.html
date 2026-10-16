@@ -860,7 +860,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.55 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.56 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1214,7 +1214,7 @@ function undoLast(){const u=S.undo;if(!u)return;const i=D.sales.findIndex(x=>x.i
 function upCh(){const t=cartTot(C());$('#chg').textContent=tl(Math.max(0,num(C().rec)-t.total))}
 function addP(id,q){
  const p=P(id);if(!p)return;
- if(p.unit==='kg'&&q==null)return askKg(id);
+ if(p.unit==='kg'&&q==null){if(S.npq>1&&p.price>0){const tt=S.npq;S.npq=0;setTimeout(npUp,0);q=Math.round(tt/p.price*1e6)/1e6;setTimeout(()=>toast(`${p.name}: ${tl(tt)} → ${Math.round(q*1000)} gr`),0)}else return askKg(id)}
  if(q==null&&S.npq>1){q=S.npq;S.npq=0;setTimeout(npUp,0)}
  q=q||1;const c=C();
  if(!c.ret&&!D.set.neg){const inCart=c.items.filter(l=>l.pid===id).reduce((a,l)=>a+l.qty,0);if(p.stock-inCart<q){toast(p.name+': stok yetersiz ('+qf(p.stock,p.unit)+')');beep(false);return}}
@@ -2645,7 +2645,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.55';
+const APPV='3.56';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
