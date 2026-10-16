@@ -817,6 +817,10 @@ html{touch-action:manipulation}
 .scq{display:inline-flex;align-items:center;gap:6px;flex:none;height:34px;padding:0 4px 0 12px;border-radius:17px;background:var(--acc);color:#fff;box-shadow:0 2px 8px color-mix(in srgb,var(--acc) 40%,transparent)}
 .scq b{font-size:1.15rem;font-weight:800;letter-spacing:-.3px}.scq small{font-size:.75rem;font-weight:700;opacity:.85}
 .scq button{width:26px;height:26px;border:0;border-radius:50%;background:rgba(255,255,255,.22);color:#fff;font-size:.8rem;font-weight:800;padding:0;display:grid;place-items:center}
+.ozl{display:flex;flex-direction:column;gap:14px;max-height:none}.ozg h3,.ksh{margin:6px 0 6px;font-size:1rem;display:flex;align-items:center;gap:8px}.ozg h3 span{font-size:.75rem;font-weight:700;color:var(--tx3);background:var(--surf2);border-radius:20px;padding:2px 8px}
+.ozg ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:5px;font-size:.92rem;line-height:1.45}.ozb{display:inline-block;font-size:.68rem;font-weight:800;color:var(--acc);background:color-mix(in srgb,var(--acc) 12%,transparent);border-radius:6px;padding:1px 6px;margin-right:6px;vertical-align:1px;text-transform:uppercase;letter-spacing:.3px}
+.ksy td:first-child{width:42%;white-space:nowrap}.ksy{min-width:0}
+#modal :focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 .totn{display:block;font-size:.72rem;font-weight:600;opacity:.75;margin-top:2px;letter-spacing:0}
 .scq.pop{animation:scqp .25s}@keyframes scqp{50%{transform:scale(1.12)}}
 /* v3.44 hesap dökümü */
@@ -861,7 +865,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.61 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.62 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1021,7 +1025,7 @@ const PAYK=['nakit','kart','havale','veresiye','parcali'];
 const PAYD={nakit:['Nakit',"pay('Nakit')"],kart:['Kart',"pay('Kart')"],havale:['Havale',"pay('Havale')"],veresiye:['Veresiye',"pay('Veresiye')"],parcali:['Parçalı ödeme','split()']};
 const AUXK=['iade','indirim','beklet'];const AUXD={iade:['İade','toggleRet()','ret'],indirim:['İndirim','discount()','disc'],beklet:['Beklet','hold()','hold'],tahsilat:['Tahsilat','tahsPos()','tahs']};
 const payName=t=>({Nakit:Tp('pay_nakit','Nakit'),Kart:Tp('pay_kart','Kart'),Havale:Tp('pay_havale','Havale'),Veresiye:Tp('pay_veresiye','Veresiye'),'Parçalı':'Parçalı'})[t]||t;
-const KEYDEF={help:['F1','Yardım'],scan:['F2','Barkod kutusu'],price:['F3','Fiyat gör'],ret:['F4','İade'],disc:['Home','İndirim'],hold:['F6','Beklet'],cust:['F7','Müşteri seç'],nakit:['F8','Nakit'],kart:['F9','Kart'],havale:['F10','Havale'],veresiye:['F11','Veresiye'],parcali:['F12','Parçalı ödeme'],del:['Delete','Satır sil'],clear:['Escape','Sepeti temizle'],tahs:['','Tahsilat al'],cam:['F5','Kamera aç/kapa']};
+const KEYDEF={help:['F1','Yardım'],scan:['F2','Barkod kutusu'],price:['F3','Fiyat gör'],ret:['F4','İade'],disc:['Home','İndirim'],hold:['F6','Beklet'],cust:['F7','Müşteri seç'],nakit:['F8','Nakit'],kart:['F9','Kart'],havale:['F10','Havale'],veresiye:['F11','Veresiye'],parcali:['F12','Parçalı ödeme'],del:['Delete','Seçili satırı sil'],clear:['Escape','Sepeti temizle'],tahs:['','Tahsilat al'],cam:['F5','Kamera aç/kapa']};
 const ACTHIDE={nakit:'pay_nakit',kart:'pay_kart',havale:'pay_havale',veresiye:'pay_veresiye',parcali:'pay_parcali',ret:'aux_iade',disc:'aux_indirim',hold:'aux_beklet',tahs:'aux_tahsilat'};
 const KL=a=>UI().keys[a]||KEYDEF[a][0];
 const kn=k=>({Escape:'Esc',Delete:'Del',' ':'Boşluk',ArrowUp:'↑',ArrowDown:'↓',ArrowLeft:'←',ArrowRight:'→'})[k]||(k.length===1?k.toUpperCase():k);
@@ -1379,7 +1383,7 @@ function pay(type,parts,force){
 }
 function rcHTML(s,chg){chg=chg||s.chg||0;const cu=s.cust?D.customers.find(x=>x.id===s.cust):null;const rc=RC();return `<div class="receipt printme"><div style="text-align:center;font-weight:700">${esc(D.set.market)}</div>${rc.head?`<div style="text-align:center;white-space:pre-line;font-size:.92em">${esc(rc.head)}</div>`:''}<div style="text-align:center">${s.ret?'İADE FİŞİ':'SATIŞ FİŞİ'} #${s.no}</div><div style="text-align:center">${fdt(s.date)} · ${esc(s.user)}</div><hr>${s.items.map(l=>`<div>${esc(l.name)}</div><div class="rl"><span>${qf(l.qty,l.unit)} x ${tl(l.price)}${l.disc?' %'+Math.round(l.disc)+' ind.':''}</span><span>${tl(lineT(l))}</span></div>`).join('')}<hr>${(s.camp||[]).map(r=>`<div class="rl"><span>Kampanya: ${esc(r.n)}</span><span>-${tl(r.amt)}</span></div>`).join('')}${(()=>{const od=r2((s.disc||0)-(s.camp||[]).reduce((a,r)=>a+r.amt,0));return od>0?`<div class="rl"><span>İndirim</span><span>-${tl(od)}</span></div>`:''})()}<div class="rl" style="font-weight:700;font-size:1.1em"><span>TOPLAM</span><span>${tl(s.total)}</span></div><div class="rl"><span>Ödeme</span><span>${s.pay}${s.parts?` (${partsTxt(s.parts)})`:''}</span></div>${s.rec?`<div class="rl"><span>Alınan</span><span>${tl(s.rec)}</span></div>`:''}${chg?`<div class="rl"><span>Para üstü</span><span>${tl(chg)}</span></div>`:''}${cu?`<div class="rl"><span>Müşteri</span><span>${esc(cu.name)}</span></div>`:''}${rc.foot?`<hr><div style="text-align:center;white-space:pre-line">${esc(rc.foot)}</div>`:''}${fisBc(s)}</div>`}
 function showRc(s,chg){modal(mHead(s.ret?'İade tamamlandı':'Satış tamamlandı')+(chg?`<div style="background:var(--okSoft);color:var(--okTx);border-radius:12px;padding:14px;font-weight:800;font-size:1.4rem;display:flex;justify-content:space-between"><span>Para üstü</span><span>${tl(chg)}</span></div>`:'')+rcHTML(s,chg)+`<div class="row"><button class="btn" onclick="rcPrint()">Fişi yazdır</button>${S.undo&&S.undo.sid===s.id?'<button class="btn" onclick="undoLast()">Geri al</button>':''}<button class="btn pri sp" autofocus onclick="closeM()">Yeni satış</button></div>`)}
-function help(){modal(mHead('Klavye kısayolları')+`<table class="tbl" style="min-width:0">${Object.keys(KEYDEF).filter(a=>!(ACTHIDE[a]&&UI().hide[ACTHIDE[a]])).map(a=>`<tr><td><b class="mono">${kn(KL(a))}</b></td><td>${esc(keyLbl(a))}</td></tr>`).join('')}<tr><td><b class="mono">3*barkod</b></td><td>3 adet ekle</td></tr></table><p class="muted" style="margin:0">Tuşları yönetici Menü › Ayarlar › Kişiselleştirme bölümünden değiştirebilir. Tarayıcıda F11 ve F12 tam ekran ve geliştirici araçlarına gidebilir; kurulan uygulamada bu sorun olmaz.</p>`)}
+function help(){modal(mHead('Klavye kısayolları')+ksyCard().replace('<div class="card">','<div>').replace('<h2>Klavye kısayolları</h2>',''))}
 function priceCheck(){modal(mHead('Fiyat gör')+`<input class="in" id="pc" autofocus placeholder="Barkod okut veya ad yaz" oninput="pcShow()" onkeydown="if(event.key==='Enter')pcShow()"><div id="pcr"></div>`)}
 function pcShow(){const v=$('#pc').value.trim();const p=findCode(v)||(v.length>1?matches(v)[0]:null);$('#pcr').innerHTML=p?`<div class="card" style="background:var(--surf2)"><b style="font-size:1.2rem">${esc(p.name)}</b><b style="font-size:2rem;color:var(--acc)">${tl(p.price)}${p.unit==='kg'?' /kg':''}</b><span class="muted">Stok: ${qf(p.stock,p.unit)} · ${esc(p.cat)}</span></div>`:(v?'<div class="muted">Bulunamadı</div>':'')}
 
@@ -2639,6 +2643,7 @@ function pgAyar(){const s=D.set;const tg=(k,l,d)=>`<div class="tgl" onclick="D.s
  <p class="muted" style="margin:0;font-size:.82rem;line-height:1.6">Terazi barkodu şöyledir: <b class="mono">27 00012 01250 X</b> → ön ek 27, ürün kodu 00012, ağırlık 1,250 kg. Kg ile satılan ürünün <b>barkod alanına terazideki ürün kodunu</b> (örn. 00012 ya da 12) yaz. Emin değilsen terazinin bastığı bir etiketi okut, ekranda çıkan koda bak.</p>`:''}</div>
  ${edCard()}
  <div class="card"><h2>Yedekleme ve veri</h2><p class="muted" style="margin:0">Veriler bulutta, tüm cihazlarda ortak. İnternet kesilirse satış devam eder, bağlantı gelince eşitlenir.</p><p style="margin:0;font-size:.9rem">Market hesabı: <b>${esc(S.email||"")}</b></p><div class="row"><button class="btn pri" onclick="backupDl()">Yedek indir</button><label class="btn" style="cursor:pointer">Yedekten geri yükle<input type="file" accept=".json,application/json" hidden onchange="backupUp(this)"></label></div><p class="muted" style="margin:0;font-size:.82rem">${D.set.lastBackup?'Son yedek: '+fdt(D.set.lastBackup):'Henüz yedek alınmadı'}. Haftada bir yedek alıp telefonuna ya da e-postana kaydetmen iyi olur. 7 günü geçince Ana sayfada hatırlatılır.</p><p class="muted" style="margin:0;font-size:.82rem">Uygulama sürümü <b>${APPV}</b></p><div class="row"><button class="btn" onclick="clrDemo()">Örnek ürünleri sil</button><button class="btn" onclick="acctOut()">Bu cihazı hesaptan çıkar</button><button class="btn danger" onclick="resetAll()">Her şeyi sıfırla</button></div></div>
+ ${ksyCard()}${ozCard()}
  </div>`;ayApply()}
 function rcW(v){rcSet('w',v)}function sclMode(v){sclSet('mode',v)}
 function setTheme(v){D.set.theme=v;save();render()}function setFs(v){D.set.fs=+v;save();render()}function setCols(v){D.set.cols=+v;save();render()}
@@ -2646,7 +2651,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.61';
+const APPV='3.62';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -3162,6 +3167,153 @@ const vkbMode=()=>lsGet('vkbM')||'oto';
 const hwKb=()=>vkbMode()==='kapali'||(vkbMode()==='oto'&&(!!window._hwKb||Date.now()-(+lsGet('hwKbT')||0)<864e5));
 document.addEventListener('keydown',e=>{if(!e.isTrusted||vkbMode()!=='oto')return;const k=e.key||'';if(k.length!==1&&k!=='Backspace'&&k!=='Enter')return;
  lsSet('hwKbT',String(Date.now()));if(window._hwKb)return;window._hwKb=true;vkbClose()},true);
+/* v3.62 özellik listesi (Ayarlar › Özellikler) */
+const OZ=[
+['Satış ekranı',[
+'Barkod tabancası, kamera ya da ürün adı yazarak satış; yazarken öneri listesi çıkar',
+'Hızlı ürünler: kategori sekmeleri, renkli kartlar, fotoğraf, sütun sayısı ayarı, sıralama ve düzenleme kalemi',
+'Adet verme: tuş takımında sayı + ×, ya da klavyeden 3* (Enter gerekmez), 3x + Enter; arama kutusunda mavi "×3 adet" etiketi',
+'Kilo ürünü: kilo ya da tutar (₺) ile giriş, "Tartılacak 313 gr" gösterimi; 50* yazıp kilo ürünü seçince 50 ₺\'lik eklenir',
+'Terazi barkodu okuma (27/28/29 ön ekli etiketlerden ürün ve kilo kendiliğinden gelir)',
+'Koli barkodu: koli okutunca koli fiyatı ve adedi ile eklenir',
+'Kayıtsız ürün: barkod yoksa fiyat yazıp satarsın; ürünü sonra kaydedince eski satışlar barkoddan bağlanır',
+'Çoklu sepet (Müşteri 1, 2, 3…): beklet ve sekmeler arası geçiş',
+'Sepette satır seçme, adet + / −, satır silme, satır fiyatını o satış için değiştirme',
+'Toplamın altında kalem ve adet sayısı (4 kalem · 6 adet + 0,5 kg)',
+'İndirim (tutar ya da yüzde), kampanyaların sepette kendiliğinden uygulanması',
+'Ödeme: Nakit, Kart, Havale, Veresiye, Parçalı ödeme',
+'Alınan para ve para üstü: hazır tutar düğmeleri, tuş takımı, ya da 500+ yazarak',
+'İade modu (F4) ve son satışı geri alma',
+'Müşteri seçme ve satıştan yeni müşteri ekleme',
+'Fiyat gör (F3): ürünü satmadan fiyatına bakma',
+'Son okutulan ürün bandı ve sesli uyarılar (okununca ve hata olunca)',
+'Satış geçmişi kutusu: son fişler, yazdır ve geri al',
+'Stok kontrolü: stokta yoksa uyarır (ayarla kapatılabilir)']],
+['Fiş ve iade',[
+'Fiş gösterme, yazdırma (58/80 mm), resim olarak WhatsApp\'tan gönderme',
+'Fişin altında barkod ve fiş numarası',
+'Fiş barkodunu okutunca o eski satış açılır; ürün seçip kısmi ya da tam iade',
+'Daha önce iade edilen ürünler işaretlenir, ikinci kez iade edilemez',
+'İadede indirim orantılı düşülür, stok geri girer, veresiyede borçtan düşer',
+'Kasiyer iade yaparken yönetici şifresi istenir',
+'Veresiye satıştan sonra WhatsApp fişi önerisi (ayarlı)']],
+['Kamera ve barkod okuma',[
+'Satış ekranında sürekli okuyan canlı kamera (📷, F5 ya da Alt+K)',
+'Arka planda: arka (ana) kamerayı kendisi seçer, geniş açı ve ön kamerayı atlar',
+'Arka planda: sürekli odak ayarı ve doğru yakınlık (net okusun diye)',
+'Arka planda: tam kare ve orta bant sırayla taranır; kayıtlı barkod ilk görüşte eklenir',
+'Arka planda: barkod okunamazsa altındaki rakamları yazıdan okuma (OCR)',
+'Arka planda: EAN kontrol hanesi doğrulaması (yanlış okumayı engeller)',
+'Arka planda: aynı barkod 1,5 sn içinde tekrar sayılmaz',
+'Arka planda: kamera donarsa ya da kapanırsa kendiliğinden yeniden açılır (kamera bekçisi)',
+'Arka planda: başka uygulamaya gidip gelince kamera döngüleri birikmez (kasma düzeltmesi)',
+'Kamera değiştirme, fener, adet çipleri (×1, ×2, ×6, ×12…) ve okuma bilgisi',
+'Ürün eklerken ve mal alışında kamerayla barkod okuma',
+'El terminali modu: telefonu barkod okuyucu yapıp kasadaki sepete gönderme']],
+['Klavye ve dokunmatik',[
+'Kısayol tuşları (F1–F12, Home, Del, Esc); yönetici tuşları değiştirebilir',
+'Bluetooth klavye ya da tabanca algılanınca ekran klavyesi kendiliğinden kapanır (1 gün hatırlar)',
+'Uygulama içi Türkçe ekran klavyesi ve büyük tuş takımı',
+'Ok tuşlarıyla sepette satır seçme, + / − ile adet, Del ile seçili satırı silme',
+'Ctrl + 1/2/3 ile sepet sekmeleri, Alt + harf ile sayfalar arası geçiş',
+'Pencerelerde ok tuşlarıyla seçim ve Enter',
+'Çift dokunmada ve iki parmakla yakınlaşma kapalı']],
+['Ürünler ve stok',[
+'Ürün kartı: ad, barkod, kategori, marka, etiketler, alış/satış fiyatı, KDV, birim (adet/kg), kritik stok, fotoğraf',
+'Arka planda: barkodu okutunca ürün adı internetten (Open Food Facts) gelir',
+'Barkodu olmayan ürüne barkod üretme',
+'Kâr oranı ve kâr tutarı gösterimi, hedef kâr ve düşük kâr uyarısı',
+'Toplu fiyat değiştirme, toplu seçim ve işlemler',
+'Kategori ve marka yönetimi',
+'Stok durumu: kritik, tükenen, eksi stok filtreleri',
+'Stok sayımı: kamerayla ya da tabancayla say, farkları onayla',
+'Son kullanma tarihi (SKT) takibi ve uyarıları',
+'Fire kaydı (bozulan, kırılan, çalınan) ve raporu',
+'Ölü stok (satılmayan ürünler) ve kâr kontrol sayfası',
+'Ürün fiyat geçmişi ve satış geçmişi',
+'Excel\'den ürün yükleme, Excel\'e stok ve ürün aktarma, hazır şablon',
+'Arka planda: stok değişiklikleri buluta "artır/azalt" olarak yazılır, cihazlar aynı anda satsa da stok silinmez']],
+['Etiket',[
+'Raf etiketi yazdırma (EAN barkodlu, fiyatlı, birim fiyatlı, tarihli)',
+'Fiyatı değişen ürünler etiket listesine kendiliğinden düşer',
+'Etiket boyutu ve adet seçimi']],
+['Kampanyalar',[
+'X al Y öde, yüzde ya da tutar indirimi, ürün/kategori/marka bazlı kampanya',
+'Kampanyalar sepette kendiliğinden uygulanır, fişte görünür']],
+['Mal alışı ve tedarikçiler',[
+'Mal alışı (fatura girişi): barkod okutarak satır ekleme, koli/adet, alış fiyatı güncelleme',
+'Fatura fotoğrafı ekleme',
+'Tedarikçiye iade',
+'Tedarikçi kartı, borç takibi, ödeme kaydı, hesap dökümü',
+'Sipariş listesi hazırlama (az kalanlar önerilir) ve WhatsApp\'tan gönderme',
+'Gelen siparişi "geldi" işaretleme']],
+['Müşteriler ve veresiye',[
+'Müşteri listesi, veresiye hesapları, borç yaşı',
+'Tahsilat alma, tahsilat düzeltme',
+'Hesap dökümü: tarih, ürün, adet, fiyat ve kalan borç',
+'Hesap dökümünü veresiye defteri görünümlü resim olarak WhatsApp\'tan gönderme',
+'Kısa borç hatırlatma ve toplu WhatsApp hatırlatma',
+'Telefonu kayıtlı olmasa da WhatsApp\'ta kişi seçerek gönderme',
+'Müşterinin aldıkları ve istatistikleri']],
+['Online sipariş',[
+'Müşteriler için sipariş sayfası (ürün kataloğu, sepet, eve teslim / gel al)',
+'QR kod ve bağlantı paylaşma',
+'Gelen siparişler sayfası, sipariş fişi, sepete aktarma, WhatsApp ile müşteriye yazma']],
+['Kasa ve muhasebe',[
+'Kasa açılış ve kapanış, kasa farkı',
+'Kasaya para giriş/çıkış hareketleri, bankaya yatırma',
+'Gün sonu (Z raporu), Excel\'e aktarma',
+'Giderler: kategoriler, kasadan ödendi seçeneği',
+'Ödemeler ve faturalar takvimi (kira, elektrik, vergi…) ve uyarıları',
+'Kredi kartları: kesim ve son ödeme tarihleri, harcama ve taksit takibi',
+'Günlük görevler listesi']],
+['Raporlar',[
+'Ciro, brüt/net kâr, fiş sayısı, ortalama sepet, iade ve indirim',
+'Kategori satış grafikleri, en çok satanlar',
+'Kasiyer performansı',
+'Yıllık kâr-zarar (aylara göre), Excel\'e aktarma',
+'Gizli kâr gösterimi (sadece yönetici, Ctrl+K ya da toplama çift dokun)']],
+['Personel ve güvenlik',[
+'Yönetici ve kasiyer rolleri, kasiyerin göremediği sayfalar',
+'PIN ile giriş, parmak izi ile giriş',
+'Kritik işlemlerde yönetici şifresi']],
+['Ekran ve görünüm',[
+'Açık / koyu tema, yazı boyutu',
+'Düzenleme modu: düğme adlarını değiştirme, gizleme, sıralama, renk, kısayol tuşları',
+'Kişiselleştirmeyi dışa/içe aktarma',
+'Ekranı açık tut ve hareketsizlikte ekranı kapatma süresi',
+'Ekran kararması (isteğe bağlı)',
+'Giriş ekranında ve ana sayfada sürüm numarası',
+'Telefon, tablet ve bilgisayara göre ayrı ekran düzeni']],
+['Veri ve yedek',[
+'Arka planda: veriler bulutta (Firebase), tüm cihazlarda ortak',
+'Arka planda: internet kesilse de satış devam eder, bağlantı gelince eşitlenir',
+'Yedek dosyası indirme ve yedekten geri yükleme',
+'Deneme modu (örnek verilerle, hiçbir şey kaydedilmez)',
+'Ana sayfada uyarılar: kritik stok, SKT, ödemeler, kurulum listesi']]
+];
+function ozCard(){const n=OZ.reduce((a,c)=>a+c[1].length,0);return `<div class="card"><h2>Özellikler <span class="muted" style="font-weight:600;font-size:.85rem">${n} özellik</span></h2><input class="in" id="ozq" placeholder="Özellik ara…" oninput="ozF()"><div id="ozl" class="ozl">${ozHTML('')}</div></div>`}
+function ozHTML(q){q=(q||'').toLocaleLowerCase('tr');return OZ.map(([k,a])=>{const f=a.filter(x=>!q||x.toLocaleLowerCase('tr').includes(q)||k.toLocaleLowerCase('tr').includes(q));return f.length?`<div class="ozg"><h3>${esc(k)} <span>${f.length}</span></h3><ul>${f.map(x=>`<li>${x.startsWith('Arka planda:')?`<span class="ozb">arka planda</span>${esc(x.slice(12).trim())}`:esc(x)}</li>`).join('')}</ul></div>`:''}).join('')||'<p class="muted">Bulunamadı.</p>'}
+function ozF(){const e=$('#ozl');if(e)e.innerHTML=ozHTML($('#ozq').value)}
+const KSY=[['Satış',[['Barkod okut / ürün adı + Enter','Sepete ekle'],['3*','Sıradaki ürün 3 adet (Enter gerekmez)'],['3x + Enter','Sıradaki ürün 3 adet'],['50* sonra kilo ürünü','50 ₺\'lik ekle'],['500+','Alınan para 500, para üstünü göster'],['↑ ↓','Sepette satır seç'],['+ / −','Seçili satırın adedini artır / azalt (arama kutusu boşken)'],['Del','Seçili satırı sil'],['Ctrl + 1 / 2 / 3','Sepet sekmeleri (Müşteri 1, 2, 3)'],['F5 ya da Alt + K','Kamera aç / kapa']]],
+['Sayfalar',[['Alt + S','Satış'],['Alt + A','Ana sayfa'],['Alt + G','Satış geçmişi'],['Alt + M','Müşteriler'],['Alt + O','Gelen siparişler'],['Alt + U','Ürünler (yönetici)'],['Alt + R','Raporlar (yönetici)'],['Alt + Y','Ayarlar (yönetici)']]],
+['Pencereler',[['↑ ↓','Seçenekler arasında gez'],['Enter','Seçili düğmeye bas'],['Esc','Pencereyi kapat']]]];
+function ksyCard(){const fk=Object.keys(KEYDEF).filter(a=>KL(a)&&!(ACTHIDE[a]&&UI().hide[ACTHIDE[a]])).map(a=>[kn(KL(a)),keyLbl(a)]);
+ const row=([k,l])=>`<tr><td><b class="mono">${esc(k)}</b></td><td>${esc(l)}</td></tr>`;
+ return `<div class="card"><h2>Klavye kısayolları</h2><p class="muted" style="margin:0;font-size:.85rem">Satış ekranında F1 ile de açılır. Tuşları Kişiselleştirme bölümünden değiştirebilirsin.</p><h3 class="ksh">Tuşlar</h3><table class="tbl ksy">${fk.map(row).join('')}${isY()?row(['Ctrl + K','Gizli kârı göster / gizle']):''}</table>${KSY.map(([h,r])=>`<h3 class="ksh">${h}</h3><table class="tbl ksy">${r.map(row).join('')}</table>`).join('')}</div>`}
+/* v3.62 klavye: ok tuşları, +/−, Ctrl+1..9, Alt+harf, pencerelerde gezinme */
+document.addEventListener('keydown',e=>{if(!S.user||S.capKey)return;const k=e.key||'',md=$('#modal')&&$('#modal').innerHTML;
+ if(md){if(k!=='ArrowDown'&&k!=='ArrowUp')return;const a=document.activeElement;if(a&&(a.tagName==='SELECT'||a.tagName==='TEXTAREA'))return;
+  const L=[...document.querySelectorAll('#modal button:not([disabled]),#modal input:not([type=hidden]),#modal select,#modal a[href]')].filter(x=>x.offsetParent);if(!L.length)return;
+  let i=L.indexOf(a);i=k==='ArrowDown'?(i+1)%L.length:(i<=0?L.length-1:i-1);e.preventDefault();L[i].focus();try{L[i].scrollIntoView({block:'nearest'})}catch(x){}return}
+ if(e.altKey&&!e.ctrlKey){const m={KeyS:'satis',KeyA:'ana',KeyG:'gecmis',KeyM:'musteri',KeyO:'siparis',KeyU:'urun',KeyR:'rapor',KeyY:'ayar'}[e.code];if(m){if(['urun','rapor','ayar'].includes(m)&&!isY())return;e.preventDefault();e.stopPropagation();nav(m);return}}
+ if(S.page!=='satis')return;
+ if((e.ctrlKey||e.metaKey)&&!e.altKey&&/^Digit[1-9]$/.test(e.code)){const i=+e.code.slice(5)-1;if(S.carts&&S.carts[i]){e.preventDefault();S.ci=i;S.sel=-1;drawCart()}return}
+ if(e.ctrlKey||e.metaKey||e.altKey)return;const sc=$('#scan'),a=document.activeElement,inOther=a&&a!==sc&&(a.tagName==='INPUT'||a.tagName==='SELECT'||a.tagName==='TEXTAREA');if(inOther)return;
+ const empty=!sc||!sc.value,sg=$('#sg'),hasSg=sg&&sg.children.length;const c=C();if(!c||!c.items.length)return;
+ if((k==='ArrowDown'||k==='ArrowUp')&&empty&&!hasSg){e.preventDefault();let i=S.sel>-1?S.sel:c.items.length;i=k==='ArrowDown'?Math.min(c.items.length-1,i+1):Math.max(0,i-1);if(S.sel<0&&k==='ArrowDown')i=0;S.sel=i;drawCart();return}
+ if((k==='+'||k==='-'||k==='−')&&empty){e.preventDefault();const i=S.sel>-1&&c.items[S.sel]?S.sel:c.items.length-1;const l=c.items[i];if(l.unit==='kg'&&l.pid){askKg(l.pid,i);return}chq(i,k==='+'?1:-1);return}
+},true);
 /* v3.52 Alt+K: kamerayı aç/kapa */
 document.addEventListener('keydown',e=>{if(e.altKey&&!e.ctrlKey&&(e.code==='KeyK'||/^k$/i.test(e.key||''))){if(!S.user)return;e.preventDefault();e.stopPropagation();if(S.page!=='satis')nav('satis');lvTog()}},true);
 function vkbSet(v){lsSet('vkbM',v);lsSet('hwKbT','0');window._hwKb=false;vkbClose();render()}
@@ -3234,8 +3386,8 @@ function okSplit(){const s=window._sp2;const c=C();const parts={};SPK.forEach(([
  closeM();pay('Parçalı',parts)}
 const partsTxt=p=>Object.entries(p||{}).filter(([,v])=>v).map(([k,v])=>k+' '+tl(v)).join(' / ');
 /* ayarlar sekmeleri */
-const AYT=[['genel','Genel'],['satis','Satış ve kasa'],['kisi','Kişiselleştirme'],['yedek','Yedekleme']];
-const AYMAP=['genel','genel','satis','satis','satis','kisi','yedek'];
+const AYT=[['genel','Genel'],['satis','Satış ve kasa'],['kisi','Kişiselleştirme'],['yedek','Yedekleme'],['ozellik','Özellikler ve kısayollar']];
+const AYMAP=['genel','genel','satis','satis','satis','kisi','yedek','ozellik','ozellik'];
 function ayTabSet(v){S.ayTab=v;render()}
 function ayApply(){const tab=S.ayTab||'genel';const g=$('#main .ayg');if(!g)return;[...g.children].forEach((el,i)=>{el.style.display=(AYMAP[i]||'genel')===tab?'':'none'})}
 /* kategori / marka satış grafiği */
