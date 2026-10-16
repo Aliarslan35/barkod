@@ -860,7 +860,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.53 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.54 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1020,7 +1020,7 @@ const PAYK=['nakit','kart','havale','veresiye','parcali'];
 const PAYD={nakit:['Nakit',"pay('Nakit')"],kart:['Kart',"pay('Kart')"],havale:['Havale',"pay('Havale')"],veresiye:['Veresiye',"pay('Veresiye')"],parcali:['Parçalı ödeme','split()']};
 const AUXK=['iade','indirim','beklet'];const AUXD={iade:['İade','toggleRet()','ret'],indirim:['İndirim','discount()','disc'],beklet:['Beklet','hold()','hold'],tahsilat:['Tahsilat','tahsPos()','tahs']};
 const payName=t=>({Nakit:Tp('pay_nakit','Nakit'),Kart:Tp('pay_kart','Kart'),Havale:Tp('pay_havale','Havale'),Veresiye:Tp('pay_veresiye','Veresiye'),'Parçalı':'Parçalı'})[t]||t;
-const KEYDEF={help:['F1','Yardım'],scan:['F2','Barkod kutusu'],price:['F3','Fiyat gör'],ret:['F4','İade'],disc:['F5','İndirim'],hold:['F6','Beklet'],cust:['F7','Müşteri seç'],nakit:['F8','Nakit'],kart:['F9','Kart'],havale:['F10','Havale'],veresiye:['F11','Veresiye'],parcali:['F12','Parçalı ödeme'],del:['Delete','Satır sil'],clear:['Escape','Sepeti temizle'],tahs:['','Tahsilat al']};
+const KEYDEF={help:['F1','Yardım'],scan:['F2','Barkod kutusu'],price:['F3','Fiyat gör'],ret:['F4','İade'],disc:['Home','İndirim'],hold:['F6','Beklet'],cust:['F7','Müşteri seç'],nakit:['F8','Nakit'],kart:['F9','Kart'],havale:['F10','Havale'],veresiye:['F11','Veresiye'],parcali:['F12','Parçalı ödeme'],del:['Delete','Satır sil'],clear:['Escape','Sepeti temizle'],tahs:['','Tahsilat al'],cam:['F5','Kamera aç/kapa']};
 const ACTHIDE={nakit:'pay_nakit',kart:'pay_kart',havale:'pay_havale',veresiye:'pay_veresiye',parcali:'pay_parcali',ret:'aux_iade',disc:'aux_indirim',hold:'aux_beklet',tahs:'aux_tahsilat'};
 const KL=a=>UI().keys[a]||KEYDEF[a][0];
 const kn=k=>({Escape:'Esc',Delete:'Del',' ':'Boşluk',ArrowUp:'↑',ArrowDown:'↓',ArrowLeft:'←',ArrowRight:'→'})[k]||(k.length===1?k.toUpperCase():k);
@@ -1382,7 +1382,7 @@ function help(){modal(mHead('Klavye kısayolları')+`<table class="tbl" style="m
 function priceCheck(){modal(mHead('Fiyat gör')+`<input class="in" id="pc" autofocus placeholder="Barkod okut veya ad yaz" oninput="pcShow()" onkeydown="if(event.key==='Enter')pcShow()"><div id="pcr"></div>`)}
 function pcShow(){const v=$('#pc').value.trim();const p=findCode(v)||(v.length>1?matches(v)[0]:null);$('#pcr').innerHTML=p?`<div class="card" style="background:var(--surf2)"><b style="font-size:1.2rem">${esc(p.name)}</b><b style="font-size:2rem;color:var(--acc)">${tl(p.price)}${p.unit==='kg'?' /kg':''}</b><span class="muted">Stok: ${qf(p.stock,p.unit)} · ${esc(p.cat)}</span></div>`:(v?'<div class="muted">Bulunamadı</div>':'')}
 
-const ACT={help:()=>help(),scan:()=>{const s=$('#scan');s&&s.focus()},price:()=>priceCheck(),ret:()=>toggleRet(),disc:()=>discount(),hold:()=>hold(),cust:()=>pickCust(),nakit:()=>pay('Nakit'),kart:()=>pay('Kart'),havale:()=>pay('Havale'),veresiye:()=>pay('Veresiye'),parcali:()=>split(),del:()=>delLine(),clear:()=>clearCart(),tahs:()=>tahsPos()};
+const ACT={help:()=>help(),scan:()=>{const s=$('#scan');s&&s.focus()},price:()=>priceCheck(),ret:()=>toggleRet(),disc:()=>discount(),hold:()=>hold(),cust:()=>pickCust(),nakit:()=>pay('Nakit'),kart:()=>pay('Kart'),havale:()=>pay('Havale'),veresiye:()=>pay('Veresiye'),parcali:()=>split(),del:()=>delLine(),clear:()=>clearCart(),tahs:()=>tahsPos(),cam:()=>lvTog()};
 document.addEventListener('keydown',e=>{
  if(S.capKey){e.preventDefault();setKey(e.key);return}
  if($('#modal').innerHTML){if(e.key==='Escape'){e.preventDefault();stopCam();closeM()}return}
@@ -2645,7 +2645,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.53';
+const APPV='3.54';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
