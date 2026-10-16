@@ -860,7 +860,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.51 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.52 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1149,7 +1149,7 @@ function renderSatis(){
  const qoff=lsGet('qOff')==='1';
  $('#app').innerHTML=`<div class="drawer"><div class="scrim" onclick="closeSide()"></div><nav class="side" aria-label="Menü">${sideHTML()}</nav></div>
  <header class="top" data-ck="panel"><button class="tbi" onclick="togSide()" aria-label="Menüyü aç">${ic('menu')}</button><div class="brand bl"><i class="blg">${LOGO.replace(/lgG/g,'lgG3')}</i><span>${esc(D.set.market)}</span></div>
- <div class="scan">${ic('satis',22)}<span id="scq" class="scq"${S.npq>1?'':' hidden'}><b>×${S.npq||''}</b><small>adet</small><button type="button" aria-label="Adedi iptal et" onclick="npClr()">✕</button></span><input id="scan" placeholder="Barkod okut veya ürün ara…" autocomplete="off" enterkeyhint="go" inputmode="${touch()&&!hwKb()?'none':'search'}" onfocus="vkbOpen()" onclick="vkbOpen()" oninput="sugg()" onkeydown="scanKey(event)"><button class="ib ghost${S.lv?' lvbtn':''}" aria-label="Kamerayla sürekli okut" title="Kamerayla okut (açık kalır)" onclick="lvTog()" style="color:var(--acc)">${ic('cam')}</button><span class="kbd">${kn(KL('scan'))}</span><div id="sg" class="sugg"></div></div>
+ <div class="scan">${ic('satis',22)}<span id="scq" class="scq"${S.npq>1?'':' hidden'}><b>×${S.npq||''}</b><small>adet</small><button type="button" aria-label="Adedi iptal et" onclick="npClr()">✕</button></span><input id="scan" placeholder="Barkod okut veya ürün ara…" autocomplete="off" enterkeyhint="go" inputmode="${touch()?'none':'search'}" onfocus="vkbOpen()" onclick="vkbOpen(1)" oninput="sugg()" onkeydown="scanKey(event)"><button class="ib ghost${S.lv?' lvbtn':''}" aria-label="Kamerayla sürekli okut" title="Kamerayla okut (açık kalır)" onclick="lvTog()" style="color:var(--acc)">${ic('cam')}</button><span class="kbd">${kn(KL('scan'))}</span><div id="sg" class="sugg"></div></div>
  <button class="tbi" onclick="togTheme()" aria-label="Açık / koyu tema">${ic(isDark()?'sun':'moon',20)}</button>
  <div class="net" id="net" title="İnternet bağlantısı"><i></i><span>Çevrimiçi</span></div>
  <button class="ordb"${HA('top_siparis')} data-ck="siparis" onclick="nav('siparis')">${ic('siparis',18)}${T('top_siparis','Siparişler')} ${yeni?`<b>${yeni}</b>`:''}</button>
@@ -2645,7 +2645,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.51';
+const APPV='3.52';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -3155,12 +3155,14 @@ function vkbEl(){let e=$('#vkb');if(e)return e;e=document.createElement('div');e
  const b=(t,f,c)=>`<button type="button" class="${c||''}" onpointerdown="event.preventDefault()" onclick="${f}">${t}</button>`;
  e.innerHTML=VKR.map((r,i)=>`<div class="vr">${[...r].map(c=>b(c,`vkK('${c}')`)).join('')}${i===3?b('⌫','vkDel()','vfn'):''}</div>`).join('')+`<div class="vr">${b('Kapat','vkbClose()','vfn')}<button type="button" style="flex:4" onpointerdown="event.preventDefault()" onclick="vkK(' ')">Boşluk</button>${b('Sil','vkClr()','vfn')}<button type="button" class="vgo" style="flex:1.6" onpointerdown="event.preventDefault()" onclick="vkGo()">Ara / Ekle</button></div>`;
  document.body.appendChild(e);return e}
-function vkbOpen(){if(!touch()||hwKb()||S.page!=='satis')return;vkbEl().classList.add('on')}
+function vkbOpen(tap){if(!touch()||S.page!=='satis')return;if(hwKb()){if(!(tap&&vkbMode()==='oto'&&Date.now()-(+lsGet('hwKbT')||0)>6e5))return;window._hwKb=false;lsSet('hwKbT','0')}vkbEl().classList.add('on')}
 /* v3.48 harici (Bluetooth) klavye: elle harf yazılınca ekran klavyesi kapanır */
 const vkbMode=()=>lsGet('vkbM')||'oto';
 const hwKb=()=>vkbMode()==='kapali'||(vkbMode()==='oto'&&(!!window._hwKb||Date.now()-(+lsGet('hwKbT')||0)<864e5));
 document.addEventListener('keydown',e=>{if(!e.isTrusted||vkbMode()!=='oto')return;const k=e.key||'';if(k.length!==1&&k!=='Backspace'&&k!=='Enter')return;
- lsSet('hwKbT',String(Date.now()));if(window._hwKb)return;window._hwKb=true;vkbClose();const sc=$('#scan');if(sc)sc.setAttribute('inputmode','search')},true);
+ lsSet('hwKbT',String(Date.now()));if(window._hwKb)return;window._hwKb=true;vkbClose()},true);
+/* v3.52 Alt+K: kamerayı aç/kapa */
+document.addEventListener('keydown',e=>{if(e.altKey&&!e.ctrlKey&&(e.code==='KeyK'||/^k$/i.test(e.key||''))){if(!S.user)return;e.preventDefault();e.stopPropagation();if(S.page!=='satis')nav('satis');lvTog()}},true);
 function vkbSet(v){lsSet('vkbM',v);lsSet('hwKbT','0');window._hwKb=false;vkbClose();render()}
 function vkbClose(){const e=$('#vkb');if(e)e.classList.remove('on');const s=$('#scan');if(s)s.blur()}
 function vkK(c){const s=$('#scan');if(!s||s.value.length>=40)return;s.value+=c;sugg()}
