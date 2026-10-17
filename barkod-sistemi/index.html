@@ -870,7 +870,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.72 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.73 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1705,6 +1705,7 @@ function pgCats(){const box=(key,lbl,fld)=>{const items=D[key];return `<div clas
 const BPAR=()=>D.set.bpar||(D.set.bpar={});
 function brKids(b){const m=BPAR();return D.brands.filter(x=>m[x]===b)}
 function brIn(pb,sel){if(!pb||!sel)return false;if(pb===sel)return true;const m=BPAR();let x=pb,n=0;while(m[x]&&n++<5){x=m[x];if(x===sel)return true}return false}
+function brTop(b){if(!b)return b;const m=BPAR();let x=b,n=0;while(m[x]&&n++<5)x=m[x];return x}
 function brLbl(b){const p=BPAR()[b];return p?p+' › '+b:b}
 function brBox(){const m=BPAR();const tops=D.brands.filter(b=>!m[b]||!D.brands.includes(m[b]));const cnt=b=>D.products.filter(p=>brIn(p.brand,b)).length;
  const row=(b,kid)=>{const i=D.brands.indexOf(b),n=cnt(b),k=brKids(b).length;return `<div class="crow${kid?' brk':''}">${kid?'<span class="brl">↳</span>':''}<b>${esc(b)}</b>${k?`<span class="tag" style="font-size:.7rem">${k} alt marka</span>`:''}${n?`<a href="#" class="muted" onclick="event.preventDefault();S.uBr=${esc(JSON.stringify(b))};S.uCat='';S.uf='Tümü';nav('urun',{uTab:'urun'})">${n} ürün ›</a>`:'<span class="muted">0 ürün</span>'}<span class="sp"></span><button class="ib ghost" aria-label="Üst marka" title="Üst marka seç" onclick="brParent(${i})"><b style="font-size:1.05rem">⇡</b></button><button class="ib ghost" aria-label="Adını değiştir" title="Adını değiştir" onclick="renList('brands',${i})">${ic('edit',16)}</button><button class="ib ghost" aria-label="Sil" onclick="delList('brands',${i})">${ic('trash',16)}</button></div>`};
@@ -2666,7 +2667,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.72';
+const APPV='3.73';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -3322,7 +3323,7 @@ const OZ=[
 'Günlük görevler listesi']],
 ['Raporlar',[
 'Ciro, brüt/net kâr, fiş sayısı, ortalama sepet, iade ve indirim',
-'Kategori satış grafikleri, en çok satanlar',
+'Kategori satış grafikleri, en çok satanlar; markaya ve marka grubuna (üretici firma) göre satış ve kâr',
 'Kasiyer performansı',
 'Yıllık kâr-zarar (aylara göre), Excel\'e aktarma',
 'Gizli kâr gösterimi (sadece yönetici, Ctrl+K ya da toplama çift dokun)']],
@@ -3449,13 +3450,13 @@ function ayTabSet(v){S.ayTab=v;render()}
 function ayApply(){const tab=S.ayTab||'genel';const g=$('#main .ayg');if(!g)return;[...g.children].forEach((el,i)=>{el.style.display=(AYMAP[i]||'genel')===tab?'':'none'})}
 /* kategori / marka satış grafiği */
 const CATCOL=['#2563EB','#16A34A','#E8590C','#7C3AED','#DB2777','#0891B2','#CA8A04','#DC2626','#4B5563','#65A30D'];
-function catSales(ss,by){const m={};ss.forEach(s=>{const sg=s.ret?-1:1;s.items.forEach(l=>{const k=UPT((by==='brand'?l.brand:l.cat)||'')||(by==='brand'?'(Markasız)':'(Kategorisiz)');const x=(m[k]=m[k]||{c:0,k:0,q:0});x.c+=lineT(l)*sg;x.k+=(lineT(l)-l.qty*(l.cost||0))*sg;x.q+=l.qty*sg})});
+function catSales(ss,by){const m={};ss.forEach(s=>{const sg=s.ret?-1:1;s.items.forEach(l=>{const k=UPT((by==='grup'?brTop(l.brand):by==='brand'?l.brand:l.cat)||'')||(by==='cat'?'(Kategorisiz)':'(Markasız)');const x=(m[k]=m[k]||{c:0,k:0,q:0});x.c+=lineT(l)*sg;x.k+=(lineT(l)-l.qty*(l.cost||0))*sg;x.q+=l.qty*sg})});
  return Object.entries(m).filter(([,v])=>v.c>0.004).sort((a,b)=>b[1].c-a[1].c)}
 function catChart(ss,by,title,lim){const rows=catSales(ss,by);const tot=rows.reduce((a,[,v])=>a+v.c,0)||1;const top=rows.slice(0,lim||10);const rest=rows.slice(lim||10);if(rest.length)top.push(['Diğer ('+rest.length+')',rest.reduce((a,[,v])=>({c:a.c+v.c,k:a.k+v.k,q:a.q+v.q}),{c:0,k:0,q:0})]);
  if(!rows.length)return `<p class="muted" style="margin:0">Bu dönemde satış yok.</p>`;
  return `<div class="cstack">${top.map(([k,v],i)=>`<i style="width:${v.c/tot*100}%;background:${CATCOL[i%CATCOL.length]}" title="${esc(k)}: ${tl(v.c)} · %${Math.round(v.c/tot*100)}"></i>`).join('')}</div>
  <div class="clist2">${top.map(([k,v],i)=>`<div class="crow2"><span class="cdot" style="background:${CATCOL[i%CATCOL.length]}"></span><span class="cn2">${esc(k)}</span><div class="cbar"><i style="width:${v.c/top[0][1].c*100}%;background:${CATCOL[i%CATCOL.length]}"></i></div><b>${tl(v.c)}</b><span class="cp">%${Math.round(v.c/tot*100)}</span><span class="ck" title="Kâr">${tl(v.k)}</span></div>`).join('')}</div>`}
-function catCard(ss,lbl){const by=S.csBy||'cat';return `<div class="card"><div class="row"><h2>${lbl||'Ne sattık?'}</h2><div class="sp">${seg([['cat','Kategoriye göre'],['brand','Markaya göre']],by,'csBySet')}</div></div><div class="row muted" style="font-size:.78rem;justify-content:flex-end;gap:14px"><span>Ciro</span><span>Pay</span><span style="width:84px;text-align:right">Kâr</span></div>${catChart(ss,by)}</div>`}
+function catCard(ss,lbl){const by=S.csBy||'cat';return `<div class="card"><div class="row"><h2>${lbl||'Ne sattık?'}</h2><div class="sp">${seg([['cat','Kategoriye göre'],['brand','Markaya göre'],['grup','Marka grubu']],by,'csBySet')}</div></div><div class="row muted" style="font-size:.78rem;justify-content:flex-end;gap:14px"><span>Ciro</span><span>Pay</span><span style="width:84px;text-align:right">Kâr</span></div>${catChart(ss,by)}</div>`}
 function csBySet(v){S.csBy=v;render()}
 /* ---------- v3.18: büyük harf ---------- */
 const UPT=x=>typeof x==='string'?x.toLocaleUpperCase('tr'):x;
