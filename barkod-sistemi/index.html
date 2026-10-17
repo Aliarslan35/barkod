@@ -516,6 +516,7 @@ body.mopen{overflow:hidden}}
 .drawer .side .lo button{min-height:40px}}
 @media (max-width:820px){.blg{display:none!important}}
 .qgrid{grid-auto-rows:auto!important;align-content:start}
+.qgrid>.qp2{min-height:min-content;flex:none}.qgrid{grid-auto-rows:max-content!important}
 .qp2{position:relative;aspect-ratio:1/1;border:0;border-radius:16px;overflow:hidden;padding:0;background:color-mix(in srgb,var(--qc) 13%,var(--surf));color:var(--tx);text-align:left;box-shadow:0 1px 3px rgba(0,0,0,.10);transition:transform .08s ease,box-shadow .15s ease;min-width:0}
 .qp2:hover{box-shadow:0 4px 14px rgba(0,0,0,.16)}
 .qp2:active{transform:scale(.96)}
@@ -865,7 +866,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.68 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.69 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -2651,7 +2652,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.68';
+const APPV='3.69';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
