@@ -521,6 +521,9 @@ body.mopen{overflow:hidden}}
 .qp2:hover{box-shadow:0 4px 14px rgba(0,0,0,.16)}
 .qp2:active{transform:scale(.96)}
 .qp2 img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#fff}
+.qp2.im{background:#fff}.qp2.im img{inset:4px;width:calc(100% - 8px);height:calc(100% - 8px);object-fit:contain;background:transparent}.qp2.im .qn{left:0!important;right:0!important;bottom:0!important;padding:5px 8px 6px;background:rgba(255,255,255,.88);font-size:.8rem}
+.qp2.im::after{display:none}.qp2.im .qn{color:#111!important;text-shadow:none!important}
+.crow.brk{padding-left:22px}.brl{color:var(--tx3);font-weight:800;margin-right:-4px}
 .qp2.im::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.80) 0%,rgba(0,0,0,.25) 45%,rgba(0,0,0,0) 70%)}
 .qp2 .qi{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:16px;background:var(--qc);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.15rem;box-shadow:0 4px 10px color-mix(in srgb,var(--qc) 35%,transparent)}
 .qp2 .qn{position:absolute;left:10px;right:10px;bottom:9px;z-index:1;font-size:.86rem;font-weight:800;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -867,7 +870,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.71 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.72 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1655,7 +1658,7 @@ function stokVal(list){let a=0,s=0,nc=0;list.forEach(p=>{const q=stv(p);a+=q*(p.
 function stPill(p){const q=+p.stock||0;const c=q<=0?'out':q<=p.crit?'low':'';return `<span class="stp ${c}">${q<=0?'Bitti':stokTxt(p)}</span>`}
 function inKamp(p){const l={pid:p.id,cat:p.cat,brand:p.brand};return KAMP().filter(kampAct).some(k=>kampHit(k,l))}
 function urFilter(){if(S.uf&&D.cats.includes(S.uf)){S.uCat=S.uf;S.uf='Tümü'}const q=nrm(S.uq||'');const f=S.uf||'Tümü';
- return D.products.filter(p=>(!q||nrm(p.name).includes(q)||String(p.barcode).includes(q)||(p.packBc&&String(p.packBc).includes(q))||nrm(p.brand).includes(q)||nrm(p.reyon).includes(q))&&(!S.uCat||p.cat===S.uCat)&&(!S.uBr||p.brand===S.uBr)
+ return D.products.filter(p=>(!q||nrm(p.name).includes(q)||String(p.barcode).includes(q)||(p.packBc&&String(p.packBc).includes(q))||nrm(p.brand).includes(q)||nrm(p.reyon).includes(q))&&(!S.uCat||p.cat===S.uCat)&&(!S.uBr||brIn(p.brand,S.uBr))
   &&(f==='Tümü'||(f==='Kritik'&&p.stock<=p.crit&&p.stock>0)||(f==='Biten'&&p.stock<=0)||(f==='Hızlı'&&p.quick)||(f==='NoCost'&&!(p.cost>0))||(f==='Zarar'&&karDurum(p)==='zarar')||(f==='Kamp'&&inKamp(p))))}
 function urSetQ(v){S.uq=v;S.uLim=100;clearTimeout(window._ut);window._ut=setTimeout(urDraw,150)}
 function urSet(k,v){S[k]=v;S.uLim=100;urDraw(true)}
@@ -1697,11 +1700,21 @@ function pgUrun(){if(S.uTab!=='urun')return pgCats();
 /* kategori, marka, etiket */
 function pgCats(){const box=(key,lbl,fld)=>{const items=D[key];return `<div class="card"><div class="row"><h2>${lbl}</h2><span class="tag">${items.length}</span></div><div class="row" style="flex-wrap:nowrap;gap:6px"><input class="in" id="nl_${key}" placeholder="Yeni ${lbl.toLocaleLowerCase('tr').replace(/ler$|lar$/,'')} adı" onkeydown="if(event.key==='Enter')addList('${key}')"><button class="btn pri" onclick="addList('${key}')">Ekle</button></div>
  <div class="clist">${items.map((x,i)=>{const n=D.products.filter(p=>fld==='tags'?(p.tags||[]).includes(x):p[fld]===x).length;return `<div class="crow"><b>${esc(x)}</b>${n?`<a href="#" class="muted" onclick="event.preventDefault();${fld==='cat'?`S.uCat=${esc(JSON.stringify(x))};S.uBr=''`:fld==='brand'?`S.uBr=${esc(JSON.stringify(x))};S.uCat=''`:`S.uq=''`};S.uf='Tümü';nav('urun',{uTab:'urun'})">${n} ürün ›</a>`:'<span class="muted">0 ürün</span>'}<span class="sp"></span><button class="ib ghost" aria-label="Adını değiştir" title="Adını değiştir" onclick="renList('${key}',${i})">${ic('edit',16)}</button><button class="ib ghost" aria-label="Sil" onclick="delList('${key}',${i})">${ic('trash',16)}</button></div>`}).join('')||'<p class="muted" style="margin:0">Henüz yok.</p>'}</div></div>`};
- $('#main').innerHTML=urTabs('cats')+head('Kategori ve markalar')+`<div class="g3 catg">${box('cats','Kategoriler','cat')}${box('brands','Markalar','brand')}${box('tags','Etiketler','tags')}</div>`}
+ $('#main').innerHTML=urTabs('cats')+head('Kategori ve markalar')+`<div class="g3 catg">${box('cats','Kategoriler','cat')}${brBox()}${box('tags','Etiketler','tags')}</div>`}
+/* v3.72 alt / üst marka (ör. Coca-Cola › Fanta) */
+const BPAR=()=>D.set.bpar||(D.set.bpar={});
+function brKids(b){const m=BPAR();return D.brands.filter(x=>m[x]===b)}
+function brIn(pb,sel){if(!pb||!sel)return false;if(pb===sel)return true;const m=BPAR();let x=pb,n=0;while(m[x]&&n++<5){x=m[x];if(x===sel)return true}return false}
+function brLbl(b){const p=BPAR()[b];return p?p+' › '+b:b}
+function brBox(){const m=BPAR();const tops=D.brands.filter(b=>!m[b]||!D.brands.includes(m[b]));const cnt=b=>D.products.filter(p=>brIn(p.brand,b)).length;
+ const row=(b,kid)=>{const i=D.brands.indexOf(b),n=cnt(b),k=brKids(b).length;return `<div class="crow${kid?' brk':''}">${kid?'<span class="brl">↳</span>':''}<b>${esc(b)}</b>${k?`<span class="tag" style="font-size:.7rem">${k} alt marka</span>`:''}${n?`<a href="#" class="muted" onclick="event.preventDefault();S.uBr=${esc(JSON.stringify(b))};S.uCat='';S.uf='Tümü';nav('urun',{uTab:'urun'})">${n} ürün ›</a>`:'<span class="muted">0 ürün</span>'}<span class="sp"></span><button class="ib ghost" aria-label="Üst marka" title="Üst marka seç" onclick="brParent(${i})"><b style="font-size:1.05rem">⇡</b></button><button class="ib ghost" aria-label="Adını değiştir" title="Adını değiştir" onclick="renList('brands',${i})">${ic('edit',16)}</button><button class="ib ghost" aria-label="Sil" onclick="delList('brands',${i})">${ic('trash',16)}</button></div>`};
+ return `<div class="card"><div class="row"><h2>Markalar</h2><span class="tag">${D.brands.length}</span></div><div class="row" style="flex-wrap:nowrap;gap:6px"><input class="in" id="nl_brands" placeholder="Yeni marka adı" onkeydown="if(event.key==='Enter')addList('brands')"><button class="btn pri" onclick="addList('brands')">Ekle</button></div><p class="muted" style="margin:0;font-size:.8rem">Alt marka için markanın yanındaki ⇡ düğmesine bas ve üst markasını seç (ör. Fanta → Coca-Cola).</p><div class="clist">${tops.map(b=>row(b)+brKids(b).map(k=>row(k,1)).join('')).join('')||'<p class="muted" style="margin:0">Henüz yok.</p>'}</div></div>`}
+function brParent(i){const b=D.brands[i];const cur=BPAR()[b]||'';const opts=D.brands.filter(x=>x!==b&&!brIn(x,b));modal(mHead(esc(b)+' · üst marka')+`<p class="muted" style="margin:0">${esc(b)} hangi markanın alt markası?</p><div class="clist" style="max-height:50vh;overflow:auto"><button class="user" onclick="brSetP(${i},'')"><span style="flex:1"><b>Üst marka yok</b><br><span class="muted">Ana marka olarak kalsın</span></span>${!cur?'✓':''}</button>${opts.map(x=>`<button class="user" onclick="brSetP(${i},${esc(JSON.stringify(x))})"><span style="flex:1"><b>${esc(x)}</b></span>${cur===x?'✓':''}</button>`).join('')}</div>`)}
+function brSetP(i,p){const b=D.brands[i];const m=BPAR();if(p)m[b]=p;else delete m[b];save();closeM();render();toast(p?b+' → '+p+' alt markası yapıldı':b+' ana marka yapıldı')}
 function addList(k){const i=$('#nl_'+k)||$('#nl');const v=i.value.trim();if(!v)return;if(D[k].some(x=>x.toLocaleLowerCase('tr')===v.toLocaleLowerCase('tr'))){toast('Zaten var');return}D[k].push(v);save();render();toast('Eklendi');setTimeout(()=>{const n=$('#nl_'+k);if(n)n.focus()},30)}
 function renList(k,i){const old=D[k][i];modal(mHead('Adını değiştir')+`<input class="in" id="rnl" value="${esc(old)}" autofocus onkeydown="if(event.key==='Enter')renOk('${k}',${i})"><p class="muted" style="margin:0;font-size:.85rem">Bu ada bağlı bütün ürünler de güncellenir.</p><button class="btn pri" onclick="renOk('${k}',${i})">Kaydet</button>`)}
 function renOk(k,i){const old=D[k][i];const v=$('#rnl').value.trim();if(!v||v===old){closeM();return}if(D[k].includes(v)){toast('Bu ad zaten var');return}D[k][i]=v;
- D.products.forEach(p=>{if(k==='cats'&&p.cat===old)p.cat=v;if(k==='brands'&&p.brand===old)p.brand=v;if(k==='tags'&&(p.tags||[]).includes(old))p.tags=p.tags.map(t=>t===old?v:t)});save();closeM();render();toast('Güncellendi')}
+ if(k==='brands'){const m=BPAR();if(m[old]){m[v]=m[old];delete m[old]}for(const x in m)if(m[x]===old)m[x]=v}D.products.forEach(p=>{if(k==='cats'&&p.cat===old)p.cat=v;if(k==='brands'&&p.brand===old)p.brand=v;if(k==='tags'&&(p.tags||[]).includes(old))p.tags=p.tags.map(t=>t===old?v:t)});save();closeM();render();toast('Güncellendi')}
 /* stok durumu */
 function pgStok(){const ss=lsGet('sSort')||'stokA';const sm=soldMap(30);const q=nrm(S.sq||'');const f=S.sf||'Tümü';
  const all=D.products;const list=prodSort(all.filter(p=>(f==='Tümü'||(f==='Kritik'&&p.stock<=p.crit&&p.stock>0)||(f==='Biten'&&p.stock<=0)||(f==='Fazla'&&(sm[p.id]||0)<=0&&p.stock>0))&&(!S.sCat||p.cat===S.sCat)&&(!q||nrm(p.name).includes(q)||String(p.barcode).includes(q))),ss);
@@ -1716,7 +1729,7 @@ function pgStok(){const ss=lsGet('sSort')||'stokA';const sm=soldMap(30);const q=
  <div class="row" style="gap:6px">${[['Tümü','Tümü'],['Kritik','Kritik stok',kr],['Biten','Stoğu biten',bt],['Fazla','30 gündür satılmayan',fz]].map(([k,l,n])=>`<button class="chip ${f===k?'on':''}" onclick="S.sf='${k}';render()">${l}${n!=null?` <span class="cn">${n}</span>`:''}</button>`).join('')}${S.sCat?`<button class="chip" onclick="S.sCat='';render()">✕ ${esc(S.sCat)}</button>`:''}</div>
  <div class="tw"><table class="tbl"><thead><tr><th>Ürün</th><th>Kategori</th><th class="r">Stok</th><th class="r">Kritik</th><th class="r">30 gün satış</th><th class="r">Kaç gün yeter</th><th class="r">Alış değeri</th><th class="r">Satış değeri</th><th></th></tr></thead><tbody>${list.slice(0,S.sLim||200).map(p=>`<tr class="click" onclick="prodForm(${p.id})"><td><div class="row" style="flex-wrap:nowrap;gap:10px">${pimg(p,30)}<b>${esc(p.name)}</b></div></td><td>${esc(p.cat)}</td><td class="r">${stPill(p)}</td><td class="r">${p.crit}</td><td class="r">${r2(sm[p.id]||0).toLocaleString('tr-TR')}</td><td class="r">${gun(p)}</td><td class="r">${p.cost>0?tl(stv(p)*p.cost):'<span class="muted">—</span>'}</td><td class="r"><b>${tl(stv(p)*p.price)}</b></td><td class="r" onclick="event.stopPropagation()"><button class="btn sm" onclick="buyForm(${p.id})">Stok ekle</button></td></tr>`).join('')||'<tr><td colspan="9"><div class="empty">Bu filtrede ürün yok.</div></td></tr>'}</tbody>
  ${list.length?`<tfoot><tr><td colspan="6"><b>${list.length} ürün</b></td><td class="r"><b>${tl(fv.a)}</b></td><td class="r"><b>${tl(fv.s)}</b></td><td></td></tr></tfoot>`:''}</table></div>${list.length>(S.sLim||200)?`<button class="btn" style="align-self:center" onclick="S.sLim=(S.sLim||200)+300;render()">Daha fazla göster</button>`:''}</div>`}
-function delList(k,i){const x=D[k][i];ask('"'+x+'" silinsin mi? Ürünlerdeki bilgi silinmez.',()=>{D[k].splice(i,1);save();render()})}
+function delList(k,i){const x=D[k][i];ask('"'+x+'" silinsin mi? Ürünlerdeki bilgi silinmez.',()=>{D[k].splice(i,1);if(k==='brands'){const m=BPAR();delete m[x];for(const y in m)if(m[y]===x)delete m[y]}save();render()})}
 function prodForm(id,bc){
  window._pfNext=0;
  const p=id?P(id):{name:'',barcode:bc||'',cat:D.cats[0]||'',brand:'',tags:[],cost:'',price:'',vat:10,unit:'adet',stock:'',crit:5,quick:false};
@@ -2653,7 +2666,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.71';
+const APPV='3.72';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -3263,7 +3276,8 @@ const OZ=[
 'Barkodu olmayan ürüne barkod üretme',
 'Kâr oranı ve kâr tutarı gösterimi, hedef kâr ve düşük kâr uyarısı',
 'Toplu fiyat değiştirme, toplu seçim ve işlemler',
-'Kategori ve marka yönetimi',
+'Kategori ve marka yönetimi, alt / üst marka (ör. Coca-Cola › Fanta); üst marka filtresi alt markaları da gösterir',
+'Hızlı ürünlerde ürün resmi kırpılmadan tam görünür',
 'Stok durumu: kritik, tükenen, eksi stok filtreleri',
 'Stok sayımı: kamerayla ya da tabancayla say, farkları onayla',
 'Son kullanma tarihi (SKT) takibi ve uyarıları',
