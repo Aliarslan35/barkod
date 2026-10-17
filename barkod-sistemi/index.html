@@ -865,7 +865,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.67 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.68 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1381,7 +1381,7 @@ function pay(type,parts,force){
  drawCart();tick();beep(true);
  if(type==='Veresiye'&&!c.ret&&D.set.waVer!==false&&s.cust)waAfter(s.id);else{if(D.set.autoRc)showRc(s,type==='Nakit'&&rec>t.total?rec-t.total:0);else toast((c.ret?'İade tamamlandı: ':'Satış tamamlandı: ')+tl(Math.abs(s.total)));if(RC().auto){setTimeout(()=>printSale(s.id),300)}}
 }
-function rcHTML(s,chg){chg=chg||s.chg||0;const cu=s.cust?D.customers.find(x=>x.id===s.cust):null;const rc=RC();return `<div class="receipt printme"><div style="text-align:center;font-weight:700">${esc(D.set.market)}</div>${rc.head?`<div style="text-align:center;white-space:pre-line;font-size:.92em">${esc(rc.head)}</div>`:''}<div style="text-align:center">${s.ret?'İADE FİŞİ':'SATIŞ FİŞİ'} #${s.no}</div><div style="text-align:center">${fdt(s.date)} · ${esc(s.user)}</div><hr>${s.items.map(l=>`<div>${esc(l.name)}</div><div class="rl"><span>${qf(l.qty,l.unit)} x ${tl(l.price)}${l.disc?' %'+Math.round(l.disc)+' ind.':''}</span><span>${tl(lineT(l))}</span></div>`).join('')}<hr>${(s.camp||[]).map(r=>`<div class="rl"><span>Kampanya: ${esc(r.n)}</span><span>-${tl(r.amt)}</span></div>`).join('')}${(()=>{const od=r2((s.disc||0)-(s.camp||[]).reduce((a,r)=>a+r.amt,0));return od>0?`<div class="rl"><span>İndirim</span><span>-${tl(od)}</span></div>`:''})()}<div class="rl" style="font-weight:700;font-size:1.1em"><span>TOPLAM</span><span>${tl(s.total)}</span></div><div class="rl"><span>Ödeme</span><span>${s.pay}${s.parts?` (${partsTxt(s.parts)})`:''}</span></div>${s.rec?`<div class="rl"><span>Alınan</span><span>${tl(s.rec)}</span></div>`:''}${chg?`<div class="rl"><span>Para üstü</span><span>${tl(chg)}</span></div>`:''}${cu?`<div class="rl"><span>Müşteri</span><span>${esc(cu.name)}</span></div>`:''}${rc.foot?`<hr><div style="text-align:center;white-space:pre-line">${esc(rc.foot)}</div>`:''}${fisBc(s)}</div>`}
+function rcHTML(s,chg){chg=chg||s.chg||0;const cu=s.cust?D.customers.find(x=>x.id===s.cust):null;const rc=RC();return `<div class="receipt printme"><div style="text-align:center;font-weight:700">${esc(D.set.market)}</div>${rc.head?`<div style="text-align:center;white-space:pre-line;font-size:.92em">${esc(rc.head)}</div>`:''}<div style="text-align:center">${s.ret?'İADE BİLGİ FİŞİ':'BİLGİ FİŞİ'} #${s.no}</div><div style="text-align:center">${fdt(s.date)} · ${esc(s.user)}</div><hr>${s.items.map(l=>`<div>${esc(l.name)}</div><div class="rl"><span>${qf(l.qty,l.unit)} x ${tl(l.price)}${l.disc?' %'+Math.round(l.disc)+' ind.':''}</span><span>${tl(lineT(l))}</span></div>`).join('')}<hr>${(s.camp||[]).map(r=>`<div class="rl"><span>Kampanya: ${esc(r.n)}</span><span>-${tl(r.amt)}</span></div>`).join('')}${(()=>{const od=r2((s.disc||0)-(s.camp||[]).reduce((a,r)=>a+r.amt,0));return od>0?`<div class="rl"><span>İndirim</span><span>-${tl(od)}</span></div>`:''})()}<div class="rl" style="font-weight:700;font-size:1.1em"><span>TOPLAM</span><span>${tl(s.total)}</span></div><div class="rl"><span>Ödeme</span><span>${s.pay}${s.parts?` (${partsTxt(s.parts)})`:''}</span></div>${s.rec?`<div class="rl"><span>Alınan</span><span>${tl(s.rec)}</span></div>`:''}${chg?`<div class="rl"><span>Para üstü</span><span>${tl(chg)}</span></div>`:''}${cu?`<div class="rl"><span>Müşteri</span><span>${esc(cu.name)}</span></div>`:''}${rc.foot?`<hr><div style="text-align:center;white-space:pre-line">${esc(rc.foot)}</div>`:''}${fisBc(s)}</div>`}
 function showRc(s,chg){window._rcS=s;window._rcChg=chg||0;modal(mHead(s.ret?'İade tamamlandı':'Satış tamamlandı')+(chg?`<div style="background:var(--okSoft);color:var(--okTx);border-radius:12px;padding:14px;font-weight:800;font-size:1.4rem;display:flex;justify-content:space-between"><span>Para üstü</span><span>${tl(chg)}</span></div>`:'')+rcHTML(s,chg)+`<div class="row"><button class="btn" onclick="rcPrint()">Fişi yazdır</button>${S.undo&&S.undo.sid===s.id?'<button class="btn" onclick="undoLast()">Geri al</button>':''}<button class="btn pri sp" autofocus onclick="closeM()">Yeni satış</button></div>`)}
 function help(){modal(mHead('Klavye kısayolları')+ksyCard().replace('<div class="card">','<div>').replace('<h2>Klavye kısayolları</h2>',''))}
 function priceCheck(){modal(mHead('Fiyat gör')+`<input class="in" id="pc" autofocus placeholder="Barkod okut veya ad yaz" oninput="pcShow()" onkeydown="if(event.key==='Enter')pcShow()"><div id="pcr"></div>`)}
@@ -2508,7 +2508,7 @@ function waAfter(sid){const s=D.sales.find(x=>x.id===sid);const cu=s&&D.customer
 /* fiş resmi */
 function rcCanvas(s){const cu=s.cust?D.customers.find(x=>x.id===s.cust):null;const W=576,P=28,lh=30;const rows=[];
  const add=(l,r,o)=>rows.push({l,r,...(o||{})});
- add(D.set.market,'',{c:1,b:1,z:30});add(`${s.ret?'İADE FİŞİ':'SATIŞ FİŞİ'} #${s.no}`,'',{c:1});add(new Date(s.date).toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}),'',{c:1,m:1});add('---');
+ add(D.set.market,'',{c:1,b:1,z:30});add(`${s.ret?'İADE BİLGİ FİŞİ':'BİLGİ FİŞİ'} #${s.no}`,'',{c:1});add(new Date(s.date).toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}),'',{c:1,m:1});add('---');
  s.items.forEach(l=>{add(l.name,'',{b:1});add(`  ${qf(l.qty,l.unit)} x ${tlw(l.price)}`,tlw(lineT(l)),{m:1})});add('---');
  if(s.disc)add('İndirim','-'+tlw(s.disc));add('TOPLAM',tlw(s.total),{b:1,z:28});add('Ödeme',s.pay);
  if(cu){add('Müşteri',cu.name);add('Toplam borç',tlw(Math.max(0,bal(cu))),{b:1,red:1})}add('---');add('Teşekkür ederiz','',{c:1,m:1});rows.push({l:'',bc:String(s.id),z:96});
@@ -2651,7 +2651,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.67';
+const APPV='3.68';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -2715,7 +2715,7 @@ function rcImg(s,chg){const rc=RC(),W=rc.w==='80'?576:384,P=4,big=rc.fs==='b',F=
  const H=(k)=>R.push({t:'hr',k:k||'d'}),G=(h)=>R.push({t:'gap',h});
  const qtot=s.items.reduce((a,l)=>a+(l.unit==='kg'?0:l.qty*(l.mul||1)),0);
  C(D.set.market,bz+10,1);if(rc.head)C(rc.head,sm);G(4);H('s');
- L(s.ret?'İADE FİŞİ':'SATIŞ FİŞİ','No: '+s.no,bz,1);L(new Date(s.date).toLocaleDateString('tr-TR'),new Date(s.date).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),sm);L('Kasiyer: '+(s.user||''),'',sm);if(cu)L('Müşteri: '+cu.name,'',sm);H('s');
+ L(s.ret?'İADE BİLGİ FİŞİ':'BİLGİ FİŞİ','No: '+s.no,bz,1);L(new Date(s.date).toLocaleDateString('tr-TR'),new Date(s.date).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),sm);L('Kasiyer: '+(s.user||''),'',sm);if(cu)L('Müşteri: '+cu.name,'',sm);H('s');
  L('ÜRÜN','TUTAR',sm,1);H('s');
  s.items.forEach((l,i)=>{if(i)H('d');L(l.name,'',bz,1);L(`  ${qf(l.qty,l.unit)} x ${tlw(l.price)}${l.disc?' (%'+Math.round(l.disc)+')':''}`,tlw(lineT(l)),sm)});H('s');
  L(`${s.items.length} kalem${qtot?' · '+qtot+' adet':''}`,'',sm);
