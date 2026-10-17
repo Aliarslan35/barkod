@@ -865,7 +865,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.66 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.67 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -2651,7 +2651,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.66';
+const APPV='3.67';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -2706,8 +2706,8 @@ function kampDel(id){ask('Kampanya silinsin mi? Geçmiş fişler etkilenmez.',()
 function RC(){return Object.assign({w:'80',head:'',foot:'Teşekkür ederiz',auto:false},D.set.rc||{})}
 function rcSet(k,v){D.set.rc=Object.assign(RC(),{[k]:v});save();render()}
 /* v3.65 fiş yazdırma: resim olarak (her yazıcıda aynı görünür) */
-function rcImg(s,chg){const rc=RC(),W=rc.w==='80'?576:384,P=4,big=rc.fs==='b',F=(z,b)=>`${b?800:600} ${z}px "JetBrains Mono",Menlo,Consolas,monospace`;
- const bz=big?(W>400?28:23):(W>400?25:20),sm=bz-3;chg=chg||s.chg||0;const cu=s.cust?D.customers.find(x=>x.id===s.cust):null;
+function rcImg(s,chg){const rc=RC(),W=rc.w==='80'?576:384,P=4,big=rc.fs==='b',F=(z,b)=>`${b?800:700} ${z}px "JetBrains Mono",Menlo,Consolas,monospace`;
+ const bz=big?(W>400?32:27):(W>400?28:24),sm=bz-2;chg=chg||s.chg||0;const cu=s.cust?D.customers.find(x=>x.id===s.cust):null;
  const cv=document.createElement('canvas'),x=cv.getContext('2d');const R=[];
  const wrap=(t,f,mw)=>{x.font=f;const out=[];String(t).split('\n').forEach(par=>{let line='';par.split(' ').forEach(w=>{const tt=line?line+' '+w:w;if(x.measureText(tt).width<=mw||!line)line=tt;else{out.push(line);line=w}});out.push(line)});return out};
  const C=(t,z,b)=>wrap(t,F(z||bz,b),W-2*P).forEach(l=>R.push({t:'c',l,z:z||bz,b}));
@@ -2721,18 +2721,18 @@ function rcImg(s,chg){const rc=RC(),W=rc.w==='80'?576:384,P=4,big=rc.fs==='b',F=
  L(`${s.items.length} kalem${qtot?' · '+qtot+' adet':''}`,'',sm);
  const gross=s.items.reduce((a,l)=>a+lineT(l),0);if(s.disc||(s.camp||[]).length)L('Ara toplam',tlw(gross),sm);
  (s.camp||[]).forEach(r=>L('Kampanya: '+r.n,'-'+tlw(r.amt),sm));{const od=r2((s.disc||0)-(s.camp||[]).reduce((a,r)=>a+r.amt,0));if(od>0)L('İndirim','-'+tlw(od),sm)}
- G(4);L(s.ret?'İADE TUTARI':'TOPLAM',tlw(s.total),bz+8,1,1);G(4);
+ H('s');L(s.ret?'İADE TUTARI':'TOPLAM',tlw(s.total),bz+10,1);H('s');
  L('Ödeme',s.pay+(s.parts?` (${partsTxt(s.parts)})`:''),sm);if(s.rec)L('Alınan',tlw(s.rec),sm);if(chg)L('Para üstü',tlw(chg),sm,1);H('s');
  if(rc.foot)C(rc.foot,bz,1);C('*** MALİ DEĞERİ YOKTUR ***',sm,1);G(6);R.push({t:'bc'});
  const hOf=r=>r.t==='hr'?(r.k==='s'?14:12):r.t==='gap'?r.h:r.t==='bc'?(W>400?104:92):Math.round(r.z*(r.inv?1.7:1.36));const Ht=P*2+R.reduce((a,r)=>a+hOf(r),0)+20;
  cv.width=W;cv.height=Ht;x.fillStyle='#fff';x.fillRect(0,0,W,Ht);x.fillStyle='#000';x.strokeStyle='#000';x.textBaseline='middle';let y=P;
  R.forEach(r=>{const h=hOf(r);x.fillStyle='#000';
-  if(r.t==='hr'){if(r.k==='s')x.fillRect(P,y+h/2-1,W-2*P,2);else{for(let i=P;i<W-P;i+=8)x.fillRect(i,y+h/2,4,1)}}
+  if(r.t==='hr'){if(r.k==='s')x.fillRect(P,y+h/2-1,W-2*P,3);else{for(let i=P;i<W-P;i+=10)x.fillRect(i,y+h/2-1,6,2)}}
   else if(r.t==='gap'){}
   else if(r.t==='bc'){const b=c128bits(String(s.id)),u=Math.max(1,Math.floor((W-2*P)/b.length)),bx=Math.round((W-b.length*u)/2);[...b].forEach((v,k)=>{if(v==='1')x.fillRect(bx+k*u,y,u,h-26)});x.font=F(W>400?18:15,1);x.textAlign='center';x.fillText(String(s.id),W/2,y+h-10)}
   else{x.font=F(r.z,r.b);if(r.inv){x.fillRect(P,y+2,W-2*P,h-4);x.fillStyle='#fff'}const px=r.inv?P+8:P;if(r.t==='c'){x.textAlign='center';x.fillText(r.l,W/2,y+h/2)}else{x.textAlign='left';x.fillText(r.l,px,y+h/2);if(r.r){x.textAlign='right';x.fillText(r.r,W-px,y+h/2)}}}
   y+=h});
- const im=x.getImageData(0,0,W,Ht),d=im.data;for(let i=0;i<d.length;i+=4){const v=(d[i]*.3+d[i+1]*.59+d[i+2]*.11)<150?0:255;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255}x.putImageData(im,0,0);
+ const im=x.getImageData(0,0,W,Ht),d=im.data;for(let i=0;i<d.length;i+=4){const v=(d[i]*.3+d[i+1]*.59+d[i+2]*.11)<170?0:255;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255}x.putImageData(im,0,0);
  return cv.toDataURL('image/png')}
 function rcPrint(src){if(Date.now()-(window._rcT||0)<2500)return;window._rcT=Date.now();
  let html=typeof src==='string'?src:'';let sale=src&&typeof src==='object'?src:null;
