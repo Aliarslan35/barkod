@@ -822,6 +822,7 @@ html{touch-action:manipulation}
 .ozg ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:5px;font-size:.92rem;line-height:1.45}.ozb{display:inline-block;font-size:.68rem;font-weight:800;color:var(--acc);background:color-mix(in srgb,var(--acc) 12%,transparent);border-radius:6px;padding:1px 6px;margin-right:6px;vertical-align:1px;text-transform:uppercase;letter-spacing:.3px}
 .ksy td:first-child{width:42%;white-space:nowrap}.ksy{min-width:0}
 #modal :focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.rccd{display:inline-grid;place-items:center;min-width:26px;height:26px;margin-left:6px;border-radius:13px;background:rgba(255,255,255,.25);font-weight:800;font-size:.9rem}
 .totn{display:block;font-size:.72rem;font-weight:600;opacity:.75;margin-top:2px;letter-spacing:0}
 .scq.pop{animation:scqp .25s}@keyframes scqp{50%{transform:scale(1.12)}}
 /* v3.44 hesap dökümü */
@@ -866,7 +867,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.70 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.71 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1069,7 +1070,7 @@ function toast(m){const t=document.createElement('div');t.textContent=m;$('#toas
 function beep(ok){if(!D.set.sound)return;try{const a=new (window.AudioContext||window.webkitAudioContext)();const o=a.createOscillator();const g=a.createGain();o.frequency.value=ok?1200:300;g.gain.value=.06;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+(ok?.07:.25))}catch(e){}}
 function modal(h,wide){$('#modal').innerHTML=`<div class="ov" onclick="if(event.target===this)closeM()"><div class="mb ${wide?'wide':''}" role="dialog" aria-modal="true">${h}</div></div>`;const f=$('#modal [autofocus]');if(f)setTimeout(()=>f.focus(),30)}
 function ask(msg,fn){window._af=fn;modal(mHead('Onay')+`<p style="margin:0;line-height:1.5">${esc(msg)}</p><div class="row"><button class="btn sp" onclick="closeM()">Vazgeç</button><button class="btn pri" autofocus onclick="const f=window._af;closeM();f()">Evet</button></div>`)}
-function closeM(){window._rcOpen=false;clearTimeout(window._rcTO);$('#modal').innerHTML='';if(S.page==='satis')focusScan();if(S.remQ&&S.remQ.length)setTimeout(remPump,60)}
+function closeM(){window._rcOpen=false;clearInterval(window._rcTO);$('#modal').innerHTML='';if(S.page==='satis')focusScan();if(S.remQ&&S.remQ.length)setTimeout(remPump,60)}
 const mHead=t=>`<div class="row"><h2 style="font-size:1.2rem">${t}</h2><button class="ib ghost sp" aria-label="Kapat" onclick="closeM()">${ic('x')}</button></div>`;
 const touch=()=>window.matchMedia('(pointer:coarse)').matches;
 function focusScan(){const s=$('#scan');if(s&&!touch())s.focus()}
@@ -1383,7 +1384,7 @@ function pay(type,parts,force){
  if(type==='Veresiye'&&!c.ret&&D.set.waVer!==false&&s.cust)waAfter(s.id);else{if(D.set.autoRc)showRc(s,type==='Nakit'&&rec>t.total?rec-t.total:0);else toast((c.ret?'İade tamamlandı: ':'Satış tamamlandı: ')+tl(Math.abs(s.total)));if(RC().auto){setTimeout(()=>printSale(s.id),300)}}
 }
 function rcHTML(s,chg){chg=chg||s.chg||0;const cu=s.cust?D.customers.find(x=>x.id===s.cust):null;const rc=RC();return `<div class="receipt printme"><div style="text-align:center;font-weight:700">${esc(D.set.market)}</div>${rc.head?`<div style="text-align:center;white-space:pre-line;font-size:.92em">${esc(rc.head)}</div>`:''}<div style="text-align:center">${s.ret?'İADE BİLGİ FİŞİ':'BİLGİ FİŞİ'} #${s.no}</div><div style="text-align:center">${fdt(s.date)} · ${esc(s.user)}</div><hr>${s.items.map(l=>`<div>${esc(l.name)}</div><div class="rl"><span>${qf(l.qty,l.unit)} x ${tl(l.price)}${l.disc?' %'+Math.round(l.disc)+' ind.':''}</span><span>${tl(lineT(l))}</span></div>`).join('')}<hr>${(s.camp||[]).map(r=>`<div class="rl"><span>Kampanya: ${esc(r.n)}</span><span>-${tl(r.amt)}</span></div>`).join('')}${(()=>{const od=r2((s.disc||0)-(s.camp||[]).reduce((a,r)=>a+r.amt,0));return od>0?`<div class="rl"><span>İndirim</span><span>-${tl(od)}</span></div>`:''})()}<div class="rl" style="font-weight:700;font-size:1.1em"><span>TOPLAM</span><span>${tl(s.total)}</span></div><div class="rl"><span>Ödeme</span><span>${s.pay}${s.parts?` (${partsTxt(s.parts)})`:''}</span></div>${s.rec?`<div class="rl"><span>Alınan</span><span>${tl(s.rec)}</span></div>`:''}${chg?`<div class="rl"><span>Para üstü</span><span>${tl(chg)}</span></div>`:''}${cu?`<div class="rl"><span>Müşteri</span><span>${esc(cu.name)}</span></div>`:''}${rc.foot?`<hr><div style="text-align:center;white-space:pre-line">${esc(rc.foot)}</div>`:''}${fisBc(s)}</div>`}
-function showRc(s,chg){window._rcS=s;window._rcChg=chg||0;clearTimeout(window._rcTO);window._rcOpen=true;window._rcTO=setTimeout(()=>{if(window._rcOpen&&$('#modal').innerHTML)closeM()},10000);modal(mHead(s.ret?'İade tamamlandı':'Satış tamamlandı')+(chg?`<div style="background:var(--okSoft);color:var(--okTx);border-radius:12px;padding:14px;font-weight:800;font-size:1.4rem;display:flex;justify-content:space-between"><span>Para üstü</span><span>${tl(chg)}</span></div>`:'')+rcHTML(s,chg)+`<div class="row"><button class="btn" onclick="rcPrint()">Fişi yazdır</button>${S.undo&&S.undo.sid===s.id?'<button class="btn" onclick="undoLast()">Geri al</button>':''}<button class="btn pri sp" autofocus onclick="closeM()">Yeni satış</button></div>`)}
+function showRc(s,chg){window._rcS=s;window._rcChg=chg||0;clearInterval(window._rcTO);window._rcOpen=true;let rcN=10;window._rcTO=setInterval(()=>{rcN--;const b=$('#rcNew');if(!window._rcOpen||!$('#modal').innerHTML||!b){clearInterval(window._rcTO);return}if(rcN<=0){clearInterval(window._rcTO);closeM();return}b.innerHTML='Yeni satış <span class="rccd">'+rcN+'</span>'},1000);modal(mHead(s.ret?'İade tamamlandı':'Satış tamamlandı')+(chg?`<div style="background:var(--okSoft);color:var(--okTx);border-radius:12px;padding:14px;font-weight:800;font-size:1.4rem;display:flex;justify-content:space-between"><span>Para üstü</span><span>${tl(chg)}</span></div>`:'')+rcHTML(s,chg)+`<div class="row"><button class="btn" onclick="rcPrint()">Fişi yazdır</button>${S.undo&&S.undo.sid===s.id?'<button class="btn" onclick="undoLast()">Geri al</button>':''}<button class="btn pri sp" id="rcNew" autofocus onclick="closeM()">Yeni satış <span class="rccd">10</span></button></div>`)}
 function help(){modal(mHead('Klavye kısayolları')+ksyCard().replace('<div class="card">','<div>').replace('<h2>Klavye kısayolları</h2>',''))}
 function priceCheck(){modal(mHead('Fiyat gör')+`<input class="in" id="pc" autofocus placeholder="Barkod okut veya ad yaz" oninput="pcShow()" onkeydown="if(event.key==='Enter')pcShow()"><div id="pcr"></div>`)}
 function pcShow(){const v=$('#pc').value.trim();const p=findCode(v)||(v.length>1?matches(v)[0]:null);$('#pcr').innerHTML=p?`<div class="card" style="background:var(--surf2)"><b style="font-size:1.2rem">${esc(p.name)}</b><b style="font-size:2rem;color:var(--acc)">${tl(p.price)}${p.unit==='kg'?' /kg':''}</b><span class="muted">Stok: ${qf(p.stock,p.unit)} · ${esc(p.cat)}</span></div>`:(v?'<div class="muted">Bulunamadı</div>':'')}
@@ -2652,7 +2653,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.70';
+const APPV='3.71';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
