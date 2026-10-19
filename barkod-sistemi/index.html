@@ -879,7 +879,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.81 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.82 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1910,9 +1910,9 @@ const EL=['0001101','0011001','0010011','0111101','0100011','0110001','0101111',
 function ean(c){if(!/^\d{13}$/.test(c))return `<div class="mono bcn">${esc(c)}</div>`;const d=[...c].map(Number);let b='101';for(let i=1;i<7;i++)b+=(EP[d[0]][i-1]==='L'?EL:EG)[d[i]];b+='01010';for(let i=7;i<13;i++)b+=ER[d[i]];b+='101';let r='';[...b].forEach((x,i)=>{if(x==='1')r+=`<rect x="${i}" y="0" width="1" height="40"/>`});return `<svg class="bc" viewBox="0 0 ${b.length} 40" preserveAspectRatio="none" aria-label="Barkod ${c}">${r}</svg><div class="mono bcn">${c}</div>`}
 /* ===== YENİ ÜRÜNLER (urun2) — eski "Ürünler" sayfası aynen duruyor ===== */
 /* ===== YENİ ETİKET (etiket2) — eski "Etiket yazdır" sayfası aynen duruyor ===== */
-const E2L={'3x9':{c:3,r:9,w:66,h:30,gx:0,gy:0,t:13.5,l:6,sz:'m'},'3x7':{c:3,r:7,w:63.5,h:38.1,gx:2.5,gy:0,t:15.15,l:7.2,sz:'m'},'3x8':{c:3,r:8,w:70,h:37,gx:0,gy:0,t:0.5,l:0,sz:'m'},'4x10':{c:4,r:10,w:48.5,h:25.4,gx:0,gy:0,t:21.5,l:8,sz:'s'},'5x13':{c:5,r:13,w:38,h:21.2,gx:0,gy:0,t:10.7,l:10,sz:'s'}};
+const E2L={'3x8g':{c:3,r:8,w:64,h:30,gx:3,gy:3,t:18,l:6,sz:'m'},'3x9':{c:3,r:9,w:66,h:30,gx:0,gy:0,t:13.5,l:6,sz:'m'},'3x7':{c:3,r:7,w:63.5,h:38.1,gx:2.5,gy:0,t:15.15,l:7.2,sz:'m'},'3x8':{c:3,r:8,w:70,h:37,gx:0,gy:0,t:0.5,l:0,sz:'m'},'4x10':{c:4,r:10,w:48.5,h:25.4,gx:0,gy:0,t:21.5,l:8,sz:'s'},'5x13':{c:5,r:13,w:38,h:21.2,gx:0,gy:0,t:10.7,l:10,sz:'s'}};
 const E2S={'60x40':[60,40],'58x40':[58,40],'50x30':[50,30],'40x30':[40,30],'30x20':[30,20]};
-function e2Init(){if(!S.e2)S.e2={mode:'a4',lay:'3x9',lsz:'58x40',q:'',sel:{}};return S.e2}
+function e2Init(){if(!S.e2)S.e2={mode:'a4',lay:'3x8g',lsz:'58x40',q:'',sel:{}};return S.e2}
 function unitPrice(p){if(p.unit==='kg')return '1 kg: '+tl(p.price);const m=String(p.name).toLocaleLowerCase('tr').match(/(\d+(?:[.,]\d+)?)\s*(kg|gr|g|lt|l|ml|cl)\b/);if(m){let q=parseFloat(m[1].replace(',','.'));const u=m[2];if(!(q>0))return '';let base='kg';if(u==='g'||u==='gr')q/=1000;else if(u==='ml'){q/=1000;base='L'}else if(u==='cl'){q/=100;base='L'}else if(u==='l'||u==='lt')base='L';return '1 '+base+': '+tl(p.price/q)}
  const k=String(p.name).match(/(\d+)\s*['’]?\s*(?:lı|li|lu|lü|'lı|'li|'lu|'lü)\b/i);if(k&&+k[1]>1)return '1 adet: '+tl(p.price/+k[1]);return ''}
 function lblDate(p){const ph=p.ph||[];const l=[...ph].reverse().find(h=>h.op!==h.p);return new Date(l?l.d:Date.now()).toLocaleDateString('tr-TR')}
@@ -1944,7 +1944,7 @@ function pgEtiket2(){const e=e2Init(),q=e.q.toLocaleLowerCase('tr');
  const list=D.products.filter(p=>(!q||p.name.toLocaleLowerCase('tr').includes(q)||String(p.barcode).includes(q))&&(!e.cat||p.cat===e.cat)&&(!e.br||p.brand===e.br));window._e2l=list;
  const r=e2Pages(),MM=3.7795;
  const md=(v,t,s)=>`<button class="e2m ${e.mode===v?'on':''}" onclick="S.e2.mode='${v}';render()"><b>${t}</b><span>${s}</span></button>`;
- const opts=e.mode==='a4'?Object.keys(E2L).map(k=>{const L=E2L[k];return `<button class="chip ${e.lay===k?'on':''}" onclick="S.e2.lay='${k}';render()">${L.c} × ${L.r} (${L.c*L.r}) · ${String(L.h/10).replace('.',',')} cm</button>`}).join('')+`<button class="chip ${D.set.lblCut!==false?'on':''}" title="Makasla keseceğin yerler kesikli çizgiyle basılır" onclick="D.set.lblCut=D.set.lblCut===false;save();render()">✂ Kesim çizgisi ${D.set.lblCut!==false?'açık':'kapalı'}</button>`:Object.keys(E2S).map(k=>`<button class="chip ${e.lsz===k?'on':''}" onclick="S.e2.lsz='${k}';render()">${k.replace('x',' × ')} mm</button>`).join('');
+ const opts=e.mode==='a4'?Object.keys(E2L).map(k=>{const L=E2L[k];return `<button class="chip ${e.lay===k?'on':''}" onclick="S.e2.lay='${k}';render()">${L.c} × ${L.r} (${L.c*L.r}) · ${String(L.h/10).replace('.',',')} cm${L.gy?' · aralıklı':''}</button>`}).join('')+`<button class="chip ${D.set.lblCut!==false?'on':''}" title="Makasla keseceğin yerler kesikli çizgiyle basılır" onclick="D.set.lblCut=D.set.lblCut===false;save();render()">✂ Kesim çizgisi ${D.set.lblCut!==false?'açık':'kapalı'}</button>`:Object.keys(E2S).map(k=>`<button class="chip ${e.lsz===k?'on':''}" onclick="S.e2.lsz='${k}';render()">${k.replace('x',' × ')} mm</button>`).join('');
  let pv;
  if(e.mode==='a4'){const sc=.5;pv=r.pages.slice(0,2).map(h=>`<div class="e2pv" style="width:${210*MM*sc}px;height:${297*MM*sc}px"><div style="transform:scale(${sc});transform-origin:0 0">${h}</div></div>`).join('')+(r.pages.length>2?`<span class="muted" style="font-weight:600">+ ${r.pages.length-2} sayfa daha (hepsi yazdırılır)</span>`:'')}
  else{const sc=Math.min(1.6,330/(r.w*MM));pv=r.n?r.pages.slice(0,4).map(h=>`<div class="e2pv e2tag" style="width:${r.w*MM*sc}px;height:${r.h*MM*sc}px;border-radius:8px"><div style="transform:scale(${sc});transform-origin:0 0">${h}</div></div>`).join('')+(r.n>4?`<span class="muted">+ ${r.n-4} etiket daha</span>`:''):'<div class="empty">Soldan ürün seçin.</div>'}
@@ -2744,7 +2744,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.81';
+const APPV='3.82';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -3370,7 +3370,7 @@ const OZ=[
 'Arka planda: stok değişiklikleri buluta "artır/azalt" olarak yazılır, cihazlar aynı anda satsa da stok silinmez']],
 ['Etiket',[
 'Raf etiketi yazdırma (EAN barkodlu, fiyatlı, birim fiyatlı, tarihli)',
-'A4 kâğıda etikette makasla kesim çizgileri (✂, açılıp kapatılabilir); 3 cm yüksekliğinde raf etiketi düzeni (3 × 9)',
+'A4 kâğıda etikette makasla kesim çizgileri (✂, açılıp kapatılabilir); 3 cm yüksekliğinde raf etiketi düzenleri (3 × 8 aralıklı, 3 × 9 sıkı)',
 'Etiket yazdır: tüm ürünleri ya da kategori/markadaki ürünleri topluca seç',
 'Esc ile sepet silinmeden önce onay sorulur',
 'Fiyatı değişen ürünler etiket listesine kendiliğinden düşer',
