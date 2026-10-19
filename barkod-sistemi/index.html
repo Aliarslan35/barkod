@@ -879,7 +879,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.83 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.85 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1274,11 +1274,15 @@ function scanKey(e){
  {const pk=D.products.find(x=>x.packBc&&x.packBc===v);if(pk)return addPack(pk.id,q??undefined)}
  let p=findCode(v);if(!p){const r=matches(v);if(r.length)p=r[0]}
  if(p)return addP(p.id,q??undefined);
+ if(isQR(v)){const sc=$('#scan');if(sc)sc.value='';$('#sg').innerHTML='';qrNo();return}
  beep(false);$('#sg').innerHTML='';{const sc=$('#scan');if(sc&&/^\d{6,14}$/.test(v))sc.value=''}
  let uq=q;if(uq==null&&S.npq>1){uq=S.npq;S.npq=0;setTimeout(npUp,0)}
  unregAsk(v,uq);
 }
 /* ---------- kamera: çizgi okuma (+ isteğe bağlı rakam) ---------- */
+/* v3.85 karekod / uzun metin barkod değildir: okuyucudan gelirse yok sayılır */
+function isQR(v){v=String(v||'').trim();if(!v||/^\d+$/.test(v))return false;return /^(https?:|www\.|wifi:|begin:|mailto:|tel:|smsto:|upi:)/i.test(v)||/[:?=&{}<>@|;]/.test(v)||(/\//.test(v)&&!/\s/.test(v))||(!/\s/.test(v)&&v.length>=22)||v.length>=40}
+function qrNo(){beep(false);toast('Karekod okunmaz. Ürünün barkodunu okut')}
 function validEan(c){if(!/^\d+$/.test(c)||![8,12,13].includes(c.length))return false;const d=[...c].map(Number);const ch=d.pop();let t=0;d.reverse().forEach((x,i)=>t+=x*(i%2?1:3));return (10-t%10)%10===ch}
 function onScanCode(code){const p=findCode(code);if(p)addP(p.id);else{const s=$('#scan');if(s){s.value=code;scanKey({key:'Enter',preventDefault(){}})}}}
 function camSt(t){const e=$('#cst');if(e)e.textContent=t}
@@ -1821,6 +1825,7 @@ function hkFocus(id){const f=()=>{const e=$('#'+(id||'hkb'));if(e){e.focus();e.s
 function hkMsg(t,c){hkD().msg=t;hkD().msgC=c||'';const e=$('#hkm');if(e){e.innerHTML=t;e.style.color=c||''}}
 function hkNext(from){const noCost=hkFix().noCost;const seq=['hkb','hkn',...(noCost?[]:['hkc']),'hkp','hks',...(hkFix().pk?['hkkp','hkkb']:[])];const i=seq.indexOf(from);if(i<0||i===seq.length-1){hkSave();return}hkFocus(seq[i+1])}
 async function hkBc(){const h=hkD();const code=h.bc.trim();if(!code){hkFocus('hkn');return}
+ if(isQR(code)){h.bc='';render();qrNo();hkFocus('hkb');return}
  const ex=D.products.find(p=>p.barcode===code||p.packBc===code);
  if(ex){Object.assign(h,{id:ex.id,name:ex.name,cost:ex.cost?String(ex.cost).replace('.',','):'',price:String(ex.price).replace('.',','),stock:String(ex.stock),img:ex.img||'',pack:ex.pack>1?String(ex.pack):'',packBc:ex.packBc||''});render();hkMsg(`Bu ürün zaten kayıtlı. Değiştirip kaydedersen <b>güncellenir</b>.`,'var(--warnTx)');hkFocus('hkp');return}
  if(h.id){Object.assign(h,{id:0,name:'',cost:'',price:'',stock:'',img:''});render()}
@@ -1885,7 +1890,7 @@ function seriHTML(){const r=SR(),f=hkFix();const n=r.items.length;
  <div class="srlist">${n?r.items.map(row).join(''):'<p class="muted" style="margin:0">Henüz barkod okutulmadı.</p>'}</div>
  <div class="row" style="gap:8px">${n?`<button class="btn" onclick="ask('Liste temizlensin mi?',()=>{SR().items=[];render()})">Listeyi temizle</button>`:''}<button class="btn pri sp hkbtn" ${n?'':'disabled'} onclick="srSave()">Hepsini kaydet (${n})</button></div></div>`}
 function srMsg(t,c){const e=$('#srmsg');if(e){e.textContent=t;e.style.color=c||''}}
-function srAdd(v){v=String(v||'').trim();const inp=$('#srb');if(inp)inp.value='';if(!v)return;const r=SR();
+function srAdd(v){v=String(v||'').trim();const inp=$('#srb');if(inp)inp.value='';if(!v)return;if(isQR(v)){qrNo();return}const r=SR();
  if(r.items.some(x=>x.bc===v)){beep(false);srMsg('Bu barkod zaten listede','var(--badTx)');return}
  const ex=D.products.find(p=>p.barcode===v||p.packBc===v);if(ex){beep(false);srMsg('Zaten kayıtlı: '+ex.name,'var(--badTx)');return}
  const it={bc:v,model:'',gr:'',price:''};r.items.push(it);beep(true);render();srMsg('Eklendi · '+r.items.length+' ürün','var(--okTx)');
@@ -1961,13 +1966,15 @@ function pgEtiket2(){const e=e2Init(),q=e.q.toLocaleLowerCase('tr');
  e2Fit($('#main'));
 }
 /* v3.83 etikette yazı sığmıyorsa alt satıra geçer, hâlâ sığmıyorsa yazı küçülür */
-function e2Fit(root){if(!root)return;root.querySelectorAll('.e2l').forEach(l=>{const r=l.querySelector('.e2r');if(!r)return;const n=r.querySelector('.e2n'),pr=r.querySelector('.e2p'),u=r.querySelector('.e2u');
-  const over=()=>[...r.children].some(c=>c.offsetTop-r.offsetTop+c.offsetHeight>r.clientHeight+3)||(n&&n.scrollWidth>n.clientWidth+1)||(pr&&pr.scrollWidth>r.clientWidth+1)||(n&&n.scrollHeight>n.clientHeight+1);
-  if(!over())return;
-  const f0=n?parseFloat(getComputedStyle(n).fontSize):0,p0=pr?parseFloat(getComputedStyle(pr).fontSize):0;
-  for(let k=.95;k>=.5&&over();k-=.05){if(n)n.style.fontSize=(f0*k).toFixed(2)+'px'}
-  for(let k=.95;k>=.5&&over();k-=.05){if(pr)pr.style.fontSize=(p0*k).toFixed(2)+'px'}
-  if(over()&&u)u.style.display='none'})}
+function e2Fit(root){if(!root)return;root.querySelectorAll('.e2l').forEach(l=>{const r=l.querySelector('.e2r');if(!r)return;const h=r.querySelector('.e2h'),n=r.querySelector('.e2n'),pr=r.querySelector('.e2p'),u=r.querySelector('.e2u');
+  const W=el=>el&&(el.scrollWidth>el.clientWidth+1||el.scrollWidth>r.clientWidth+1);
+  const V=()=>[...r.children].some(c=>c.offsetTop-r.offsetTop+c.offsetHeight>r.clientHeight+2);
+  const shr=(el,bad,min)=>{if(!el||!bad())return;const f=parseFloat(getComputedStyle(el).fontSize);for(let k=.94;k>=min&&bad();k-=.04)el.style.fontSize=(f*k).toFixed(2)+'px'};
+  shr(h,()=>W(h),.4);shr(u,()=>W(u),.4);shr(pr,()=>W(pr),.4);
+  shr(n,()=>W(n)||n.scrollHeight>n.clientHeight+1||V(),.3);
+  shr(pr,()=>V(),.4);
+  if(V()&&u)u.style.display='none';
+  if(V()&&h)h.style.display='none'})}
 function e2Print(){const r=e2Pages();if(!r.n){toast('Önce ürün seçin');return}{const lp=D.set.lblPend;if(lp){let ch=0;Object.keys(e2Init().sel).forEach(id=>{if(e2Init().sel[id]>0&&lp[id]){delete lp[id];ch=1}});if(ch)save()}}
  let w=document.getElementById('e2print');if(w)w.remove();{const m=document.createElement('div');m.style.cssText='position:absolute;left:-9999px;top:0;visibility:hidden';m.innerHTML=r.pages.join('');document.body.appendChild(m);try{e2Fit(m)}catch(x){}r.pages=[...m.children].map(c=>c.outerHTML);m.remove()}w=document.createElement('div');w.id='e2print';w.className='printme';w.innerHTML=r.pages.join('');document.body.appendChild(w);
  const st=document.createElement('style');st.textContent=`@page{size:${r.w}mm ${r.h}mm;margin:0}`;document.head.appendChild(st);document.body.classList.add('e2p');
@@ -1980,7 +1987,7 @@ function setSf(v){S.sf=v;render()}
 function buyForm(id){S.af=S.af&&S.af.lines.length?S.af:afNew();if(id&&!S.af.lines.some(l=>l.pid===id))afAddLine(id);nav('alisF')}
 function afNew(){return {sup:'',inv:'',date:ymd(new Date()),photo:'',lines:[],pay:'',pd:0,due:''}}
 function afAddLine(id,pk){const p=P(id);if(!p)return;const ex=S.af.lines.find(l=>l.pid===id&&!!l.pk===!!pk);if(ex){ex.qty+=1}else S.af.lines.push({pid:id,qty:1,pk:!!pk&&p.pack>1,cost:(c=>pk&&p.pack>1?r2(c*p.pack):c)(afSupCost(p)),price:p.price});}
-function afScan(v){v=String(v||'').trim();if(!v)return;const pk=D.products.find(x=>x.packBc&&x.packBc===v);const p=pk||findCode(v)||matches(v)[0];
+function afScan(v){v=String(v||'').trim();if(!v)return;if(isQR(v)&&!findCode(v)){qrNo();return}const pk=D.products.find(x=>x.packBc&&x.packBc===v);const p=pk||findCode(v)||matches(v)[0];
  if(!p){beep(false);ask('"'+v+'" kayıtlı değil. Yeni ürün olarak eklensin mi?',()=>{window._afNewBc=v;prodForm(null,/^\d{8,14}$/.test(v)?v:'')});return}
  afAddLine(p.id,!!pk);beep(true);render();setTimeout(()=>{const i=$('#afs');if(i)i.focus()},30)}
 function afSet(i,k,v){const l=S.af.lines[i],p=P(l.pid);if(k==='pk'){const m=p.pack||1;l.cost=v?r2(l.cost*m):r2(l.cost/m);l.pk=v;render();return}l[k]=num2(v);afTot()}
@@ -2558,7 +2565,7 @@ function syF(v){const d=syGet();d.f=v;syPut(d);render()}
 function sySet(id,v){const d=syGet();const s=String(v).trim();if(s==='')delete d.c[id];else d.c[id]=r2(parseFloat(s.replace(',','.'))||0);d.last=id;syPut(d);const p=P(id);const k=syCalc(p,d);const has=d.c[id]!=null;
  const a=$('#syd'+id),b=$('#syn'+id),r=$('#sy'+id);if(a)a.innerHTML=syDf(k.df,p,has||d.zero);if(b)b.innerHTML=`<b>${has||d.zero?qf(k.nw,p.unit):'<span class="muted">—</span>'}</b>`;if(r)r.classList.toggle('son',has)}
 function syAdd(id,n){const d=syGet();d.c[id]=r2((d.c[id]||0)+n);d.last=id;syPut(d);render()}
-function syScan(v){v=String(v||'').trim();if(!v)return;const d=syGet();const pk=D.products.find(x=>x.packBc&&x.packBc===v);const p=pk||findCode(v)||(!/^\d{6,}$/.test(v)&&matches(v).length===1?matches(v)[0]:null);
+function syScan(v){v=String(v||'').trim();if(!v)return;if(isQR(v)&&!findCode(v)){qrNo();return}const d=syGet();const pk=D.products.find(x=>x.packBc&&x.packBc===v);const p=pk||findCode(v)||(!/^\d{6,}$/.test(v)&&matches(v).length===1?matches(v)[0]:null);
  if(!p){if(!/^\d{6,}$/.test(v)){d.q=v;syPut(d);render();return}beep(false);return syUnk(v)}
  if(!syScope(d).some(x=>x.id===p.id)){beep(false);toast(p.name+' bu sayımın kapsamında değil');return}
  if(lsGet('syAsk')==='1'||p.unit==='kg'){d.q='';syPut(d);beep(true);return syAskQ(p,!!pk)}
@@ -2753,7 +2760,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.83';
+const APPV='3.85';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -3382,6 +3389,7 @@ const OZ=[
 'A4 kâğıda etikette makasla kesim çizgileri (✂, açılıp kapatılabilir); 3 cm yüksekliğinde raf etiketi düzenleri (3 × 8 aralıklı, 3 × 9 sıkı)',
 'Etiket yazdır: tüm ürünleri ya da kategori/markadaki ürünleri topluca seç',
 'Etikette uzun ürün adı alt satıra geçer, sığmazsa yazı kendiliğinden küçülür',
+'Barkod okuyucudan gelen karekod / uzun metin yok sayılır (kayıtsız ürün penceresi açılmaz)',
 'Esc ile sepet silinmeden önce onay sorulur',
 'Fiyatı değişen ürünler etiket listesine kendiliğinden düşer',
 'Etiket boyutu ve adet seçimi']],
