@@ -353,7 +353,7 @@ tr.usel td{background:color-mix(in srgb,var(--acc) 8%,transparent)}
 .e2d{font-weight:700;color:#333}
 .e2r{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;gap:.5mm}.e2r .e2u{margin-top:auto}.e2r .e2p{margin-top:auto}.e2r .e2u+.e2p{margin-top:0}
 .e2h{width:100%;font-weight:800;letter-spacing:1.2px;padding-bottom:.5mm;border-bottom:.3mm solid #111;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.e2n{font-weight:800;line-height:1.1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;width:100%}
+.e2n{font-weight:800;line-height:1.1;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;width:100%;overflow-wrap:anywhere}
 .e2p{display:flex;align-items:flex-start;justify-content:center;line-height:.88;font-weight:800;letter-spacing:-.6px;white-space:nowrap}
 .e2pd{display:flex;flex-direction:column;align-items:flex-start;font-size:.42em;line-height:1;margin-left:.3mm}.e2pd i{font-style:normal;font-size:.8em;margin-top:.3mm}
 .e2u{font-weight:600;color:#333;white-space:nowrap;line-height:1.1}
@@ -879,7 +879,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.82 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.83 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1958,9 +1958,18 @@ function pgEtiket2(){const e=e2Init(),q=e.q.toLocaleLowerCase('tr');
  <div class="card"><div class="row"><h2>Önizleme</h2><span class="muted sp" style="font-weight:600">${r.n} etiket${e.mode==='a4'?' · '+r.pages.length+' sayfa':''}</span></div>
  <div class="e2pvw">${pv}</div>
  <button class="btn pri" style="min-height:56px;font-size:1rem" onclick="e2Print()">${ic('print',20)}${r.n?r.n+' etiketi yazdır':'Ürün seçin'}</button></div></div>`;
+ e2Fit($('#main'));
 }
+/* v3.83 etikette yazı sığmıyorsa alt satıra geçer, hâlâ sığmıyorsa yazı küçülür */
+function e2Fit(root){if(!root)return;root.querySelectorAll('.e2l').forEach(l=>{const r=l.querySelector('.e2r');if(!r)return;const n=r.querySelector('.e2n'),pr=r.querySelector('.e2p'),u=r.querySelector('.e2u');
+  const over=()=>[...r.children].some(c=>c.offsetTop-r.offsetTop+c.offsetHeight>r.clientHeight+3)||(n&&n.scrollWidth>n.clientWidth+1)||(pr&&pr.scrollWidth>r.clientWidth+1)||(n&&n.scrollHeight>n.clientHeight+1);
+  if(!over())return;
+  const f0=n?parseFloat(getComputedStyle(n).fontSize):0,p0=pr?parseFloat(getComputedStyle(pr).fontSize):0;
+  for(let k=.95;k>=.5&&over();k-=.05){if(n)n.style.fontSize=(f0*k).toFixed(2)+'px'}
+  for(let k=.95;k>=.5&&over();k-=.05){if(pr)pr.style.fontSize=(p0*k).toFixed(2)+'px'}
+  if(over()&&u)u.style.display='none'})}
 function e2Print(){const r=e2Pages();if(!r.n){toast('Önce ürün seçin');return}{const lp=D.set.lblPend;if(lp){let ch=0;Object.keys(e2Init().sel).forEach(id=>{if(e2Init().sel[id]>0&&lp[id]){delete lp[id];ch=1}});if(ch)save()}}
- let w=document.getElementById('e2print');if(w)w.remove();w=document.createElement('div');w.id='e2print';w.className='printme';w.innerHTML=r.pages.join('');document.body.appendChild(w);
+ let w=document.getElementById('e2print');if(w)w.remove();{const m=document.createElement('div');m.style.cssText='position:absolute;left:-9999px;top:0;visibility:hidden';m.innerHTML=r.pages.join('');document.body.appendChild(m);try{e2Fit(m)}catch(x){}r.pages=[...m.children].map(c=>c.outerHTML);m.remove()}w=document.createElement('div');w.id='e2print';w.className='printme';w.innerHTML=r.pages.join('');document.body.appendChild(w);
  const st=document.createElement('style');st.textContent=`@page{size:${r.w}mm ${r.h}mm;margin:0}`;document.head.appendChild(st);document.body.classList.add('e2p');
  const done=()=>{document.body.classList.remove('e2p');st.remove();w.remove();window.removeEventListener('afterprint',done)};
  window.addEventListener('afterprint',done);
@@ -2744,7 +2753,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.82';
+const APPV='3.83';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -3372,6 +3381,7 @@ const OZ=[
 'Raf etiketi yazdırma (EAN barkodlu, fiyatlı, birim fiyatlı, tarihli)',
 'A4 kâğıda etikette makasla kesim çizgileri (✂, açılıp kapatılabilir); 3 cm yüksekliğinde raf etiketi düzenleri (3 × 8 aralıklı, 3 × 9 sıkı)',
 'Etiket yazdır: tüm ürünleri ya da kategori/markadaki ürünleri topluca seç',
+'Etikette uzun ürün adı alt satıra geçer, sığmazsa yazı kendiliğinden küçülür',
 'Esc ile sepet silinmeden önce onay sorulur',
 'Fiyatı değişen ürünler etiket listesine kendiliğinden düşer',
 'Etiket boyutu ve adet seçimi']],
