@@ -879,7 +879,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.85 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.86 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1282,7 +1282,10 @@ function scanKey(e){
 /* ---------- kamera: çizgi okuma (+ isteğe bağlı rakam) ---------- */
 /* v3.85 karekod / uzun metin barkod değildir: okuyucudan gelirse yok sayılır */
 function isQR(v){v=String(v||'').trim();if(!v||/^\d+$/.test(v))return false;return /^(https?:|www\.|wifi:|begin:|mailto:|tel:|smsto:|upi:)/i.test(v)||/[:?=&{}<>@|;]/.test(v)||(/\//.test(v)&&!/\s/.test(v))||(!/\s/.test(v)&&v.length>=22)||v.length>=40}
-function qrNo(){beep(false);toast('Karekod okunmaz. Ürünün barkodunu okut')}
+function qrAlarm(){try{const a=new (window.AudioContext||window.webkitAudioContext)();const g=a.createGain();g.gain.value=.25;g.connect(a.destination);[0,.45,.9].forEach((t,i)=>{const o=a.createOscillator();o.type='square';o.frequency.value=i===1?260:420;o.connect(g);o.start(a.currentTime+t);o.stop(a.currentTime+t+.38)})}catch(e){}try{navigator.vibrate&&navigator.vibrate([300,100,300,100,300])}catch(e){}}
+function qrNo(){qrAlarm();if($('#qrw'))return;window._qrPrev=document.activeElement;const d=document.createElement('div');d.id='qrw';d.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(120,0,0,.72);display:flex;align-items:center;justify-content:center;padding:16px';d.innerHTML='<div role="alertdialog" aria-modal="true" style="background:#fff;border:6px solid #C92A2A;border-radius:18px;max-width:520px;width:100%;padding:26px 22px;text-align:center"><div style="font-size:3.2rem;line-height:1">⚠</div><div style="font-size:1.7rem;font-weight:900;color:#A61E1E;margin:8px 0">KAREKOD OKUNDU</div><div style="font-size:1.3rem;font-weight:800;margin-bottom:6px">ÜRÜN EKLENMEDİ</div><div style="color:#3A4556;margin-bottom:18px">Karekod barkod değildir. Ürünün barkodunu tekrar okut.</div><button type="button" id="qrwB" style="min-height:56px;width:100%;border:0;border-radius:12px;background:#C92A2A;color:#fff;font-size:1.2rem;font-weight:800">TAMAM</button></div>';document.body.appendChild(d);const b=$('#qrwB');b.onclick=qrClose;b.focus()}
+function qrClose(){const d=$('#qrw');if(d)d.remove();const p=window._qrPrev;window._qrPrev=null;if(p&&p.isConnected&&p!==document.body&&p.focus)p.focus();else focusScan()}
+document.addEventListener('keydown',e=>{if(!$('#qrw'))return;if(e.key==='Enter'||e.key==='Escape'||e.key===' '){e.preventDefault();e.stopImmediatePropagation();qrClose();return}if(e.key.length===1&&!e.ctrlKey&&!e.metaKey){qrClose();return}e.preventDefault();e.stopImmediatePropagation()},true);
 function validEan(c){if(!/^\d+$/.test(c)||![8,12,13].includes(c.length))return false;const d=[...c].map(Number);const ch=d.pop();let t=0;d.reverse().forEach((x,i)=>t+=x*(i%2?1:3));return (10-t%10)%10===ch}
 function onScanCode(code){const p=findCode(code);if(p)addP(p.id);else{const s=$('#scan');if(s){s.value=code;scanKey({key:'Enter',preventDefault(){}})}}}
 function camSt(t){const e=$('#cst');if(e)e.textContent=t}
@@ -2760,7 +2763,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.85';
+const APPV='3.86';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -3389,7 +3392,7 @@ const OZ=[
 'A4 kâğıda etikette makasla kesim çizgileri (✂, açılıp kapatılabilir); 3 cm yüksekliğinde raf etiketi düzenleri (3 × 8 aralıklı, 3 × 9 sıkı)',
 'Etiket yazdır: tüm ürünleri ya da kategori/markadaki ürünleri topluca seç',
 'Etikette uzun ürün adı alt satıra geçer, sığmazsa yazı kendiliğinden küçülür',
-'Barkod okuyucudan gelen karekod / uzun metin yok sayılır (kayıtsız ürün penceresi açılmaz)',
+'Barkod okuyucudan gelen karekod / uzun metin yok sayılır: kırmızı "KAREKOD OKUNDU, ÜRÜN EKLENMEDİ" uyarısı + uzun ses, TAMAM veya Enter ile kapanır',
 'Esc ile sepet silinmeden önce onay sorulur',
 'Fiyatı değişen ürünler etiket listesine kendiliğinden düşer',
 'Etiket boyutu ve adet seçimi']],
