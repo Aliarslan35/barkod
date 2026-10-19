@@ -879,7 +879,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.80 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.81 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1946,14 +1946,14 @@ function pgEtiket2(){const e=e2Init(),q=e.q.toLocaleLowerCase('tr');
  const md=(v,t,s)=>`<button class="e2m ${e.mode===v?'on':''}" onclick="S.e2.mode='${v}';render()"><b>${t}</b><span>${s}</span></button>`;
  const opts=e.mode==='a4'?Object.keys(E2L).map(k=>{const L=E2L[k];return `<button class="chip ${e.lay===k?'on':''}" onclick="S.e2.lay='${k}';render()">${L.c} × ${L.r} (${L.c*L.r}) · ${String(L.h/10).replace('.',',')} cm</button>`}).join('')+`<button class="chip ${D.set.lblCut!==false?'on':''}" title="Makasla keseceğin yerler kesikli çizgiyle basılır" onclick="D.set.lblCut=D.set.lblCut===false;save();render()">✂ Kesim çizgisi ${D.set.lblCut!==false?'açık':'kapalı'}</button>`:Object.keys(E2S).map(k=>`<button class="chip ${e.lsz===k?'on':''}" onclick="S.e2.lsz='${k}';render()">${k.replace('x',' × ')} mm</button>`).join('');
  let pv;
- if(e.mode==='a4'){const sc=.5;pv=r.pages.map(h=>`<div class="e2pv" style="width:${210*MM*sc}px;height:${297*MM*sc}px"><div style="transform:scale(${sc});transform-origin:0 0">${h}</div></div>`).join('')}
+ if(e.mode==='a4'){const sc=.5;pv=r.pages.slice(0,2).map(h=>`<div class="e2pv" style="width:${210*MM*sc}px;height:${297*MM*sc}px"><div style="transform:scale(${sc});transform-origin:0 0">${h}</div></div>`).join('')+(r.pages.length>2?`<span class="muted" style="font-weight:600">+ ${r.pages.length-2} sayfa daha (hepsi yazdırılır)</span>`:'')}
  else{const sc=Math.min(1.6,330/(r.w*MM));pv=r.n?r.pages.slice(0,4).map(h=>`<div class="e2pv e2tag" style="width:${r.w*MM*sc}px;height:${r.h*MM*sc}px;border-radius:8px"><div style="transform:scale(${sc});transform-origin:0 0">${h}</div></div>`).join('')+(r.n>4?`<span class="muted">+ ${r.n-4} etiket daha</span>`:''):'<div class="empty">Soldan ürün seçin.</div>'}
  const pend=lblPendIds();$('#main').innerHTML=head('Etiket yazdır',`${pend.length?`<button class="btn okb" onclick="lblPendSel()">Fiyatı değişenleri seç (${pend.length})</button><button class="btn ghost" onclick="lblPendClr()" title="Listeyi sıfırla">Listeyi sıfırla</button>`:''}<button class="btn" onclick="S.e2.sel={};render()">Temizle</button>`)+`<div class="e2"><div class="card">
  <label class="f">Etikette yazacak market adı<input class="in" value="${esc(lblName())}" placeholder="örn. STAR MARKET" onchange="D.set.lblName=this.value.trim();save();render()"></label><h2>Yazıcı</h2><div class="e2modes">${md('a4','Normal yazıcı (A4)','Bir sayfaya çok etiket')}${md('label','Etiket yazıcısı','Termal, tek tek etiket')}</div>
  <div class="row" style="gap:6px"><span class="muted" style="font-weight:600">${e.mode==='a4'?'Sayfa düzeni:':'Etiket boyutu:'}</span>${opts}</div>
  <input class="in" id="e2q" placeholder="Ürün adı veya barkod ara" value="${esc(e.q)}" oninput="S.e2.q=this.value;clearTimeout(window._e2t);window._e2t=setTimeout(()=>{render();const i=$('#e2q');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}},250)">
  <div class="row" style="gap:6px;flex-wrap:nowrap"><select class="in" onchange="S.e2.cat=this.value;render()"><option value="">Tüm kategoriler</option>${D.cats.map(c=>`<option ${e.cat===c?'selected':''}>${esc(c)}</option>`).join('')}</select><select class="in" onchange="S.e2.br=this.value;render()"><option value="">Tüm markalar</option>${[...new Set(D.products.map(p=>p.brand).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'tr')).map(c=>`<option ${e.br===c?'selected':''}>${esc(c)}</option>`).join('')}</select></div>
- ${e.cat||e.br||e.q?`<div class="row" style="gap:6px"><button class="btn sm" onclick="(window._e2l||[]).forEach(p=>S.e2.sel[p.id]=Math.max(1,S.e2.sel[p.id]||0));render()">Listedekilerin hepsini seç (${list.length})</button><button class="btn sm ghost" onclick="(window._e2l||[]).forEach(p=>delete S.e2.sel[p.id]);render()">Listedekileri kaldır</button></div>`:''}
+ <div class="row" style="gap:6px"><button class="btn sm pri" onclick="(window._e2l||[]).forEach(p=>S.e2.sel[p.id]=Math.max(1,S.e2.sel[p.id]||0));render()">${e.cat||e.br||e.q?'Listedekilerin hepsini seç':'Tüm ürünleri seç'} (${list.length})</button><button class="btn sm ghost" onclick="(window._e2l||[]).forEach(p=>delete S.e2.sel[p.id]);render()">${e.cat||e.br||e.q?'Listedekileri kaldır':'Seçimi kaldır'}</button><span class="muted sp" style="font-weight:600;font-size:.85rem">${Object.values(e.sel).filter(v=>v>0).length} ürün seçili</span></div>
  <div class="e2list">${list.map(p=>{const n=e.sel[p.id]||0;return `<div class="e2row"><button class="e2ck ${n?'on':''}" aria-label="${n?'Seçimi kaldır':'Seç'}: ${esc(p.name)}" onclick="e2Tog(${p.id})">${n?ic('ok',16):''}</button><span class="nm"><b>${esc(p.name)}</b><small class="mono">${esc(p.barcode)}</small></span><span class="pr">${tl(p.price)}</span><div class="e2q"><button class="ib" aria-label="Azalt" onclick="e2Q(${p.id},-1)">${ic('minus',16)}</button><input class="in mono" inputmode="numeric" value="${n||''}" placeholder="0" aria-label="${esc(p.name)} etiket adedi" onchange="e2Set(${p.id},this.value)"><button class="ib" aria-label="Artır" onclick="e2Q(${p.id},1)">${ic('plus',16)}</button></div></div>`}).join('')||'<div class="empty">Ürün bulunamadı.</div>'}</div></div>
  <div class="card"><div class="row"><h2>Önizleme</h2><span class="muted sp" style="font-weight:600">${r.n} etiket${e.mode==='a4'?' · '+r.pages.length+' sayfa':''}</span></div>
  <div class="e2pvw">${pv}</div>
@@ -2744,7 +2744,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.80';
+const APPV='3.81';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
@@ -3371,6 +3371,7 @@ const OZ=[
 ['Etiket',[
 'Raf etiketi yazdırma (EAN barkodlu, fiyatlı, birim fiyatlı, tarihli)',
 'A4 kâğıda etikette makasla kesim çizgileri (✂, açılıp kapatılabilir); 3 cm yüksekliğinde raf etiketi düzeni (3 × 9)',
+'Etiket yazdır: tüm ürünleri ya da kategori/markadaki ürünleri topluca seç',
 'Esc ile sepet silinmeden önce onay sorulur',
 'Fiyatı değişen ürünler etiket listesine kendiliğinden düşer',
 'Etiket boyutu ve adet seçimi']],
