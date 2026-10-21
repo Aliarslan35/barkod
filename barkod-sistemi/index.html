@@ -558,7 +558,7 @@ body.mopen{overflow:hidden}}
 .dd.td{outline:1.5px solid var(--acc)}
 .tdinfo{gap:16px;font-size:.85rem;margin:-4px 0 14px}
 .tdinfo span{display:inline-flex;align-items:center;gap:5px}
-.tdt td{vertical-align:middle}
+.tdt td{vertical-align:middle}.tdt tr.tgrp td{background:color-mix(in srgb,var(--acc) 12%,var(--surf));font-weight:800;color:var(--acc);padding:6px 10px}.tdnx{margin-top:10px;padding:8px 12px;border-radius:10px;background:var(--warnSoft);font-size:.88rem}
 .tdt tr.son td{background:color-mix(in srgb,var(--acc) 7%,var(--surf))}
 .tck{width:20px;height:20px;accent-color:var(--acc);cursor:pointer}
 .pchg{display:inline-block;margin-left:6px;font-size:.7rem;font-weight:700;padding:1px 5px;border-radius:5px}
@@ -879,7 +879,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.87 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.88 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -2211,22 +2211,24 @@ function pgTed(){if(S.tsid&&supById(S.tsid))return pgTedDet();S.tsid=null;
  (unk.length?`<div class="card" style="margin-top:16px"><h2>Mal alışlarında geçen firmalar</h2><p class="muted" style="margin:0 0 8px">Bunların tedarikçi kartı yok. Ekleyebilir ya da aynı firmanın başka yazılışıysa var olan firmayla birleştirebilirsin.</p>${unk.map(u=>`<div class="row" style="padding:8px 0;border-top:1px solid var(--line)"><b style="flex:1">${esc(u.name)}</b><span class="muted">${u.n} alış kaydı</span><button class="btn sm" onclick="supNew(${esc(JSON.stringify(u.name))});save();render()">Tedarikçi olarak ekle</button>${sups.length?`<select class="dt" onchange="if(this.value){supMerge(${esc(JSON.stringify(u.name))},+this.value)}"><option value="">Birleştir…</option>${sups.map(s=>`<option value="${s.id}">${esc(s.name)} ile aynı</option>`).join('')}</select>`:''}</div>`).join('')}</div>`:'')}
 function supMerge(name,sid){const s=supById(sid);if(!s)return;s.alias=s.alias||[];if(!s.alias.some(a=>nrm(a)===nrm(name)))s.alias.push(String(name).trim());save();render();toast(`"${name}" artık ${s.name} sayılıyor`)}
 
-function pgTedDet(){const s=supById(S.tsid);const lp=lastPrices(),sm=soldMap(30);
- if(!S.ts||S.ts.sid!==s.id){S.ts={sid:s.id,cover:14,only:true,q:'',sel:{}};const oo=openOrd(s.id);supProds(s,lp).forEach(p=>{const g=sugOf(p,sm[p.id]||0,14);if(g.low&&g.q>0&&!oo[p.id])S.ts.sel[p.id]={on:true,q:g.q,pk:g.pk}})}
- const t=S.ts,oo=openOrd(s.id),q=nrm(t.q);
- let ps=supProds(s,lp).map(p=>({p,g:sugOf(p,sm[p.id]||0,t.cover),sold:sm[p.id]||0}));
+function pgTedDet(){const s=supById(S.tsid);const lp=lastPrices(),sm=soldMap(30),sm7=soldMap(7),sm14=soldMap(14);
+ if(!S.ts||S.ts.sid!==s.id){S.ts={sid:s.id,cover:14,only:true,q:'',brand:'',sel:{}};const oo=openOrd(s.id);supProds(s,lp).forEach(p=>{const g=sugOf(p,sm[p.id]||0,14);if(g.low&&g.q>0&&!oo[p.id])S.ts.sel[p.id]={on:true,q:g.q,pk:g.pk}})}
+ const t=S.ts,oo=openOrd(s.id),q=nrm(t.q);const nx=tedNext(s);const cov=t.cover||(nx?nx.cover:14);
+ let ps=supProds(s,lp).map(p=>({p,g:sugOf(p,sm[p.id]||0,cov),sold:sm[p.id]||0}));
+ const bl={};ps.forEach(x=>{const b=x.p.brand||'';bl[b]=(bl[b]||0)+1});
  ps.forEach(x=>{if(!t.sel[x.p.id])t.sel[x.p.id]={on:false,q:x.g.q||(x.p.pack>1&&x.p.unit!=='kg'?1:1),pk:x.g.q?x.g.pk:(x.p.pack>1&&x.p.unit!=='kg')}});
- const all=ps.length;if(t.only)ps=ps.filter(x=>x.g.low||t.sel[x.p.id].on);if(q)ps=ps.filter(x=>nrm(x.p.name).includes(q)||nrm(x.p.brand).includes(q)||String(x.p.barcode).includes(q));
- ps.sort((a,b)=>(b.g.low-a.g.low)||(a.g.left-b.g.left)||a.p.name.localeCompare(b.p.name,'tr'));
+ const all=ps.length;if(t.brand!==''&&bl[t.brand]===undefined)t.brand='';if(t.brand)ps=ps.filter(x=>(x.p.brand||'')===t.brand);if(t.only)ps=ps.filter(x=>x.g.low||t.sel[x.p.id].on);if(q)ps=ps.filter(x=>nrm(x.p.name).includes(q)||nrm(x.p.brand).includes(q)||String(x.p.barcode).includes(q));
+ ps.sort((a,b)=>(b.p.price-a.p.price)||(b.g.low-a.g.low)||(a.g.left-b.g.left)||a.p.name.localeCompare(b.p.name,'tr'));
+ let lastPr=null;
  const pr=(p)=>{const m=lp[p.id]||{};const me=m[s.id];const oth=Object.entries(m).filter(([k])=>k!==String(s.id)).map(([,v])=>v).sort((a,b)=>a.cost-b.cost);
   const meH=me?`<b>${tl(me.cost)}</b>${p.pack>1&&p.unit!=='kg'?`<small class="muted"> · koli ${tl(me.cost*p.pack)}</small>`:''}${me.prev!=null&&me.prev!==me.cost?`<span class="pchg ${me.cost>me.prev?'up':'dn'}" title="Önceki fiyat">${me.cost>me.prev?'▲':'▼'} ${tl(me.prev)}</span>`:''}<div class="muted" style="font-size:.72rem">${fdd(me.date)}</div>`:`<span class="muted">Bu firmadan alınmadı</span>`;
   const oH=oth.length?oth.slice(0,3).map(o=>`<div class="oth ${me&&o.cost<me.cost?'ch':''}">${esc(o.name)} <b>${tl(o.cost)}</b> <span class="muted">${fdd(o.date)}</span>${me&&o.cost<me.cost?' <i>daha ucuz</i>':''}</div>`).join(''):'<span class="muted">—</span>';
   return [meH,oH]};
- const rows=ps.map(({p,g,sold})=>{const sl=t.sel[p.id];const [meH,oH]=pr(p);const lf=g.left>=999?'∞':Math.floor(g.left);const pkOk=p.pack>1&&p.unit!=='kg';
-  return `<tr class="${sl.on?'son':''}" id="tr${p.id}"><td class="tdck"><input type="checkbox" class="tck" ${sl.on?'checked':''} onchange="tedTog(${p.id},this.checked)" aria-label="Seç"></td>
-  <td class="tdnm"><div class="row" style="flex-wrap:nowrap;gap:10px">${pimg(p,36)}<div style="min-width:0"><b>${esc(p.name)}</b>${oo[p.id]?' <span class="tag t-Kart">Siparişte</span>':''}<div class="muted" style="font-size:.72rem">${esc(p.brand||'Markasız')}${pkOk?' · koli '+p.pack:''}</div></div></div></td>
+ const rows=ps.map(({p,g,sold})=>{const sl=t.sel[p.id];const [meH,oH]=pr(p);const lf=g.left>=999?'∞':Math.floor(g.left);const pkOk=p.unit!=='kg';const gh=(p.price!==lastPr)?(lastPr=p.price,`<tr class="tgrp"><td colspan="10">${tl(p.price)} grubu</td></tr>`):'';
+  return gh+`<tr class="${sl.on?'son':''}" id="tr${p.id}"><td class="tdck"><input type="checkbox" class="tck" ${sl.on?'checked':''} onchange="tedTog(${p.id},this.checked)" aria-label="Seç"></td>
+  <td class="tdnm"><div class="row" style="flex-wrap:nowrap;gap:10px">${pimg(p,36)}<div style="min-width:0"><b>${esc(p.name)}</b>${oo[p.id]?' <span class="tag t-Kart">Siparişte</span>':''}<div class="muted" style="font-size:.72rem">${esc(p.brand||'Markasız')}${p.pack>1&&p.unit!=='kg'?' · koli '+p.pack:''}</div></div></div></td>
   <td class="r" data-l="Stok"><span class="tag ${p.stock<=0?'t-iade':g.low?'t-Veresiye':'t-Nakit'}">${p.stock<=0?'Bitti':qf(p.stock,p.unit)}</span></td>
-  <td class="r" data-l="30 gün satış">${qf(Math.round(sold*100)/100,p.unit)}<div class="muted" style="font-size:.72rem">günde ${String(Math.round(sold/30*10)/10).replace('.',',')}</div></td>
+  <td class="r" data-l="7 gün">${qf(Math.round((sm7[p.id]||0)*100)/100,p.unit)}</td><td class="r" data-l="14 gün">${qf(Math.round((sm14[p.id]||0)*100)/100,p.unit)}</td><td class="r" data-l="30 gün">${qf(Math.round(sold*100)/100,p.unit)}<div class="muted" style="font-size:.72rem">günde ${String(Math.round(sold/30*10)/10).replace('.',',')}</div></td>
   <td class="r" data-l="Yeter"><b style="color:${g.left<7?'var(--badTx)':g.left<t.cover?'var(--warnTx)':'var(--tx2)'}">${lf}</b> <span class="muted">gün</span></td>
   <td class="r" data-l="Son alış (bu firma)">${meH}</td><td class="othc" data-l="Diğer firmalar">${oH}</td>
   <td class="r tdq" data-l="Sipariş"><div class="row" style="flex-wrap:nowrap;gap:6px;justify-content:flex-end"><input class="in sm2" inputmode="decimal" value="${String(sl.q).replace('.',',')}" oninput="tedQ(${p.id},this.value)">${pkOk?`<div class="seg"><button class="${sl.pk?'':'on'}" onclick="tedPk(${p.id},false)">Adet</button><button class="${sl.pk?'on':''}" onclick="tedPk(${p.id},true)">Koli</button></div>`:`<span class="muted">${p.unit==='kg'?'kg':'adet'}</span>`}</div></td></tr>`}).join('');
@@ -2234,23 +2236,27 @@ function pgTedDet(){const s=supById(S.tsid);const lp=lastPrices(),sm=soldMap(30)
  $('#main').innerHTML=`<div class="row" style="gap:10px;margin-bottom:6px"><button class="btn sm" onclick="S.tsid=null;render()">← Tedarikçiler</button></div>`+
  head(esc(s.name),`<button class="btn" onclick="supForm(${s.id})">Düzenle</button>${s.phone?`<button class="btn" onclick="waOpen(${esc(JSON.stringify(s.phone))})">WhatsApp</button>`:''}<button class="btn" onclick="S.af=afNew();S.af.sup=${esc(JSON.stringify(s.name))};S.af.ret=true;nav('alisF')">İade</button><button class="btn pri" onclick="S.af=afNew();S.af.sup=${esc(JSON.stringify(s.name))};nav('alisF')">+ Mal alışı gir</button>`)+
  `<div class="row muted tdinfo">${s.rep?`<span>${ic('user',16)} ${esc(s.rep)}</span>`:''}${s.phone?`<span>${esc(s.phone)}</span>`:'<span>Telefon yok, WhatsApp için Düzenle\'den ekle</span>'}<span>${(s.days||[]).length?'Gelir: '+s.days.map(i=>GUN[i]).join(', '):'Geliş günü yok'}</span>${(s.brands||[]).length?`<span>Markalar: ${s.brands.map(esc).join(', ')}</span>`:''}</div>`+supBorcCard(s)+
- `<div class="card"><div class="row" style="gap:10px"><div class="seg"><button class="${t.only?'on':''}" onclick="S.ts.only=true;render()">Azalanlar</button><button class="${t.only?'':'on'}" onclick="S.ts.only=false;render()">Tümü (${all})</button></div>
- <label class="chip" style="gap:6px;min-height:40px">Kaç günlük?<select class="dt" onchange="tedCover(+this.value)">${[[7,'1 hafta'],[14,'2 hafta'],[30,'1 ay']].map(([v,l])=>`<option value="${v}" ${v===t.cover?'selected':''}>${l}</option>`).join('')}</select></label>
+ `<div class="card">${Object.keys(bl).length>1?`<div class="row" style="gap:6px;margin-bottom:10px"><button class="chip ${t.brand===''?'on':''}" onclick="S.ts.brand='';render()">Tüm markalar</button>${Object.keys(bl).sort((a,b)=>a.localeCompare(b,'tr')).map(b=>`<button class="chip ${t.brand===b&&b!==''?'on':''}" onclick="S.ts.brand=${esc(JSON.stringify(b))};render()">${esc(b||'Markasız')} <small>${bl[b]}</small></button>`).join('')}</div>`:''}<div class="row" style="gap:10px"><div class="seg"><button class="${t.only?'on':''}" onclick="S.ts.only=true;render()">Azalanlar</button><button class="${t.only?'':'on'}" onclick="S.ts.only=false;render()">Tümü (${all})</button></div>
+ <label class="chip" style="gap:6px;min-height:40px">Kaç günlük?<select class="dt" onchange="tedCover(+this.value)">${[[7,'1 hafta'],[14,'2 hafta'],[30,'1 ay'],...(nx?[[0,'Sonraki gelişe göre']]:[])].map(([v,l])=>`<option value="${v}" ${v===t.cover?'selected':''}>${l}</option>`).join('')}</select></label>
  <input class="in" id="tdq" style="max-width:260px" placeholder="Ürün ara" value="${esc(t.q)}" oninput="S.ts.q=this.value;clearTimeout(window._tq);window._tq=setTimeout(()=>{render();const i=$('#tdq');if(i){i.focus();i.setSelectionRange(99,99)}},300)"></div>
- <div class="tw" style="margin-top:12px"><table class="tbl tdt"><thead><tr><th></th><th>Ürün</th><th class="r">Stok</th><th class="r">30 gün satış</th><th class="r">Yeter</th><th class="r">Son alış (bu firma)</th><th>Diğer firmalar</th><th class="r">Sipariş</th></tr></thead><tbody>${rows||`<tr><td colspan="8" class="empty">${all?'Azalan ürün yok. Hepsini görmek için "Tümü"ye bas.':'Bu firmaya bağlı ürün yok. Düzenle\'den markalarını seç ya da bu firmadan mal alışı gir.'}</td></tr>`}</tbody></table></div></div>`+
+ ${t.cover===0&&nx?`<div class="tdnx">Sonraki geliş: <b>${nx.name}</b> (${nx.d1} gün sonra). Bir sonrakine kadar <b>${nx.cover} günlük</b> hesaplandı.</div>`:''}<div class="tw" style="margin-top:12px"><table class="tbl tdt"><thead><tr><th></th><th>Ürün</th><th class="r">Stok</th><th class="r">7 gün</th><th class="r">14 gün</th><th class="r">30 gün</th><th class="r">Yeter</th><th class="r">Son alış (bu firma)</th><th>Diğer firmalar</th><th class="r">Sipariş</th></tr></thead><tbody>${rows||`<tr><td colspan="10" class="empty">${all?'Azalan ürün yok. Hepsini görmek için "Tümü"ye bas.':'Bu firmaya bağlı ürün yok. Düzenle\'den markalarını seç ya da bu firmadan mal alışı gir.'}</td></tr>`}</tbody></table></div></div>`+
  `<div class="tdbar" id="tdbar"></div>`+
  (ords.length?`<div class="card" style="margin-top:16px"><h2>Verilen siparişler</h2>${ords.map(o=>`<div class="row" style="padding:8px 0;border-top:1px solid var(--line)"><span class="tag ${o.st==='Geldi'?'t-Nakit':'t-Veresiye'}">${o.st==='Geldi'?'Geldi':'Bekleniyor'}</span><b>${fdt(o.date)}</b>${o.dt?`<span class="muted">Teslim ${fdd(o.dt+'T12:00')}</span>`:''}<span class="muted" style="flex:1">${o.lines.length} kalem: ${esc(o.lines.slice(0,3).map(l=>(P(l.pid)||{}).name||'?').join(', '))}${o.lines.length>3?'…':''}</span>${o.st!=='Geldi'?`<button class="btn sm pri" onclick="ordGeldi(${o.id})">Geldi, mal alışına aktar</button>`:''}<button class="btn sm" onclick="ordSend(${o.id})">WhatsApp</button><button class="ib ghost" aria-label="Siparişi sil" onclick="ask('Bu sipariş silinsin mi?',()=>{D.set.sord=SORD().filter(x=>x.id!==${o.id});save();render()})">${ic('trash',18)}</button></div>`).join('')}</div>`:'');
  tedBar()}
 function tedTog(id,on){S.ts.sel[id].on=on;if(on&&!(S.ts.sel[id].q>0))S.ts.sel[id].q=1;const r=$('#tr'+id);if(r)r.classList.toggle('son',on);tedBar()}
 function tedQ(id,v){const n=parseFloat(String(v).replace(',','.'))||0;const sl=S.ts.sel[id];sl.q=n;if(n>0&&!sl.on){sl.on=true;const r=$('#tr'+id);if(r){r.classList.add('son');r.querySelector('.tck').checked=true}}tedBar()}
-function tedPk(id,pk){S.ts.sel[id].pk=pk;render()}
-function tedCover(c){S.ts.cover=c;const s=supById(S.ts.sid),lp=lastPrices(),sm=soldMap(30),oo=openOrd(s.id);supProds(s,lp).forEach(p=>{const g=sugOf(p,sm[p.id]||0,c);const sl=S.ts.sel[p.id];if(g.q>0)S.ts.sel[p.id]={on:sl?sl.on||(g.low&&!oo[p.id]):(g.low&&!oo[p.id]),q:g.q,pk:g.pk}});render()}
-function tedLines(){const t=S.ts;return Object.entries(t.sel).filter(([id,l])=>l.on&&l.q>0&&P(+id)).map(([id,l])=>({pid:+id,q:l.q,pk:!!l.pk}))}
+function tedNext(s){const ds=(s.days||[]).map(Number).filter(n=>n>=0&&n<=6);if(!ds.length)return null;const t0=(new Date().getDay()+6)%7;const v=[];for(let d=1;d<=14&&v.length<2;d++){if(ds.includes((t0+d)%7))v.push(d)}if(v.length<2)return null;return {d1:v[0],cover:v[1],name:GUN[(t0+v[0])%7]}}
+function tedPk(id,pk){const p=P(id);if(pk&&!(p.pack>1)){modal(mHead('Kolide kaç adet var?')+`<p class="muted" style="margin:0 0 8px">${esc(p.name)}</p><input class="in" id="kpk" inputmode="numeric" autofocus placeholder="Örn: 24" onkeydown="if(event.key==='Enter')tedPkOk(${id})"><div class="row"><button class="btn" onclick="closeM()">Vazgeç</button><button class="btn pri" onclick="tedPkOk(${id})">Tamam</button></div>`);return}S.ts.sel[id].pk=pk;render()}
+function tedPkOk(id){const n=Math.round(num2($('#kpk').value));if(!(n>1)){toast('1\'den büyük bir sayı yaz');return}P(id).pack=n;save();closeM();S.ts.sel[id].pk=true;render()}
+function tedCover(c){S.ts.cover=c;const s=supById(S.ts.sid),lp=lastPrices(),sm=soldMap(30),oo=openOrd(s.id);const nx0=tedNext(s);const cv=c||(nx0?nx0.cover:14);supProds(s,lp).forEach(p=>{const g=sugOf(p,sm[p.id]||0,cv);const sl=S.ts.sel[p.id];if(g.q>0)S.ts.sel[p.id]={on:sl?sl.on||(g.low&&!oo[p.id]):(g.low&&!oo[p.id]),q:g.q,pk:g.pk}});render()}
+function tedLines(){const t=S.ts;return Object.entries(t.sel).filter(([id,l])=>l.on&&l.q>0&&P(+id)).map(([id,l])=>({pid:+id,q:l.q,pk:!!l.pk&&P(+id).pack>1}))}
 function tedBar(){const b=$('#tdbar');if(!b)return;const ls=tedLines();const lp=lastPrices();const s=supById(S.ts.sid);
  const tot=ls.reduce((a,l)=>{const p=P(l.pid);const m=lp[l.pid]||{};const c=(m[s.id]||{}).cost||p.cost||0;return a+c*l.q*(l.pk?p.pack:1)},0);
  b.innerHTML=ls.length?`<span><b>${ls.length}</b> ürün seçili · tahmini <b>${tl(tot)}</b></span><span class="sp row" style="gap:8px"><label class="chip" style="gap:6px;min-height:40px">Teslim tarihi<input type="date" class="dt" min="${ymd(new Date())}" value="${S.ts.dt||''}" onchange="S.ts.dt=this.value"></label><button class="btn" onclick="tedSave(false)">Siparişi kaydet</button><button class="btn okb" onclick="tedSave(true)">WhatsApp'tan gönder</button></span>`:`<span class="muted">Sipariş vermek istediğin ürünleri işaretle.</span>`;b.classList.toggle('on',!!ls.length)}
-function ordText(s,o){const ls=o.lines.map(l=>{const p=P(l.pid);return p?`• ${p.name}: ${qtxt(p,l.q,l.pk)}`:''}).filter(Boolean);
- return `Merhaba${s.rep?' '+s.rep:''},\n${D.set.market} sipariş listesi (${new Date(o.date).toLocaleDateString('tr-TR')}):${o.dt?'\nTeslim tarihi: '+new Date(o.dt+'T12:00').toLocaleDateString('tr-TR',{day:'numeric',month:'long',weekday:'long'}):''}\n\n${ls.join('\n')}\n\nToplam ${ls.length} kalem. Teşekkürler.`}
+function gramOf(n){const m=String(n||'').match(/(\d+(?:[.,]\d+)?)\s*(KG|GR|G|ML|LT|CL|L)(?![A-Za-zÇĞİÖŞÜçğıöşü])/i);if(!m)return null;const u=m[2].toUpperCase();return {t:(/ML|LT|CL|^L$/.test(u)?'Hacim':'Gramaj'),v:m[1]+' '+u}}
+function ordText(s,o){const gr=o.lines.map(l=>({l,p:P(l.pid)})).filter(x=>x.p).sort((a,b)=>(b.p.price-a.p.price)||a.p.name.localeCompare(b.p.name,'tr'));const out=[];let last=null;
+ gr.forEach(({l,p})=>{if(last!==null&&p.price!==last)out.push('━━━━━━━━━━','');last=p.price;const g=gramOf(p.name);out.push('• *'+p.name+'*');const bl=[p.barcode?'Barkod: '+p.barcode:'',g?g.t+': '+g.v:''].filter(Boolean).join(' · ');if(bl)out.push('  '+bl);out.push('  Sipariş: '+qtxt(p,l.q,l.pk&&p.pack>1),'')});
+ return `Merhaba${s.rep?' '+s.rep:''},\n${D.set.market} sipariş listesi (${new Date(o.date).toLocaleDateString('tr-TR')}):${o.dt?'\nTeslim tarihi: '+new Date(o.dt+'T12:00').toLocaleDateString('tr-TR',{day:'numeric',month:'long',weekday:'long'}):''}\n\n${out.join('\n')}\nToplam ${gr.length} kalem. Teşekkürler.`}
 function tedSave(send){const s=supById(S.ts.sid);const ls=tedLines();if(!ls.length){toast('Önce ürün seç');return}
  const o={id:nid(),sid:s.id,date:new Date().toISOString(),lines:ls,st:'Bekliyor',dt:S.ts.dt||''};SORD().push(o);if(D.set.sord.length>150)D.set.sord=D.set.sord.slice(-150);save();
  if(send){if(!s.phone)toast('Telefon kayıtlı değil, WhatsApp kişi seçerek açılacak');waOpen(s.phone,ordText(s,o))}
@@ -2689,11 +2695,59 @@ function stmPages(c,per){const {rows,open}=stmRange(c,per);const R=[];
    x.strokeStyle=RED;x.lineWidth=3.5;x.beginPath();x.ellipse(W-90-tw/2,yy-24,tw/2+42,54,-0.04,0.35,Math.PI*2+0.2);x.stroke()}
   return cv})}
 function stmCanvas(c,per){return stmPages(c,per)[0]}
+
+/* ---------- hesap özeti PDF (v3.88): fiş görünümlü, iki sütun, küçük yazı ---------- */
+function stmPdfName(l){if(l.unreg&&l.bc){const real=l.name&&l.name!=='Kayıtsız ürün';return real?l.name+' ('+l.bc+')':l.bc+' (kayıtsız ürün)'}return l.name}
+function stmPdfBoxes(c,per){const {rows,open}=stmRange(c,per);const B=[];let n=0,tb=0,tp=0;
+ rows.forEach(r=>{const m=r.m,s=r.s,dd=new Date(m.date);const dt=dd.toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric'})+' · '+dd.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+  if(m.a<0){tp+=-m.a;B.push({k:'pay',title:dt,label:m.t==='Tahsilat'?'Ödeme'+(m.how?' ('+m.how+')':''):(m.t||'İade'),amt:m.a,rows:[]});return}
+  tb+=m.a;const R=[];if(s){s.items.forEach(l=>R.push({n:stmPdfName(l),q:l.unit==='kg'?String(Math.round(l.qty*1000)/1000).replace('.',',')+' kg':String(l.qty),p:stmM(l.price),t:stmM(lineT(l))}));if(s.disc)R.push({n:'İndirim',q:'',p:'',t:'−'+stmM(s.disc)})}
+  B.push({k:'buy',title:dt,label:s&&s.ret?'İade':'Alışveriş '+(++n),amt:m.a,rows:R})});
+ return {B,open,tb,tp}}
+function stmPdfPages(c,per){const {B,open,tb,tp}=stmPdfBoxes(c,per);const W=1240,H=1754,M=44,G=26,CW=(W-2*M-G)/2,FN='"Plus Jakarta Sans",Arial,sans-serif',INK='#14181F',GR='#157347',MU='#5A6578';
+ const pages=[];let cv,x,col,y,ends=[0,0];const top=()=>pages.length===1?190:110,bot=H-M-40;
+ const newCol=()=>{if(col===0){ends[0]=y;col=1;y=top();return}ends=[0,0];cv=document.createElement('canvas');cv.width=W;cv.height=H;x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,W,H);pages.push(cv);col=0;y=top();
+  x.textBaseline='alphabetic';if(pages.length===1){x.fillStyle=INK;x.font=`800 46px ${FN}`;x.textAlign='left';x.fillText(D.set.market||'',M,M+40);x.font=`800 30px ${FN}`;x.textAlign='right';x.fillText('HESAP ÖZETİ',W-M,M+30);x.font=`500 22px ${FN}`;x.fillStyle=MU;x.fillText(new Date().toLocaleDateString('tr-TR')+' itibarıyla',W-M,M+60);
+   x.fillStyle=INK;x.textAlign='left';x.font=`800 32px ${FN}`;x.fillText(c.name,M,M+100);if(c.phone){x.font=`500 22px ${FN}`;x.fillStyle=MU;x.fillText(c.phone,M+x.measureText(c.name).width*1.45+20,M+100)}x.strokeStyle=INK;x.lineWidth=3;x.beginPath();x.moveTo(M,M+118);x.lineTo(W-M,M+118);x.stroke()}
+  else{x.fillStyle=MU;x.font=`700 24px ${FN}`;x.textAlign='left';x.fillText((D.set.market||'')+' · '+c.name+' · hesap özeti',M,M+34)}};
+ const X0=()=>M+col*(CW+G);
+ const RH=34,HH=48,CH=30;
+ const rr=(a,b,w,h,r,col2,lw)=>{x.beginPath();x.roundRect?x.roundRect(a,b,w,h,r):x.rect(a,b,w,h);x.strokeStyle=col2;x.lineWidth=lw;x.stroke()};
+ newCol();
+ if(open>0){const h=56;if(y+h>bot)newCol();x.fillStyle=INK;x.textAlign='left';x.font=`700 24px ${FN}`;x.fillText('Önceki borç',X0()+12,y+36);x.textAlign='right';x.fillText('₺'+stmM(open),X0()+CW-12,y+36);y+=h+8}
+ B.forEach(b=>{if(b.k==='pay'){const h=HH+12;if(y+h>bot)newCol();const a=X0();rr(a,y,CW,h,18,GR,2.5);x.fillStyle=GR;x.textAlign='left';x.font=`700 22px ${FN}`;x.fillText(b.title,a+14,y+h/2+8);x.textAlign='right';x.font=`800 22px ${FN}`;x.fillText(b.label+'   −₺'+stmM(-b.amt),a+CW-14,y+h/2+8);y+=h+14;return}
+  let i=0;const rows=b.rows;let first=true;
+  while(true){const avail=bot-y;const full=HH+(rows.length?CH:0)+(rows.length-i)*RH+46;let nrow;let cont=false;
+   if(full<=avail){nrow=rows.length-i}else{nrow=Math.floor((avail-HH-CH-20)/RH);if(nrow<2||(i===0&&nrow<1)){newCol();continue}nrow=Math.min(nrow,rows.length-i);cont=true}
+   const h=HH+(rows.length?CH:0)+nrow*RH+(cont?24:46);const a=X0();rr(a,y,CW,h,22,INK,2.5);
+   x.fillStyle=INK;x.textAlign='left';x.font=`700 22px ${FN}`;x.fillText(b.title,a+14,y+32);x.textAlign='right';x.font=`800 22px ${FN}`;x.fillText(b.label+(first?'':' (devam)'),a+CW-14,y+32);
+   let yy=y+HH;if(rows.length){x.fillStyle=MU;x.font=`600 17px ${FN}`;x.textAlign='left';x.fillText('Ürün',a+14,yy+18);x.textAlign='right';x.fillText('Adet',a+CW-250,yy+18);x.fillText('Fiyat',a+CW-140,yy+18);x.fillText('Tutar',a+CW-14,yy+18);yy+=CH}
+   for(let k=0;k<nrow;k++){const r=rows[i+k];x.fillStyle=INK;x.font=`500 20px ${FN}`;x.textAlign='left';x.fillText(r.n,a+14,yy+23,CW-300);x.textAlign='right';x.fillText(r.q,a+CW-250,yy+23);x.fillText(r.p,a+CW-140,yy+23);x.font=`700 20px ${FN}`;x.fillText(r.t,a+CW-14,yy+23);yy+=RH}
+   i+=nrow;if(cont){x.fillStyle=MU;x.font=`600 18px ${FN}`;x.textAlign='right';x.fillText('devamı →',a+CW-14,yy+16);y+=h+14;first=false;newCol();continue}
+   x.strokeStyle='#999';x.lineWidth=1.5;x.setLineDash([6,5]);x.beginPath();x.moveTo(a+14,yy+6);x.lineTo(a+CW-14,yy+6);x.stroke();x.setLineDash([]);x.fillStyle=INK;x.textAlign='right';x.font=`800 24px ${FN}`;x.fillText((b.label==='İade'?'İade toplamı: ':'Alışveriş toplamı: ')+'₺'+stmM(b.amt),a+CW-14,yy+36);y+=h+14;break}});
+ {const h=150,w=W-2*M;ends[col]=y;let ty=Math.max(ends[0],ends[1])+6;if(ty+h>H-M-30){col=1;newCol();ty=top()}
+  rr(M,ty,w,h,26,INK,4);x.fillStyle=INK;x.textAlign='left';x.font=`600 26px ${FN}`;x.fillText('Toplam alışveriş: ₺'+stmM(tb),M+24,ty+52);x.fillText('Ödenen / iade: −₺'+stmM(tp),M+24,ty+96);x.textAlign='right';x.font=`700 24px ${FN}`;x.fillStyle=MU;x.fillText('KALAN BORÇ',M+w-24,ty+44);x.fillStyle='#A61E1E';x.font=`800 56px ${FN}`;x.fillText('₺'+stmM(Math.max(0,bal(c))),M+w-24,ty+104)}
+ pages.forEach((p,i)=>{const g=p.getContext('2d');g.fillStyle=MU;g.font=`500 18px ${FN}`;g.textAlign='center';g.fillText('Bilgi amaçlıdır, mali değeri yoktur · Sayfa '+(i+1)+'/'+pages.length,W/2,H-24)});
+ return pages}
+function pdfBuild(cvs){const enc=new TextEncoder(),parts=[],offs=[];let len=0;const push=b=>{if(typeof b==='string')b=enc.encode(b);parts.push(b);len+=b.length};
+ const N=cvs.length,tot=2+N*3;push('%PDF-1.4\n');const obj=(n,fn)=>{offs[n]=len;push(n+' 0 obj\n');fn();push('\nendobj\n')};
+ obj(1,()=>push('<</Type/Catalog/Pages 2 0 R>>'));obj(2,()=>push('<</Type/Pages/Count '+N+'/Kids['+cvs.map((_,i)=>(3+i*3)+' 0 R').join(' ')+']>>'));
+ cvs.forEach((cv,i)=>{const pg=3+i*3,im=pg+1,ct=pg+2;const b64=cv.toDataURL('image/jpeg',.9).split(',')[1];const bin=atob(b64);const jb=new Uint8Array(bin.length);for(let k=0;k<bin.length;k++)jb[k]=bin.charCodeAt(k);
+  obj(pg,()=>push(`<</Type/Page/Parent 2 0 R/MediaBox[0 0 595 842]/Resources<</XObject<</I${i} ${im} 0 R>>>>/Contents ${ct} 0 R>>`));
+  obj(im,()=>{push(`<</Type/XObject/Subtype/Image/Width ${cv.width}/Height ${cv.height}/ColorSpace/DeviceRGB/BitsPerComponent 8/Filter/DCTDecode/Length ${jb.length}>>\nstream\n`);push(jb);push('\nendstream')});
+  obj(ct,()=>{const t=`q 595 0 0 842 0 0 cm /I${i} Do Q`;push(`<</Length ${t.length}>>\nstream\n${t}\nendstream`)})});
+ const xr=len;push(`xref\n0 ${tot+1}\n0000000000 65535 f \n`);for(let n=1;n<=tot;n++)push(String(offs[n]).padStart(10,'0')+' 00000 n \n');push(`trailer\n<</Size ${tot+1}/Root 1 0 R>>\nstartxref\n${xr}\n%%EOF`);
+ return new Blob(parts,{type:'application/pdf'})}
+async function stmPdf(id){const c=D.customers.find(x=>x.id===id);if(!c)return;toast('PDF hazırlanıyor…');await new Promise(r=>setTimeout(r,50));
+ try{const cvs=stmPdfPages(c,S.stmPer||'acik');const bl=pdfBuild(cvs);const f=new File([bl],'hesap-ozeti-'+String(c.name).toLocaleLowerCase('tr').replace(/[^a-z0-9çğıöşü]+/g,'-')+'.pdf',{type:'application/pdf'});
+  if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:'Hesap özeti · '+c.name})}catch(e){}}
+  else{const a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download=f.name;document.body.appendChild(a);a.click();a.remove();toast("PDF indirildi, WhatsApp'ta dosya olarak ekle")}}
+ catch(e){toast('PDF hazırlanamadı')}}
 function waStatement(id){S.stmPer=S.stmPer||'acik';stmDraw(id)}
 async function stmDraw(id){const c=D.customers.find(x=>x.id===id);const per=S.stmPer;const {rows}=stmRange(c,per);window._stmId=id;window._stmBlobs=null;
  modal(mHead('Hesap dökümü · '+esc(c.name))+`${seg([['acik','Açık hesap'],['ay','Bu ay'],['tum','Tümü']],per,'stmPerSet')}<p class="muted" style="margin:0;font-size:.82rem">${per==='acik'?'Borcun en son sıfırlandığı günden bu yana':per==='ay'?'Bu ayın başından bu yana':'Bütün hareketler'} · ${rows.length} hareket</p>
  <div class="stmpv" id="stmpv"><p class="muted">Resim hazırlanıyor…</p></div>
- <div class="wabtns"><button class="btn wab" id="stmgo" onclick="stmShare(${id})">${ic('wa',18)} Resim olarak gönder</button><button class="btn wab" style="background:#fff;color:#178F46" onclick="waOpen(${esc(JSON.stringify(c.phone||''))},stmText(D.customers.find(x=>x.id===${id}),S.stmPer))">${ic('wa',18)} Yazı olarak gönder</button></div>
+ <div class="wabtns"><button class="btn wab" onclick="stmPdf(${id})">${ic('wa',18)} PDF olarak gönder</button><button class="btn wab" id="stmgo" onclick="stmShare(${id})">${ic('wa',18)} Resim olarak gönder</button><button class="btn wab" style="background:#fff;color:#178F46" onclick="waOpen(${esc(JSON.stringify(c.phone||''))},stmText(D.customers.find(x=>x.id===${id}),S.stmPer))">${ic('wa',18)} Yazı olarak gönder</button></div>
  <details class="sdet"><summary class="muted" style="font-size:.85rem">Yazı halini gör</summary><pre class="wapre">${esc(stmText(c,per))}</pre></details>`,true);
  await stmFont();if(window._stmId!==id||S.stmPer!==per)return;const cvs=stmPages(c,per);const pv=$('#stmpv');if(!pv)return;
  pv.innerHTML=cvs.map((cv,i)=>`<img src="${cv.toDataURL('image/png')}" alt="Hesap dökümü ${i+1}">`).join('');
@@ -2763,7 +2817,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.87';
+const APPV='3.88';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
