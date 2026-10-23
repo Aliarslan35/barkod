@@ -880,7 +880,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.95 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.96 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1177,8 +1177,7 @@ function renderSatis(){
  <div class="who">${esc(S.user.isim||S.user.name)}<br><small id="clk"></small></div></header>
  <div class="pos ${lsGet('npOn')==='1'?'npmode ':''}${S.lv?'lvon':(isHid('quick')?'noquick':'')} ${!S.lv&&qoff?'qoff':''}" id="pos">
  <section class="card quick"${HA('quick')}>${S.lv?lvHTML():`<button class="qopen" onclick="qTog(false)" aria-label="Hızlı ürünleri aç">${ic('grid',20)}<span>${esc(Tp('quick_title','Hızlı ürünler'))}</span></button>
- <div class="qside">${D.set.qAuto===false?`<button class="qh qhb qvt" onclick="qTog(true)" title="Hızlı ürünleri kapat" aria-label="Hızlı ürünleri kapat"><span class="qhc">${ic('chl',14)}</span><span class="qvx">${T('quick_title','Hızlı ürünler')}</span></button>`:`<div class="qvt qvl"><span class="qvx">${T('quick_title','Hızlı ürünler')}</span></div>`}${isY()?`<button class="qed" title="Hızlı ürünleri düzenle" aria-label="Hızlı ürünleri düzenle" onclick="nav('urun',{uTab:'urun',uf:'Hızlı'})">${ic('edit',16)}</button>`:''}</div>
- <div class="qmain"><div class="qrow">${cats.map(c=>`<button class="chip ${S.qcat===c?'on':''}" onclick="S.qcat='${esc(c)}';renderSatis()">${esc(c)}</button>`).join('')}</div>
+ <div class="qmain"><div class="qrow">${isY()?`<button class="qed" title="Hızlı ürünleri düzenle" aria-label="Hızlı ürünleri düzenle" onclick="nav('urun',{uTab:'urun',uf:'Hızlı'})">${ic('edit',16)}</button>`:''}${D.set.qAuto===false?`<button class="qed" title="Hızlı ürünleri kapat" aria-label="Hızlı ürünleri kapat" onclick="qTog(true)">${ic('chl',16)}</button>`:''}${cats.map(c=>`<button class="chip ${S.qcat===c?'on':''}" onclick="S.qcat='${esc(c)}';renderSatis()">${esc(c)}</button>`).join('')}</div>
  <div class="qgrid">${D.products.filter(p=>p.quick&&(S.qcat==='Tümü'||p.cat===S.qcat)).sort(qSort).map(p=>`<button class="qp2 ${p.img?'im':''} ${p.stock<=0?'out':''}" style="--qc:${qcol(p.cat)}" onclick="addP(${p.id})" title="${esc(p.name)}">${p.img?`<img src="${esc(p.img)}" alt="" loading="lazy" onerror="this.parentNode.classList.remove('im');this.remove()">`:`<span class="qi">${esc((p.name.trim()[0]||'?').toLocaleUpperCase('tr'))}</span>`}<span class="qpr">${tl(p.price)}${p.unit==='kg'?'<small>/kg</small>':''}</span>${p.stock<=0?'<span class="qx">Stok yok</span>':''}<b class="qn">${esc(p.name)}</b></button>`).join('')||'<div class="muted">Bu kategoride hızlı ürün yok.</div>'}</div></div>`}</section>
  <section class="card cart" id="cartBox"></section>
  <section class="pay" id="payBox"></section></div>
@@ -2823,7 +2822,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.95';
+const APPV='3.96';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
