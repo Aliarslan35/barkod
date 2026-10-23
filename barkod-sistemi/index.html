@@ -880,7 +880,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.96 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.97 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1275,7 +1275,7 @@ function findCode(v){v=String(v||'').trim();return D.products.find(p=>p.barcode=
 function matches(v){v=v.toLocaleLowerCase('tr');return D.products.filter(p=>p.name.toLocaleLowerCase('tr').includes(v)||p.barcode.includes(v)).slice(0,7)}
 function parseScan(raw){const m=raw.match(/^(\d+(?:[.,]\d+)?)\*(.*)$/);return m?{q:num2(m[1]),v:m[2].trim()}:{q:null,v:raw.trim()}}
 function npTyped(live){const e=$('#scan');if(!e)return false;{const r=e.value.match(/^\s*(\d+(?:[.,]\d{1,2})?)\s*\+$/);if(r&&C().items.length){C().rec=r[1];e.value='';const g=$('#sg');if(g)g.innerHTML='';drawCart();const ri=$('#rec');if(ri)ri.value=r[1];upCh();const t=cartTot(C()),ch=num(r[1])-t.total;toast(ch>=0?'Para üstü: '+tl(ch)+' — Nakit için F8':'Eksik: '+tl(-ch));return true}}const m=e.value.match(live?/^\s*(\d{1,3})\s*[×*]$/:/^\s*(\d{1,3})\s*[xX×*]\s*$/);if(!m||!(+m[1]>1))return false;S.npq=+m[1];e.value='';const g=$('#sg');if(g)g.innerHTML='';npUp();return true}
-function sugg(){{const sc=$('#scan'),v=sc&&sc.value;if(v==='+'||v==='-'||v==='−'){sc.value='';if(!(Date.now()-(window._pmT||0)<400))pmApply(v==='+'?1:-1);return}}if(npTyped(true))return;const {v}=parseScan($('#scan').value);const g=$('#sg');if(v.length<2||/^\d{8,}$/.test(v)){g.innerHTML='';return}const r=matches(v);g.innerHTML=r.map(p=>`<button onclick="pickSug(${p.id})"><span><b>${esc(p.name)}</b> <span class="muted mono">${p.barcode}</span></span><b>${tl(p.price)}</b></button>`+(p.pack>1?`<button onclick="addPack(${p.id})"><span><b>${esc(p.name)}</b> <span class="tag t-Kart">Koli ${p.pack}</span></span><b>${tl(p.packPrice||p.price*p.pack)}</b></button>`:'')).join('')}
+function sugg(){{const sc=$('#scan'),v=sc&&sc.value;if(v==='+'||v==='-'||v==='−'){sc.value='';try{sc.blur()}catch(x){}if(!(Date.now()-(window._pmT||0)<400))pmApply(v==='+'?1:-1);return}}if(npTyped(true))return;const {v}=parseScan($('#scan').value);const g=$('#sg');if(v.length<2||/^\d{8,}$/.test(v)){g.innerHTML='';return}const r=matches(v);g.innerHTML=r.map(p=>`<button onclick="pickSug(${p.id})"><span><b>${esc(p.name)}</b> <span class="muted mono">${p.barcode}</span></span><b>${tl(p.price)}</b></button>`+(p.pack>1?`<button onclick="addPack(${p.id})"><span><b>${esc(p.name)}</b> <span class="tag t-Kart">Koli ${p.pack}</span></span><b>${tl(p.packPrice||p.price*p.pack)}</b></button>`:'')).join('')}
 function pickSug(id){const {q}=parseScan($('#scan').value);addP(id,q??undefined)}
 function scanKey(e){
  if(e.key!=='Enter')return;e.preventDefault();S._sc=1;setTimeout(()=>{S._sc=0},0);setTimeout(()=>{const sc=$('#scan'),vk=$('#vkb');if(sc&&document.activeElement===sc&&touch()&&hwKb()&&!(vk&&vk.classList.contains('on')))sc.blur()},120);if(npTyped())return;const raw=$('#scan').value;const {q,v}=parseScan(raw);if(!v)return;
@@ -1431,7 +1431,7 @@ document.addEventListener('keydown',e=>{
   if(k==='del'&&inInput&&a.value)return;
   if(ACTHIDE[k]&&UI().hide[ACTHIDE[k]])return;
   e.preventDefault();ACT[k]();return}
- if(e.key.length===1&&!e.ctrlKey&&!e.metaKey&&!inInput){const s=$('#scan');if(s)s.focus()}
+ if(e.key.length===1&&!e.ctrlKey&&!e.metaKey&&!inInput&&!e.defaultPrevented&&!/^[+\-−]$/.test(e.key)){const s=$('#scan');if(s)s.focus()}
 });
 window.tl=tl;window.num=num;
 
@@ -2822,7 +2822,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.96';
+const APPV='3.97';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
