@@ -879,7 +879,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.88 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.89 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1268,20 +1268,20 @@ function npTyped(live){const e=$('#scan');if(!e)return false;{const r=e.value.ma
 function sugg(){{const sc=$('#scan'),v=sc&&sc.value;if(v==='+'||v==='-'||v==='−'){sc.value='';if(!(Date.now()-(window._pmT||0)<400))pmApply(v==='+'?1:-1);return}}if(npTyped(true))return;const {v}=parseScan($('#scan').value);const g=$('#sg');if(v.length<2||/^\d{8,}$/.test(v)){g.innerHTML='';return}const r=matches(v);g.innerHTML=r.map(p=>`<button onclick="pickSug(${p.id})"><span><b>${esc(p.name)}</b> <span class="muted mono">${p.barcode}</span></span><b>${tl(p.price)}</b></button>`+(p.pack>1?`<button onclick="addPack(${p.id})"><span><b>${esc(p.name)}</b> <span class="tag t-Kart">Koli ${p.pack}</span></span><b>${tl(p.packPrice||p.price*p.pack)}</b></button>`:'')).join('')}
 function pickSug(id){const {q}=parseScan($('#scan').value);addP(id,q??undefined)}
 function scanKey(e){
- if(e.key!=='Enter')return;e.preventDefault();if(npTyped())return;const raw=$('#scan').value;const {q,v}=parseScan(raw);if(!v)return;
+ if(e.key!=='Enter')return;e.preventDefault();setTimeout(()=>{const sc=$('#scan'),vk=$('#vkb');if(sc&&document.activeElement===sc&&touch()&&hwKb()&&!(vk&&vk.classList.contains('on')))sc.blur()},120);if(npTyped())return;const raw=$('#scan').value;const {q,v}=parseScan(raw);if(!v)return;
  {const fs=fisFind(v);if(fs){$('#scan').value='';$('#sg').innerHTML='';beep(true);if(typeof npClr==='function'&&S.npq)npClr();fisOpen(fs.id);return}}
  if(!findCode(v)){const w=scaleParse(v);if(w&&w.p){if(!(w.q>0)){toast('Tartı barkodunda miktar okunamadı');beep(false);return}return addP(w.p.id,w.q)}if(w&&w.miss){beep(false);toast('Terazi ürün kodu '+w.miss+' kayıtlı değil. Ürünün barkod alanına bu kodu yaz.');return}}
  {const pk=D.products.find(x=>x.packBc&&x.packBc===v);if(pk)return addPack(pk.id,q??undefined)}
  let p=findCode(v);if(!p){const r=matches(v);if(r.length)p=r[0]}
  if(p)return addP(p.id,q??undefined);
  if(isQR(v)){const sc=$('#scan');if(sc)sc.value='';$('#sg').innerHTML='';qrNo();return}
- beep(false);$('#sg').innerHTML='';{const sc=$('#scan');if(sc&&/^\d{6,14}$/.test(v))sc.value=''}
+ beep(false);$('#sg').innerHTML='';{const sc=$('#scan');if(sc&&!/\s/.test(v)&&v.length>=6)sc.value=''}
  let uq=q;if(uq==null&&S.npq>1){uq=S.npq;S.npq=0;setTimeout(npUp,0)}
  unregAsk(v,uq);
 }
 /* ---------- kamera: çizgi okuma (+ isteğe bağlı rakam) ---------- */
 /* v3.85 karekod / uzun metin barkod değildir: okuyucudan gelirse yok sayılır */
-function isQR(v){v=String(v||'').trim();if(!v||/^\d+$/.test(v))return false;return /^(https?:|www\.|wifi:|begin:|mailto:|tel:|smsto:|upi:)/i.test(v)||/[:?=&{}<>@|;]/.test(v)||(/\//.test(v)&&!/\s/.test(v))||(!/\s/.test(v)&&v.length>=22)||v.length>=40}
+function isQR(v){v=String(v||'').trim();if(!v)return false;if(/^\d+$/.test(v))return v.length>=15;return /^(https?:|www\.|wifi:|begin:|mailto:|tel:|smsto:|upi:)/i.test(v)||/[:?=&{}<>@|;]/.test(v)||(/\//.test(v)&&!/\s/.test(v))||(!/\s/.test(v)&&v.length>=16)||v.length>=40}
 function qrAlarm(){try{const a=new (window.AudioContext||window.webkitAudioContext)();const g=a.createGain();g.gain.value=.25;g.connect(a.destination);[0,.45,.9].forEach((t,i)=>{const o=a.createOscillator();o.type='square';o.frequency.value=i===1?260:420;o.connect(g);o.start(a.currentTime+t);o.stop(a.currentTime+t+.38)})}catch(e){}try{navigator.vibrate&&navigator.vibrate([300,100,300,100,300])}catch(e){}}
 function qrNo(){qrAlarm();if($('#qrw'))return;window._qrPrev=document.activeElement;const d=document.createElement('div');d.id='qrw';d.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(120,0,0,.72);display:flex;align-items:center;justify-content:center;padding:16px';d.innerHTML='<div role="alertdialog" aria-modal="true" style="background:#fff;border:6px solid #C92A2A;border-radius:18px;max-width:520px;width:100%;padding:26px 22px;text-align:center"><div style="font-size:3.2rem;line-height:1">⚠</div><div style="font-size:1.7rem;font-weight:900;color:#A61E1E;margin:8px 0">KAREKOD OKUNDU</div><div style="font-size:1.3rem;font-weight:800;margin-bottom:6px">ÜRÜN EKLENMEDİ</div><div style="color:#3A4556;margin-bottom:18px">Karekod barkod değildir. Ürünün barkodunu tekrar okut.</div><button type="button" id="qrwB" style="min-height:56px;width:100%;border:0;border-radius:12px;background:#C92A2A;color:#fff;font-size:1.2rem;font-weight:800">TAMAM</button></div>';document.body.appendChild(d);const b=$('#qrwB');b.onclick=qrClose;b.focus()}
 function qrClose(){const d=$('#qrw');if(d)d.remove();const p=window._qrPrev;window._qrPrev=null;if(p&&p.isConnected&&p!==document.body&&p.focus)p.focus();else focusScan()}
@@ -2817,7 +2817,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.88';
+const APPV='3.89';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
