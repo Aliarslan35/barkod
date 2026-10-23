@@ -880,7 +880,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.97 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.98 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -952,7 +952,7 @@ function flush(){clearTimeout(saveT);dirty=false;if(!MID||!window.FB||!D)return;
 window.addEventListener('pagehide',()=>{if(dirty)flush()});
 window.cloudIn=u=>{MID=u.uid;S.email=u.email;READY=false;GOT=new Set();META=undefined;CACHE={};COLS.forEach(c=>CACHE[c]={});metaJ='';
  D={cats:[],brands:[],tags:[],set:defSet(),products:[],customers:[],users:[],sales:[],expenses:[],purchases:[],orders:[],remote:[]};showLoading()};
-window.cloudOut=()=>{MID=null;READY=false;D=null;S.user=null;S.carts=[];renderAcct()};
+window.cloudOut=()=>{try{localStorage.removeItem('bs_carts')}catch(e){}MID=null;READY=false;D=null;S.user=null;S.carts=[];renderAcct()};
 window.onCol=(c,arr,pend)=>{if(!MID)return;if(dirty&&READY){flush();return}
  if(c==='sales')arr.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
  const oldNew=c==='orders'?D.orders.filter(o=>o.st==='Yeni').length:0;
@@ -967,7 +967,7 @@ window.onMeta=(data,pend,fromCache)=>{if(!MID)return;
  if(!READY)return tryReady();if(!pend){applySet();remoteRender('meta')}};
 function tryReady(){if(META===undefined||!COLS.every(c=>GOT.has(c)))return;READY=true;try{if(upFix())setTimeout(save,500)}catch(e){}
  if(META===null){Object.assign(D,seedCloud());if(S.newMk){if(S.newMk.market)D.set.market=S.newMk.market;const y=D.users.find(u=>u.role==='yonetici');if(y&&S.newMk.name)y.name=S.newMk.name;S.newMk=null}flush()}
- S.user=null;S.page='login';if(!S.carts.length)newCart();render();processRemote();if(window._wpend){const l=window._wpend;window._wpend=null;setTimeout(()=>window.onWebOrders(l),800)}try{localStorage.setItem('bs_mid',MID)}catch(e){}setTimeout(()=>webPub(),3000)}
+ S.user=null;S.page='login';if(!S.carts.length&&cartsLoad())S._restored=1;if(!S.carts.length)newCart();render();processRemote();if(window._wpend){const l=window._wpend;window._wpend=null;setTimeout(()=>window.onWebOrders(l),800)}try{localStorage.setItem('bs_mid',MID)}catch(e){}setTimeout(()=>webPub(),3000)}
 function remoteRender(c){if(!S.user){if(S.page==='login')renderLogin();return}if($('#modal').innerHTML)return;
  const a=document.activeElement;
  if(S.page==='satis'){const sc=$('#scan');if(sc&&sc.value)return;if(a&&a.id==='rec')return;renderSatis();return}
@@ -1114,7 +1114,10 @@ function pinK(k){const u=D.users.find(x=>x.id===S.uSel);if(!u)return;
  if(k==='Sil')S.pin='';else if(k==='⌫')S.pin=S.pin.slice(0,-1);else S.pin+=k;
  const d=$('#dots');if(!d)return;[...d.children].forEach((x,i)=>x.classList.toggle('on',i<S.pin.length));
  if(S.pin.length>=String(u.pw||'').length){if(S.pin===String(u.pw)){loginOK(u)}else{d.classList.add('err');beep(false);const e=$('#lerr');if(e)e.textContent='Şifre yanlış. Tekrar dene.';setTimeout(()=>{S.pin='';d.classList.remove('err');[...d.children].forEach(x=>x.classList.remove('on'))},450)}}}
-function loginOK(u){S.user=u;S.lsw=false;S.pin='';lsSet('lastUid',u.id);if(S.fpReg){S.fpReg=false;fpRegister(u)}if(!S.carts.length)newCart();nav(u.role==='yonetici'?'ana':'satis')}
+function cartsLoad(){try{const o=JSON.parse(localStorage.getItem('bs_carts')||'null');if(!o||!o.t||Date.now()-o.t>864e5||o.mid!==MID||!Array.isArray(o.c))return false;const cs=o.c.filter(x=>x&&Array.isArray(x.items));if(!cs.some(x=>x.items.length))return false;S.carts=cs;S.ci=Math.max(0,Math.min(o.ci||0,cs.length-1));S.sel=-1;return true}catch(e){return false}}
+function cartsSave(){try{if(window.DEMO||!S.user)return;if(!S.carts.some(x=>x.items.length)){localStorage.removeItem('bs_carts');return}localStorage.setItem('bs_carts',JSON.stringify({t:Date.now(),mid:MID,ci:S.ci,c:S.carts}))}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')cartsSave()});addEventListener('pagehide',cartsSave);
+function loginOK(u){S.user=u;S.lsw=false;S.pin='';lsSet('lastUid',u.id);if(S.fpReg){S.fpReg=false;fpRegister(u)}if(!S.carts.length)newCart();nav(u.role==='yonetici'?'ana':'satis');if(S._restored){S._restored=0;setTimeout(()=>toast('Yarım kalan satış geri geldi'),600)}}
 /* parmak izi: bu cihaza bağlanır (WebAuthn) */
 const fpOk=()=>!!(window.PublicKeyCredential&&navigator.credentials&&window.isSecureContext);
 const b64=a=>btoa(String.fromCharCode(...new Uint8Array(a)));const ub64=t=>Uint8Array.from(atob(t),c=>c.charCodeAt(0));
@@ -1213,6 +1216,7 @@ function drawCart(){
  ${karRow(c,t)}`;
  {const nl=document.querySelector('#cartBox .lines');if(nl){nl.scrollTop=_st;const r=nl.querySelector('.ln.sel');if(r){const a=r.getBoundingClientRect(),b=nl.getBoundingClientRect();if(a.bottom>b.bottom)nl.scrollTop+=a.bottom-b.bottom;else if(a.top<b.top)nl.scrollTop-=b.top-a.top}}}
  {const ps=$('#pos');if(ps&&!S.lv){const on=D.set.qAuto!==false&&S._sc&&c.items.length>=1&&!S.qMan;if(on)S.qClosed=true;if(c.items.length===0){S.qMan=false;S.qClosed=false}ps.classList.toggle('qoff',(S.qClosed&&c.items.length>0&&D.set.qAuto!==false)||lsGet('qOff')==='1')}}
+ cartsSave();
  const ch=num(c.rec)-t.total;const [pbig,psm]=payBtns();
  const ls=D.sales.length?D.sales[D.sales.length-1]:null;const canUndo=ls&&S.undo&&S.undo.sid===ls.id;
  $('#payBox').innerHTML=`<div class="payhd"><button class="ib" aria-label="Sepete dön" onclick="payClose()">${ic('chl')}</button><h2>Ödeme</h2><span class="muted">${c.items.length} kalem</span></div>
@@ -2822,7 +2826,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.97';
+const APPV='3.98';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
