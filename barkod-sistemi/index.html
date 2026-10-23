@@ -881,7 +881,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.100 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.101 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1085,7 +1085,7 @@ function beep(ok){if(!D.set.sound)return;try{const a=new (window.AudioContext||w
 function mbSplit(){const m=document.querySelector('#modal .mb');if(!m)return;const k=[...m.children];if(k.length<3)return;let hd=null,ft=null;if(k[0].classList.contains('row')&&k[0].querySelector('h2'))hd=k[0];const l=k[k.length-1];if(l!==hd&&l.classList.contains('row')&&l.querySelector('.btn'))ft=l;if(!hd&&!ft)return;const mid=k.filter(x=>x!==hd&&x!==ft);if(!mid.length)return;const sc=document.createElement('div');sc.className='mbs';mid.forEach(x=>sc.appendChild(x));m.insertBefore(sc,ft||null);if(hd)hd.classList.add('mbh');if(ft)ft.classList.add('mbf');m.classList.add('mbsp')}
 function modal(h,wide){$('#modal').innerHTML=`<div class="ov" onclick="if(event.target===this)closeM()"><div class="mb ${wide?'wide':''}" role="dialog" aria-modal="true">${h}</div></div>`;try{mbSplit()}catch(e){}const f=$('#modal [autofocus]');if(f)setTimeout(()=>f.focus(),30)}
 function ask(msg,fn){window._af=fn;modal(mHead('Onay')+`<p style="margin:0;line-height:1.5">${esc(msg)}</p><div class="row"><button class="btn sp" onclick="closeM()">Vazgeç</button><button class="btn pri" autofocus onclick="const f=window._af;closeM();f()">Evet</button></div>`)}
-function closeM(){const _un=window._unOpen&&$('#modal').querySelector('#unp');window._unOpen=false;if(_un&&window._unStack&&window._unStack.length)setTimeout(unResume,0);window._rcOpen=false;clearInterval(window._rcTO);$('#modal').innerHTML='';if(S.page==='satis')focusScan();if(S.remQ&&S.remQ.length)setTimeout(remPump,60)}
+function closeM(){{const _w=document.getElementById('unwarn');if(_w)_w.remove()}const _un=window._unOpen&&$('#modal').querySelector('#unp');window._unOpen=false;if(_un&&window._unStack&&window._unStack.length)setTimeout(unResume,0);window._rcOpen=false;clearInterval(window._rcTO);$('#modal').innerHTML='';if(S.page==='satis')focusScan();if(S.remQ&&S.remQ.length)setTimeout(remPump,60)}
 const mHead=t=>`<div class="row"><h2 style="font-size:1.2rem">${t}</h2><button class="ib ghost sp" aria-label="Kapat" onclick="closeM()">${ic('x')}</button></div>`;
 const touch=()=>window.matchMedia('(pointer:coarse)').matches;
 function focusScan(){const s=$('#scan');if(s&&!touch())s.focus()}
@@ -1284,7 +1284,7 @@ function npTyped(live){const e=$('#scan');if(!e)return false;{const r=e.value.ma
 function sugg(){{const sc=$('#scan'),v=sc&&sc.value;if(v==='+'||v==='-'||v==='−'){sc.value='';try{sc.blur()}catch(x){}if(!(Date.now()-(window._pmT||0)<400))pmApply(v==='+'?1:-1);return}}if(npTyped(true))return;const {v}=parseScan($('#scan').value);const g=$('#sg');if(v.length<2||/^\d{8,}$/.test(v)){g.innerHTML='';return}const r=matches(v);g.innerHTML=r.map(p=>`<button onclick="pickSug(${p.id})"><span><b>${esc(p.name)}</b> <span class="muted mono">${p.barcode}</span></span><b>${tl(p.price)}</b></button>`+(p.pack>1?`<button onclick="addPack(${p.id})"><span><b>${esc(p.name)}</b> <span class="tag t-Kart">Koli ${p.pack}</span></span><b>${tl(p.packPrice||p.price*p.pack)}</b></button>`:'')).join('')}
 function pickSug(id){const {q}=parseScan($('#scan').value);addP(id,q??undefined)}
 function scanKey(e){
- if(e.key!=='Enter')return;e.preventDefault();S._sc=1;window._scT=Date.now();setTimeout(()=>{S._sc=0},0);setTimeout(()=>{const sc=$('#scan'),vk=$('#vkb');if(sc&&document.activeElement===sc&&touch()&&hwKb()&&!(vk&&vk.classList.contains('on')))sc.blur()},120);if(npTyped())return;const raw=$('#scan').value;const {q,v}=parseScan(raw);if(!v)return;
+ if(e.key!=='Enter')return;e.preventDefault();S._sc=1;window._scT=Date.now();setTimeout(()=>{S._sc=0},0);setTimeout(()=>{const sc=$('#scan'),vk=$('#vkb');if(sc&&document.activeElement===sc&&touch()&&hwKb()&&!(vk&&vk.classList.contains('on')))sc.blur()},120);if(window._unOpen&&$('#modal').querySelector('#unp')){const c=String($('#scan').value||'').trim();$('#scan').value='';$('#sg').innerHTML='';unBlock(c);const u=$('#unp');if(u)u.focus();return}if(npTyped())return;const raw=$('#scan').value;const {q,v}=parseScan(raw);if(!v)return;
  {const fs=fisFind(v);if(fs){$('#scan').value='';$('#sg').innerHTML='';beep(true);if(typeof npClr==='function'&&S.npq)npClr();fisOpen(fs.id);return}}
  if(!findCode(v)){const w=scaleParse(v);if(w&&w.p){if(!(w.q>0)){toast('Tartı barkodunda miktar okunamadı');beep(false);return}return addP(w.p.id,w.q)}if(w&&w.miss){beep(false);toast('Terazi ürün kodu '+w.miss+' kayıtlı değil. Ürünün barkod alanına bu kodu yaz.');return}}
  {const pk=D.products.find(x=>x.packBc&&x.packBc===v);if(pk)return addPack(pk.id,q??undefined)}
@@ -2513,8 +2513,8 @@ function setupCard(){if(D.set.setupHide)return '';const st=[
 /* ---------- kayıtsız ürün satışı: fiyatla sat, sonra kaydedince satışlar barkoddan bağlanır ---------- */
 function unregGroups(){const m={};D.sales.forEach(s=>s.items.forEach(l=>{if(!l.unreg||!l.bc)return;const g=m[l.bc]=m[l.bc]||{bc:l.bc,name:'',n:0,q:0,price:0,last:''};g.q+=(s.ret?-1:1)*l.qty;g.n++;if(s.date>=g.last){g.last=s.date;g.price=l.price;if(l.name&&l.name!=='Kayıtsız ürün')g.name=l.name}}));
  return Object.values(m).filter(g=>!D.products.some(p=>p.barcode===g.bc)).sort((a,b)=>a.last<b.last?1:-1)}
-function unregAsk(v,q){window._unv=v;window._unOpen=true;const bc=/^\d{6,14}$/.test(v)?v:'';const cl=bc&&(S.carts||[]).flatMap(c=>c.items).find(l=>l.unreg&&l.bc===bc);const last=cl?{price:cl.price,name:cl.name==='Kayıtsız ürün'?'':cl.name}:bc&&unregGroups().find(g=>g.bc===bc);window._unbc=bc;
- modal(mHead('Ürün kayıtlı değil')+`<p style="margin:0 0 8px">${bc?`<b class="mono">${esc(bc)}</b> barkodlu ürün sistemde yok.`:`"<b>${esc(v)}</b>" bulunamadı.`} Fiyatını yazıp satışa devam et, ürünü sonra kaydedersin${bc?'; kaydedince bu satışlar barkoddan ürüne bağlanır':''}.</p>
+function unregAsk(v,q){window._unv=v;window._unOpen=true;unSnd();const bc=/^\d{6,14}$/.test(v)?v:'';const cl=bc&&(S.carts||[]).flatMap(c=>c.items).find(l=>l.unreg&&l.bc===bc);const last=cl?{price:cl.price,name:cl.name==='Kayıtsız ürün'?'':cl.name}:bc&&unregGroups().find(g=>g.bc===bc);window._unbc=bc;
+ modal(mHead('Ürün kayıtlı değil')+`<p style="margin:0 0 8px">${bc?`<b class="mono">${esc(bc)}</b> barkodlu ürün sistemde yok.`:`"<b>${esc(v)}</b>" bulunamadı.`} <b style="color:#C92A2A">Bu pencere açıkken yeni ürün okutulmaz.</b> Fiyatını yazıp satışa devam et, ürünü sonra kaydedersin${bc?'; kaydedince bu satışlar barkoddan ürüne bağlanır':''}.</p>
  <div class="g2"><label class="f">Fiyat<input class="in" id="unp" oninput="unTrack(this)" inputmode="${kpIM()}" autofocus onfocus="kpSet(this)" value="${last?String(last.price).replace('.',','):''}" placeholder="0,00" onkeydown="if(event.key==='Enter'&&!unBc(this))unregOk()" style="font-size:1.4rem;font-weight:800"></label><label class="f">Adet<input class="in" id="unq" oninput="unTrack(this)" inputmode="${kpIM()}" onfocus="kpSet(this)" value="${q||1}" onkeydown="if(event.key==='Enter'&&!unBc(this))unregOk()"></label></div>
  ${kpHTML('unregOk()',true)}
  <label class="f">Ürün adı <span class="muted" style="font-weight:500">(isteğe bağlı)</span><input class="in" id="unn" oninput="unTrack(this)" value="${esc(last?last.name:(bc?'':v))}" placeholder="Kayıtsız ürün" onkeydown="if(event.key==='Enter'&&!unBc(this))unregOk()"></label>
@@ -2522,12 +2522,12 @@ function unregAsk(v,q){window._unv=v;window._unOpen=true;const bc=/^\d{6,14}$/.t
 function unTrack(el){const n=Date.now();const pv=el._pv===undefined?(el.defaultValue||''):el._pv;if(!el._t||n-el._t>250)el._b=pv;el._t=n;el._pv=el.value}
 function unBc(el){const v=String(el.value||'');const b=el._b||'';let p=0;while(p<b.length&&p<v.length&&b[p]===v[p])p++;let q=0;while(q<b.length-p&&q<v.length-p&&b[b.length-1-q]===v[v.length-1-q])q++;const code=v.slice(p,v.length-q).replace(/\s/g,'');if(!/^\d{8,14}$/.test(code))return false;
  el.value=b;el._pv=b;const A={v:window._unv||'',q:($('#unq')||{}).value,pr:($('#unp')||{}).value,nm:($('#unn')||{}).value};
- const sc=$('#scan'),go=()=>{if(sc){sc.value=code;scanKey({key:'Enter',preventDefault(){}})}};
  if(code===window._unbc){const u=$('#unq');if(u){u.value=String(Math.round(num2(u.value)||1)+1);toast('Adet '+u.value)}return true}
- if(fisFind(code)){window._unStack=[];window._unOpen=false;closeM();go();return true}
- const reg=findCode(code)||D.products.find(x=>x.packBc&&x.packBc===code)||(()=>{const w=scaleParse(code);return w&&w.p})();
- if(reg){go();toast(reg.name+' sepete eklendi');setTimeout(()=>{const u=$('#unp');if(u&&$('#modal').contains(u))u.focus()},60);return true}
- (window._unStack=window._unStack||[]).push(A);go();return true}
+ unBlock(code);return true}
+function unSnd(){try{const a=new (window.AudioContext||window.webkitAudioContext)();const g=a.createGain();g.gain.value=.22;g.connect(a.destination);[[0,880],[.16,660],[.32,880],[.48,660]].forEach(([t,f])=>{const o=a.createOscillator();o.type='sawtooth';o.frequency.value=f;o.connect(g);o.start(a.currentTime+t);o.stop(a.currentTime+t+.13)})}catch(e){}try{navigator.vibrate&&navigator.vibrate([200,80,200])}catch(e){}}
+function unBlock(code){const u=$('#unq');if(code&&code===window._unbc&&u){u.value=String(Math.round(num2(u.value)||1)+1);toast('Adet '+u.value);return}
+ qrAlarm();let w=$('#unwarn');if(!w){w=document.createElement('div');w.id='unwarn';w.style.cssText='position:fixed;left:0;right:0;top:0;z-index:10000;background:#C92A2A;color:#fff;text-align:center;padding:18px 14px;font-weight:900;font-size:1.5rem;line-height:1.25;box-shadow:0 6px 24px rgba(0,0,0,.5);pointer-events:none';document.body.appendChild(w)}
+ w.innerHTML='⚠ YENİ ÜRÜN OKUNMADI<div style="font-size:1.1rem;font-weight:700;margin-top:4px">Önce açık olan kayıtsız ürünün fiyatını yaz<br>Okutulan barkod: '+esc(code||'?')+'</div>';clearTimeout(w._t);w._t=setTimeout(()=>{w.remove()},6000)}
 function unResume(){const A=(window._unStack||[]).pop();if(!A)return;unregAsk(A.v,A.q);const pe=$('#unp'),ne=$('#unn');if(pe&&A.pr)pe.value=A.pr;if(ne&&A.nm)ne.value=A.nm;toast('Bekleyen kayıtsız ürün tekrar açıldı')}
 function unregOk(){const pr=num($('#unp').value),q=num2($('#unq').value)||1,nm=$('#unn').value.trim();if(!(pr>0)){toast('Fiyatı yaz');$('#unp').focus();return}if(pr>=100000){toast('Fiyat çok yüksek, barkod olabilir. Kontrol et');$('#unp').select();return}closeM();sellUnreg(window._unbc||'',r2(pr),nm,q)}
 function sellUnreg(bc,price,name,q){const c=C();const nm=name||'Kayıtsız ürün';let i=bc?c.items.findIndex(l=>l.unreg&&l.bc===bc&&l.price===price):-1;
@@ -2840,7 +2840,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.100';
+const APPV='3.101';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
