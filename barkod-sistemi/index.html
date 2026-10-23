@@ -870,6 +870,7 @@ html{touch-action:manipulation}
 .np.kp{margin:6px 0 4px}.np.kp button{height:50px;font-size:1.3rem}.np.kp .kpok{grid-row:span 2;height:auto;font-size:1rem}.np.kp .kp0{grid-column:span 2}
 .in.kpon{border-color:var(--acc);box-shadow:0 0 0 2px color-mix(in srgb,var(--acc) 25%,transparent)}
 .paysm button.npt{border-color:var(--acc);color:var(--acc)}.paysm button.npt.on{background:var(--acc);color:#fff}.paysm button.npt.on small{color:#DDE6FF}
+.pos:not(.lvon):not(.qoff) .quick{display:flex;flex-direction:row;gap:10px}.qside{display:flex;flex-direction:column;align-items:center;gap:10px;flex:none}.qside .qvt{writing-mode:vertical-rl;display:inline-flex;align-items:center;gap:8px;height:auto;min-height:0;padding:12px 7px;border:1px solid var(--line2);border-radius:10px;background:var(--surf2);color:var(--tx);font-weight:800;font-size:.9rem;cursor:pointer;margin:0;white-space:nowrap}.qside .qvt:hover{border-color:var(--acc)}.qside .qhc{display:inline-flex;color:var(--tx3)}.qside .qhc svg{transform:rotate(90deg)}.qside .qed{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line2);border-radius:10px;background:var(--surf);color:var(--acc);padding:0;cursor:pointer}.qside .qed:hover{border-color:var(--acc)}.qmain{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:8px}
 </style>
 </head>
 <body>
@@ -879,7 +880,7 @@ html{touch-action:manipulation}
 <div id="toast" aria-live="polite"></div>
 <script>
 'use strict';
-/* Barkod Sistemi · tek dosya PWA · v3.93 (Ekim 2026)
+/* Barkod Sistemi · tek dosya PWA · v3.94 (Ekim 2026)
    Bölümler: araçlar · veri · bulut · düzenleme modu · giriş · menü · satış · kamera · siparişler · raporlar
    · ürünler · stok · mal alışı · Excel · satış geçmişi · müşteriler · giderler/personel · tedarikçiler
    · stok sayımı · WhatsApp · ayarlar · başlangıç */
@@ -1176,8 +1177,9 @@ function renderSatis(){
  <div class="who">${esc(S.user.isim||S.user.name)}<br><small id="clk"></small></div></header>
  <div class="pos ${lsGet('npOn')==='1'?'npmode ':''}${S.lv?'lvon':(isHid('quick')?'noquick':'')} ${!S.lv&&qoff?'qoff':''}" id="pos">
  <section class="card quick"${HA('quick')}>${S.lv?lvHTML():`<button class="qopen" onclick="qTog(false)" aria-label="Hızlı ürünleri aç">${ic('grid',20)}<span>${esc(Tp('quick_title','Hızlı ürünler'))}</span></button>
- <div class="qrow"><button class="qh qhb" onclick="qTog(true)" title="Hızlı ürünleri kapat" aria-label="Hızlı ürünleri kapat">${T('quick_title','Hızlı ürünler')}<span class="qhc">${ic('chl',14)}</span></button>${isY()?`<span class="qact"><button class="qed" title="Hızlı ürünleri düzenle" aria-label="Hızlı ürünleri düzenle" onclick="nav('urun',{uTab:'urun',uf:'Hızlı'})">${ic('edit',16)}</button></span>`:''}${cats.map(c=>`<button class="chip ${S.qcat===c?'on':''}" onclick="S.qcat='${esc(c)}';renderSatis()">${esc(c)}</button>`).join('')}</div>
- <div class="qgrid">${D.products.filter(p=>p.quick&&(S.qcat==='Tümü'||p.cat===S.qcat)).sort(qSort).map(p=>`<button class="qp2 ${p.img?'im':''} ${p.stock<=0?'out':''}" style="--qc:${qcol(p.cat)}" onclick="addP(${p.id})" title="${esc(p.name)}">${p.img?`<img src="${esc(p.img)}" alt="" loading="lazy" onerror="this.parentNode.classList.remove('im');this.remove()">`:`<span class="qi">${esc((p.name.trim()[0]||'?').toLocaleUpperCase('tr'))}</span>`}<span class="qpr">${tl(p.price)}${p.unit==='kg'?'<small>/kg</small>':''}</span>${p.stock<=0?'<span class="qx">Stok yok</span>':''}<b class="qn">${esc(p.name)}</b></button>`).join('')||'<div class="muted">Bu kategoride hızlı ürün yok.</div>'}</div>`}</section>
+ <div class="qside"><button class="qh qhb qvt" onclick="qTog(true)" title="Hızlı ürünleri kapat" aria-label="Hızlı ürünleri kapat"><span class="qhc">${ic('chl',14)}</span><span class="qvx">${T('quick_title','Hızlı ürünler')}</span></button>${isY()?`<button class="qed" title="Hızlı ürünleri düzenle" aria-label="Hızlı ürünleri düzenle" onclick="nav('urun',{uTab:'urun',uf:'Hızlı'})">${ic('edit',16)}</button>`:''}</div>
+ <div class="qmain"><div class="qrow">${cats.map(c=>`<button class="chip ${S.qcat===c?'on':''}" onclick="S.qcat='${esc(c)}';renderSatis()">${esc(c)}</button>`).join('')}</div>
+ <div class="qgrid">${D.products.filter(p=>p.quick&&(S.qcat==='Tümü'||p.cat===S.qcat)).sort(qSort).map(p=>`<button class="qp2 ${p.img?'im':''} ${p.stock<=0?'out':''}" style="--qc:${qcol(p.cat)}" onclick="addP(${p.id})" title="${esc(p.name)}">${p.img?`<img src="${esc(p.img)}" alt="" loading="lazy" onerror="this.parentNode.classList.remove('im');this.remove()">`:`<span class="qi">${esc((p.name.trim()[0]||'?').toLocaleUpperCase('tr'))}</span>`}<span class="qpr">${tl(p.price)}${p.unit==='kg'?'<small>/kg</small>':''}</span>${p.stock<=0?'<span class="qx">Stok yok</span>':''}<b class="qn">${esc(p.name)}</b></button>`).join('')||'<div class="muted">Bu kategoride hızlı ürün yok.</div>'}</div></div>`}</section>
  <section class="card cart" id="cartBox"></section>
  <section class="pay" id="payBox"></section></div>
  <footer class="keys"${HA('keys')}>${keysBar()}</footer>
@@ -2820,7 +2822,7 @@ function clrDemo(){ask('Başlangıçta eklenen örnek ürünler silinsin mi?',cl
 function resetAll(){ask('Tüm veriler silinip test verileriyle baştan başlansın mı?',resetAll2)}function resetAll2(){Object.assign(D,seedCloud());save();S.carts=[];newCart();logout()}
 
 /* ===================== v3.7 eklemeleri ===================== */
-const APPV='3.93';
+const APPV='3.94';
 /* ---------- kampanyalar ---------- */
 function KAMP(){if(!Array.isArray(D.set.kamp))D.set.kamp=[];return D.set.kamp}
 const KTYP=[['xy','X al Y öde'],['pct','% indirim'],['fix','Özel fiyat']];
